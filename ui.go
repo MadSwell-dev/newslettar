@@ -993,15 +993,17 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             }
         }
 
-        async function checkUpdates() {
-            const button = event.target;
-            button.classList.add('loading');
-            button.disabled = true;
+        async function checkUpdates(event) {
+            const button = event ? event.target : null;
+            if (button) {
+                button.classList.add('loading');
+                button.disabled = true;
+            }
 
             try {
                 const resp = await fetch('/api/version');
                 const data = await resp.json();
-                
+
                 let html = '<div style="background: #252f3f; padding: 20px; border-radius: 10px; margin-bottom: 20px;">';
                 html += '<p><strong>Current Version:</strong> ' + data.current_version + '</p>';
                 html += '<p><strong>Latest Version:</strong> ' + data.latest_version + '</p>';
@@ -1027,8 +1029,10 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             } catch (error) {
                 showNotification('Failed to check updates: ' + error.message, 'error');
             } finally {
-                button.classList.remove('loading');
-                button.disabled = false;
+                if (button) {
+                    button.classList.remove('loading');
+                    button.disabled = false;
+                }
             }
         }
 
