@@ -484,6 +484,24 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
                 <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
 
+                <h3 style="margin-bottom: 15px; color: #667eea;">Trakt Settings (Optional)</h3>
+                <div class="info-banner" style="margin-bottom: 20px;">
+                    <p style="font-size: 0.9em;">
+                        ℹ️ Trakt integration enables trending content sections in your newsletter. Get your API credentials from
+                        <a href="https://trakt.tv/oauth/applications" target="_blank" style="color: #667eea; text-decoration: underline;">https://trakt.tv/oauth/applications</a>
+                    </p>
+                </div>
+                <div class="form-group">
+                    <label for="trakt_client_id">Trakt Client ID</label>
+                    <input type="text" name="trakt_client_id" id="trakt_client_id" placeholder="Your Trakt Client ID" aria-label="Trakt Client ID">
+                </div>
+                <div class="form-group">
+                    <label for="trakt_api_key">Trakt API Key</label>
+                    <input type="text" name="trakt_api_key" id="trakt_api_key" placeholder="Your Trakt API Key" aria-label="Trakt API Key">
+                </div>
+
+                <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
+
                 <h3 style="margin-bottom: 15px; color: #667eea;">Email Settings</h3>
                 <div class="form-group">
                     <label for="smtp_host">SMTP Server</label>
@@ -591,6 +609,80 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 </div>
                 <label class="toggle-switch">
                     <input type="checkbox" id="show-unmonitored" onchange="saveTemplateSettings()" aria-label="Toggle unmonitored items">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="template-option">
+                <div>
+                    <strong>Dark Mode</strong>
+                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                        Use dark theme for email newsletters (recommended). When disabled, uses traditional light theme with white background.
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="dark-mode" onchange="saveTemplateSettings()" aria-label="Toggle dark mode">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
+
+            <h3 style="margin-bottom: 15px;">Trakt Trending Sections</h3>
+            <div class="info-banner" style="margin-bottom: 20px;">
+                <p style="font-size: 0.9em;">
+                    ℹ️ Requires Trakt API credentials in Configuration tab. Toggles are inactive without credentials.
+                </p>
+            </div>
+
+            <div class="template-option">
+                <div>
+                    <strong>Show Most Anticipated Series</strong>
+                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                        Display trending series people are most excited about
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="show-trakt-anticipated-series" onchange="saveTemplateSettings()" aria-label="Toggle Trakt anticipated series">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="template-option">
+                <div>
+                    <strong>Show Most Watched Series</strong>
+                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                        Display most watched series from the last week
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="show-trakt-watched-series" onchange="saveTemplateSettings()" aria-label="Toggle Trakt watched series">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="template-option">
+                <div>
+                    <strong>Show Most Anticipated Movies</strong>
+                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                        Display upcoming movies generating the most buzz
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="show-trakt-anticipated-movies" onchange="saveTemplateSettings()" aria-label="Toggle Trakt anticipated movies">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="template-option">
+                <div>
+                    <strong>Show Most Watched Movies</strong>
+                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                        Display most watched movies from the last week
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="show-trakt-watched-movies" onchange="saveTemplateSettings()" aria-label="Toggle Trakt watched movies">
                     <span class="toggle-slider"></span>
                 </label>
             </div>
@@ -798,6 +890,8 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 document.querySelector('[name="sonarr_api_key"]').value = data.sonarr_api_key || '';
                 document.querySelector('[name="radarr_url"]').value = data.radarr_url || '';
                 document.querySelector('[name="radarr_api_key"]').value = data.radarr_api_key || '';
+                document.querySelector('[name="trakt_client_id"]').value = data.trakt_client_id || '';
+                document.querySelector('[name="trakt_api_key"]').value = data.trakt_api_key || '';
                 document.querySelector('[name="smtp_host"]').value = data.smtp_host || 'smtp.mailgun.org';
                 document.querySelector('[name="smtp_port"]').value = data.smtp_port || '587';
                 document.querySelector('[name="smtp_user"]').value = data.smtp_user || '';
@@ -814,6 +908,11 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 document.getElementById('show-series-overview').checked = data.show_series_overview !== 'false';
                 document.getElementById('show-episode-overview').checked = data.show_episode_overview !== 'false';
                 document.getElementById('show-unmonitored').checked = data.show_unmonitored !== 'false';
+                document.getElementById('dark-mode').checked = data.dark_mode !== 'false';
+                document.getElementById('show-trakt-anticipated-series').checked = data.show_trakt_anticipated_series !== 'false';
+                document.getElementById('show-trakt-watched-series').checked = data.show_trakt_watched_series !== 'false';
+                document.getElementById('show-trakt-anticipated-movies').checked = data.show_trakt_anticipated_movies !== 'false';
+                document.getElementById('show-trakt-watched-movies').checked = data.show_trakt_watched_movies !== 'false';
 
                 document.getElementById('current-timezone').textContent = data.timezone || 'UTC';
                 
@@ -974,6 +1073,11 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             const showSeriesOverview = document.getElementById('show-series-overview').checked;
             const showEpisodeOverview = document.getElementById('show-episode-overview').checked;
             const showUnmonitored = document.getElementById('show-unmonitored').checked;
+            const darkMode = document.getElementById('dark-mode').checked;
+            const showTraktAnticipatedSeries = document.getElementById('show-trakt-anticipated-series').checked;
+            const showTraktWatchedSeries = document.getElementById('show-trakt-watched-series').checked;
+            const showTraktAnticipatedMovies = document.getElementById('show-trakt-anticipated-movies').checked;
+            const showTraktWatchedMovies = document.getElementById('show-trakt-watched-movies').checked;
 
             try {
                 await fetch('/api/config', {
@@ -984,7 +1088,12 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                         show_downloaded: showDownloaded ? 'true' : 'false',
                         show_series_overview: showSeriesOverview ? 'true' : 'false',
                         show_episode_overview: showEpisodeOverview ? 'true' : 'false',
-                        show_unmonitored: showUnmonitored ? 'true' : 'false'
+                        show_unmonitored: showUnmonitored ? 'true' : 'false',
+                        dark_mode: darkMode ? 'true' : 'false',
+                        show_trakt_anticipated_series: showTraktAnticipatedSeries ? 'true' : 'false',
+                        show_trakt_watched_series: showTraktWatchedSeries ? 'true' : 'false',
+                        show_trakt_anticipated_movies: showTraktAnticipatedMovies ? 'true' : 'false',
+                        show_trakt_watched_movies: showTraktWatchedMovies ? 'true' : 'false'
                     })
                 });
 
