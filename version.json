@@ -1,11 +1,12 @@
 {
-  "version": "1.4.16",
+  "version": "1.4.17",
   "released": "2025-11-16",
   "changelog": [
     "Fix: Episode ratings no longer incorrectly show series rating (Sonarr doesn't provide episode-level ratings)",
     "Fix: Series ratings now correctly display only in series headers, not on individual episodes",
     "Feature: Configurable result limits (1-20) for each Trakt section - anticipated/watched series/movies",
-    "Enhancement: Limit input fields appear dynamically when Trakt toggles are enabled",
+    "Enhancement: Redesigned Trakt limit input fields with better styling and visual hierarchy",
+    "Enhancement: Removed episode ratings toggle (Sonarr API doesn't provide per-episode ratings)",
     "Enhancement: Default Trakt limit remains 5 if not specified"
   ]
 }

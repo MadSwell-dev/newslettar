@@ -375,9 +375,6 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.ShowSeriesRatings != "" {
 			envMap["SHOW_SERIES_RATINGS"] = webCfg.ShowSeriesRatings
 		}
-		if webCfg.ShowEpisodeRatings != "" {
-			envMap["SHOW_EPISODE_RATINGS"] = webCfg.ShowEpisodeRatings
-		}
 		if webCfg.DarkMode != "" {
 			envMap["DARK_MODE"] = webCfg.DarkMode
 		}
@@ -452,7 +449,6 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		"show_episode_overview":         getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", DefaultShowEpisodeOverview),
 		"show_unmonitored":              getEnvFromFile(envMap, "SHOW_UNMONITORED", DefaultShowUnmonitored),
 		"show_series_ratings":           getEnvFromFile(envMap, "SHOW_SERIES_RATINGS", DefaultShowSeriesRatings),
-		"show_episode_ratings":          getEnvFromFile(envMap, "SHOW_EPISODE_RATINGS", DefaultShowEpisodeRatings),
 		"dark_mode":                     getEnvFromFile(envMap, "DARK_MODE", DefaultDarkMode),
 		"show_trakt_anticipated_series":      getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_SERIES", DefaultShowTraktAnticipatedSeries),
 		"show_trakt_watched_series":          getEnvFromFile(envMap, "SHOW_TRAKT_WATCHED_SERIES", DefaultShowTraktWatchedSeries),
