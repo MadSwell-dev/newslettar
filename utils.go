@@ -10,11 +10,11 @@ import (
 	"time"
 )
 
-// Ring buffer for logs (no disk writes, 500 lines in memory)
+// Ring buffer for logs (no disk writes, configurable lines in memory)
 var (
 	logBuffer   []string
 	logBufferMu sync.Mutex
-	maxLogLines = 500
+	maxLogLines = DefaultMaxLogLines
 )
 
 // Custom log writer that maintains ring buffer
@@ -39,11 +39,11 @@ func (w *logWriter) Write(p []byte) (n int, err error) {
 // Get timezone location
 func getTimezone(tz string) *time.Location {
 	if tz == "" {
-		tz = "UTC"
+		tz = DefaultTimezone
 	}
 	loc, err := time.LoadLocation(tz)
 	if err != nil {
-		log.Printf("⚠️  Invalid timezone '%s', using UTC", tz)
+		log.Printf("⚠️  Invalid timezone '%s', using %s", tz, DefaultTimezone)
 		return time.UTC
 	}
 	return loc
@@ -57,6 +57,14 @@ func groupEpisodesBySeries(episodes []Episode) []SeriesGroup {
 	sort.Slice(episodes, func(i, j int) bool {
 		return episodes[i].AirDate < episodes[j].AirDate
 	})
+
+	// Track seen episodes per series using map for O(1) lookups instead of O(N)
+	type episodeKey struct {
+		seriesTitle string
+		seasonNum   int
+		episodeNum  int
+	}
+	seenEpisodes := make(map[episodeKey]bool)
 
 	for _, ep := range episodes {
 		group, exists := seriesMap[ep.SeriesTitle]
@@ -72,17 +80,15 @@ func groupEpisodesBySeries(episodes []Episode) []SeriesGroup {
 			seriesMap[ep.SeriesTitle] = group
 		}
 
-		// Check for duplicate episodes (same season and episode number)
-		isDuplicate := false
-		for _, existingEp := range group.Episodes {
-			if existingEp.SeasonNum == ep.SeasonNum && existingEp.EpisodeNum == ep.EpisodeNum {
-				isDuplicate = true
-				break
-			}
+		// Check for duplicate episodes using O(1) map lookup instead of O(N) loop
+		key := episodeKey{
+			seriesTitle: ep.SeriesTitle,
+			seasonNum:   ep.SeasonNum,
+			episodeNum:  ep.EpisodeNum,
 		}
 
-		// Only add if not a duplicate
-		if !isDuplicate {
+		if !seenEpisodes[key] {
+			seenEpisodes[key] = true
 			group.Episodes = append(group.Episodes, ep)
 		}
 	}

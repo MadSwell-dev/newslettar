@@ -42,6 +42,15 @@ func main() {
 	// Load config once at startup
 	cachedConfig = loadConfig()
 
+	// Validate configuration and display warnings
+	warnings := validateConfig(cachedConfig)
+	if len(warnings) > 0 {
+		log.Println("⚠️  Configuration warnings:")
+		for _, warning := range warnings {
+			log.Printf("   - %s", warning)
+		}
+	}
+
 	// Precompile email template with custom functions
 	var err error
 	emailTemplate, err = initEmailTemplate()

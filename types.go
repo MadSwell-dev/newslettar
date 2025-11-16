@@ -21,6 +21,12 @@ type Config struct {
 	ShowSeriesOverview  bool
 	ShowEpisodeOverview bool
 	ShowUnmonitored     bool
+	// Performance tuning
+	APIPageSize      int
+	MaxRetries       int
+	PreviewRetries   int
+	APITimeout       int // in seconds
+	WebUIPort        string
 }
 
 // Minimal structs - only fields we actually need (reduces memory & JSON parsing time)

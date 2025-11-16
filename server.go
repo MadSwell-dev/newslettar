@@ -54,21 +54,16 @@ func startWebServer() {
 	// Setup internal scheduler
 	setupScheduler(cfg)
 
-	port := os.Getenv("WEBUI_PORT")
-	if port == "" {
-		port = "8080"
-	}
-
 	// Register HTTP handlers
 	registerHandlers()
 
 	// Graceful shutdown
 	server := &http.Server{
-		Addr: ":" + port,
+		Addr: ":" + cfg.WebUIPort,
 	}
 
 	go func() {
-		log.Printf("🌐 Web UI started on port %s", port)
+		log.Printf("🌐 Web UI started on port %s", cfg.WebUIPort)
 		log.Printf("📅 Scheduler: %s at %s (%s)", cfg.ScheduleDay, cfg.ScheduleTime, cfg.Timezone)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("❌ Server error: %v", err)
