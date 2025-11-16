@@ -258,79 +258,67 @@
         </div>
         {{end}}
 
-        {{if or .ShowTraktAnticipatedSeries .ShowTraktWatchedSeries .ShowTraktAnticipatedMovies .ShowTraktWatchedMovies}}
+        {{if or .TraktAnticipatedSeries .TraktWatchedSeries .TraktAnticipatedMovies .TraktWatchedMovies}}
         <div class="section trakt-section">
             <h2>🔥 Trending on Trakt</h2>
 
-            {{if .ShowTraktAnticipatedSeries}}
             {{if .TraktAnticipatedSeries}}
             <h3>Most Anticipated Series (Next Week) <span class="count-badge">{{len .TraktAnticipatedSeries}}</span></h3>
             {{range .TraktAnticipatedSeries}}
-            <div class="trakt-item">
-                <div class="movie-poster-placeholder">📺</div>
-                <div class="movie-content">
-                    <div class="movie-title">{{.Title}}{{if .IMDBID}} <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: #f5c518; text-decoration: none; font-size: 0.9em;">⭐</a>{{end}}</div>
-                    <div class="movie-year">({{.Year}}){{if .Network}} • {{.Network}}{{end}}{{if .ReleaseDate}} • Premieres {{formatDateWithDay .ReleaseDate}}{{end}}</div>
-                    {{if .Overview}}
-                        <div class="series-overview">{{.Overview}}</div>
-                    {{end}}
+            <div class="trakt-item" style="margin-bottom: 15px;">
+                <div class="movie-title">
+                    {{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}
                 </div>
+                <div class="movie-year">({{.Year}}){{if .Network}} • {{.Network}}{{end}}{{if .ReleaseDate}} • Premieres {{formatDateWithDay .ReleaseDate}}{{end}}</div>
+                {{if .Overview}}
+                    <div class="series-overview">{{.Overview}}</div>
+                {{end}}
             </div>
             {{end}}
             {{end}}
-            {{end}}
 
-            {{if .ShowTraktWatchedSeries}}
             {{if .TraktWatchedSeries}}
             <h3>Most Watched Series (Last Week) <span class="count-badge">{{len .TraktWatchedSeries}}</span></h3>
             {{range .TraktWatchedSeries}}
-            <div class="trakt-item">
-                <div class="movie-poster-placeholder">📺</div>
-                <div class="movie-content">
-                    <div class="movie-title">{{.Title}}{{if .IMDBID}} <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: #f5c518; text-decoration: none; font-size: 0.9em;">⭐</a>{{end}}</div>
-                    <div class="movie-year">({{.Year}}){{if .Network}} • {{.Network}}{{end}}</div>
-                    {{if .Overview}}
-                        <div class="series-overview">{{.Overview}}</div>
-                    {{end}}
+            <div class="trakt-item" style="margin-bottom: 15px;">
+                <div class="movie-title">
+                    {{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}
                 </div>
+                <div class="movie-year">({{.Year}}){{if .Network}} • {{.Network}}{{end}}</div>
+                {{if .Overview}}
+                    <div class="series-overview">{{.Overview}}</div>
+                {{end}}
             </div>
             {{end}}
             {{end}}
-            {{end}}
 
-            {{if .ShowTraktAnticipatedMovies}}
             {{if .TraktAnticipatedMovies}}
             <h3>Most Anticipated Movies (Next Week) <span class="count-badge">{{len .TraktAnticipatedMovies}}</span></h3>
             {{range .TraktAnticipatedMovies}}
-            <div class="trakt-item">
-                <div class="movie-poster-placeholder">🎬</div>
-                <div class="movie-content">
-                    <div class="movie-title">{{.Title}}{{if .IMDBID}} <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: #f5c518; text-decoration: none; font-size: 0.9em;">⭐</a>{{end}}</div>
-                    <div class="movie-year">({{.Year}}){{if .ReleaseDate}} • Releases {{formatDateWithDay .ReleaseDate}}{{end}}</div>
-                    {{if .Overview}}
-                        <div class="series-overview">{{.Overview}}</div>
-                    {{end}}
+            <div class="trakt-item" style="margin-bottom: 15px;">
+                <div class="movie-title">
+                    {{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}
                 </div>
+                <div class="movie-year">({{.Year}}){{if .ReleaseDate}} • Releases {{formatDateWithDay .ReleaseDate}}{{end}}</div>
+                {{if .Overview}}
+                    <div class="series-overview">{{.Overview}}</div>
+                {{end}}
             </div>
-            {{end}}
             {{end}}
             {{end}}
 
-            {{if .ShowTraktWatchedMovies}}
             {{if .TraktWatchedMovies}}
             <h3>Most Watched Movies (Last Week) <span class="count-badge">{{len .TraktWatchedMovies}}</span></h3>
             {{range .TraktWatchedMovies}}
-            <div class="trakt-item">
-                <div class="movie-poster-placeholder">🎬</div>
-                <div class="movie-content">
-                    <div class="movie-title">{{.Title}}{{if .IMDBID}} <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: #f5c518; text-decoration: none; font-size: 0.9em;">⭐</a>{{end}}</div>
-                    <div class="movie-year">({{.Year}})</div>
-                    {{if .Overview}}
-                        <div class="series-overview">{{.Overview}}</div>
-                    {{end}}
+            <div class="trakt-item" style="margin-bottom: 15px;">
+                <div class="movie-title">
+                    {{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}
                 </div>
+                <div class="movie-year">({{.Year}})</div>
+                {{if .Overview}}
+                    <div class="series-overview">{{.Overview}}</div>
+                {{end}}
             </div>
-            {{end}}
             {{end}}
             {{end}}
         </div>

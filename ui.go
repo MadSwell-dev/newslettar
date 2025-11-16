@@ -496,6 +496,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                     <label for="trakt_client_id">Trakt Client ID</label>
                     <input type="text" name="trakt_client_id" id="trakt_client_id" placeholder="Your Trakt Client ID" aria-label="Trakt Client ID">
                 </div>
+                <button type="button" class="btn btn-secondary" onclick="testConnection('trakt')" aria-label="Test Trakt connection">
+                    <span>Test Trakt</span>
+                </button>
 
                 <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
 
@@ -861,6 +864,29 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
             // Update timezone info on change
             document.getElementById('timezone').addEventListener('change', updateTimezoneInfo);
+
+            // Enable/disable Trakt toggles based on Client ID
+            const traktClientId = document.getElementById('trakt_client_id');
+            const traktToggles = [
+                document.getElementById('show-trakt-anticipated-series'),
+                document.getElementById('show-trakt-watched-series'),
+                document.getElementById('show-trakt-anticipated-movies'),
+                document.getElementById('show-trakt-watched-movies')
+            ];
+
+            function updateTraktToggles() {
+                const hasClientId = traktClientId.value.trim() !== '';
+                traktToggles.forEach(toggle => {
+                    toggle.disabled = !hasClientId;
+                    toggle.closest('.template-option').style.opacity = hasClientId ? '1' : '0.5';
+                    toggle.closest('.template-option').style.pointerEvents = hasClientId ? 'auto' : 'none';
+                });
+            }
+
+            // Check on page load and on input change
+            traktClientId.addEventListener('input', updateTraktToggles);
+            // Call once after config is loaded
+            setTimeout(updateTraktToggles, 100);
         });
 
         async function updateTimezoneInfo() {
@@ -968,6 +994,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             } else if (type === 'radarr') {
                 endpoint = '/api/test-radarr';
                 payload = { url: data.radarr_url, api_key: data.radarr_api_key };
+            } else if (type === 'trakt') {
+                endpoint = '/api/test-trakt';
+                payload = { client_id: data.trakt_client_id };
             } else {
                 endpoint = '/api/test-email';
                 payload = {

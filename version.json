@@ -1,11 +1,12 @@
 {
-  "version": "1.4.4",
+  "version": "1.4.5",
   "released": "2025-11-16",
   "changelog": [
-    "Fix: Date format now shows only date without time component",
-    "Enhancement: Added IMDB links to all Trakt items (clickable star icon)",
-    "Enhancement: Added network/streaming service information for TV series (e.g., Netflix, HBO, Disney+)",
-    "Enhancement: Improved config deletion debugging with detailed logging",
-    "Fix: Release dates now parse both RFC3339 and simple date formats correctly"
+    "Enhancement: Trakt section now hidden when no data is available (no more empty section)",
+    "Enhancement: Added 'Test Trakt' button to validate Client ID before saving",
+    "Enhancement: Trakt toggles are now greyed out and disabled when no Client ID is configured",
+    "Enhancement: IMDB links now appear directly on titles (clickable title) instead of separate icon",
+    "Enhancement: Simplified Trakt items to compact list format (removed placeholder images)",
+    "Fix: Trakt section visibility logic improved to only show when actual data exists"
   ]
 }
