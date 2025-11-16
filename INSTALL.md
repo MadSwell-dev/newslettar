@@ -221,6 +221,21 @@ systemctl daemon-reload
 systemctl restart newslettar.service
 ```
 
+### Installation script hangs during git clone
+
+If the script hangs after "Cloning from GitHub...", this usually means:
+- Your container has network issues
+- GitHub is temporarily unreachable
+- Git is not installed or misconfigured
+
+**The script will automatically detect this and fall back to downloading individual files using wget.** Just wait a bit longer (git clones can take 30+ seconds). If it still fails, you can manually try again:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install.sh | bash
+```
+
+If the script continues to hang or fail, use the manual installation method below.
+
 ## Manual Installation (Alternative)
 
 If you prefer to install manually:
@@ -264,4 +279,4 @@ systemctl enable --now newslettar.service
 
 - GitHub: https://github.com/agencefanfare/newslettar
 - Issues: https://github.com/agencefanfare/newslettar/issues
-- Version: 1.1.0 (Refactored & Optimized)
+- Version: 1.1.1 (Future-Proof Installation)

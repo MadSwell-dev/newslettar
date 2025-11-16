@@ -84,15 +84,31 @@ if [ -d "$INSTALL_DIR/.git" ]; then
     git fetch origin main -q
     git reset --hard origin/main -q
 else
-    echo -e "${BLUE}  Cloning from GitHub...${NC}"
-    git clone --depth 1 --branch main "https://github.com/agencefanfare/newslettar.git" temp_clone 2>/dev/null
+    echo -e "${BLUE}  Cloning from GitHub (this may take a moment)...${NC}"
+    git clone --depth 1 --branch main "https://github.com/agencefanfare/newslettar.git" temp_clone
     if [ $? -ne 0 ]; then
-        echo -e "${RED}Failed to clone repository${NC}"
-        exit 1
+        echo -e "${RED}Git clone failed. Falling back to direct file downloads...${NC}"
+        
+        # Fallback: download individual files
+        mkdir -p templates
+        for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod version.json; do
+            echo -e "${BLUE}  Downloading ${file}...${NC}"
+            wget -q -O "$file" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/${file}" || {
+                echo -e "${RED}Failed to download $file${NC}"
+                exit 1
+            }
+        done
+        
+        echo -e "${BLUE}  Downloading email template...${NC}"
+        wget -q -O templates/email.html "https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html" || {
+            echo -e "${RED}Failed to download email template${NC}"
+            exit 1
+        }
+    else
+        mv temp_clone/* . 2>/dev/null
+        mv temp_clone/.git . 2>/dev/null
+        rmdir temp_clone 2>/dev/null
     fi
-    mv temp_clone/* . 2>/dev/null
-    mv temp_clone/.git . 2>/dev/null
-    rmdir temp_clone 2>/dev/null
 fi
 
 echo -e "${GREEN}✓ Application downloaded${NC}"
