@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Newsletter</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #0f1419; color: #e8e8e8; }
+        .container { background-color: #1a2332; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        h1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; margin: -30px -30px 20px -30px; border-radius: 12px 12px 0 0; text-align: center; }
+        h2 { color: #667eea; margin-top: 40px; border-left: 4px solid #667eea; padding-left: 15px; }
+        h3 { color: #a0b0c0; margin-top: 25px; margin-bottom: 15px; font-size: 1.2em; }
+        .section { margin-bottom: 30px; }
+        .series-group { margin-bottom: 25px; border: 1px solid #2a3444; border-radius: 8px; overflow: hidden; background-color: #252f3f; }
+        .series-header { display: flex; align-items: center; padding: 15px; background-color: #2a3444; border-bottom: 2px solid #667eea; }
+        .poster { width: 60px; height: 90px; object-fit: cover; border-radius: 4px; margin-right: 15px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+        .poster-placeholder { width: 60px; height: 90px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 4px; margin-right: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; }
+        .series-title { font-weight: bold; font-size: 1.3em; color: #e8e8e8; }
+        .series-title a { color: #667eea; text-decoration: none; }
+        .series-title a:hover { color: #764ba2; text-decoration: underline; }
+        .episode-list { padding: 10px 15px; }
+        .episode-item { padding: 10px; margin: 5px 0; background-color: #1a2332; border-left: 3px solid #667eea; border-radius: 4px; }
+        .episode-number { font-weight: 600; color: #667eea; display: inline-block; min-width: 70px; }
+        .episode-title { color: #e8e8e8; }
+        .episode-date { color: #8899aa; font-size: 0.9em; display: block; margin-top: 3px;}
+        .movie-item { display: flex; padding: 15px; margin: 12px 0; background-color: #252f3f; border-left: 3px solid #38ef7d; border-radius: 8px; align-items: flex-start; }
+        .movie-poster { width: 80px; height: 120px; object-fit: cover; border-radius: 6px; margin-right: 15px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+        .movie-poster-placeholder { width: 80px; height: 120px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 6px; margin-right: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 36px; color: white; }
+        .movie-content { flex: 1; }
+        .movie-title { font-weight: bold; color: #e8e8e8; font-size: 1.1em; }
+        .movie-title a { color: #38ef7d; text-decoration: none; }
+        .movie-title a:hover { color: #11998e; text-decoration: underline; }
+        .movie-year { color: #8899aa; font-size: 0.95em; }
+        .date-range { color: #8899aa; font-size: 0.95em; margin-bottom: 20px; text-align: center; }
+        .empty { color: #8899aa; font-style: italic; padding: 15px; text-align: center; background-color: #252f3f; border-radius: 6px; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a3444; color: #8899aa; font-size: 0.85em; text-align: center; }
+        .count-badge { background-color: #667eea; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-left: 10px; font-weight: normal; }
+        .downloaded-section { margin-top: 50px; padding-top: 30px; border-top: 2px dashed #2a3444; }
+        .downloaded-section h2 { color: #38ef7d; border-left-color: #38ef7d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📺 Your Weekly Newslettar</h1>
+        <div class="date-range">Week of {{.WeekStart}} - {{.WeekEnd}}</div>
+        
+        <div class="section">
+            <h2>📅 Coming This Week</h2>
+            <h3>TV Shows <span class="count-badge">{{len .UpcomingSeriesGroups}}</span></h3>
+            {{if .UpcomingSeriesGroups}}
+                {{range .UpcomingSeriesGroups}}
+                <div class="series-group">
+                    <div class="series-header">
+                        {{if $.ShowPosters}}
+                            {{if .PosterURL}}
+                                <img src="{{.PosterURL}}" alt="{{.SeriesTitle}}" class="poster" />
+                            {{else}}
+                                <div class="poster-placeholder">📺</div>
+                            {{end}}
+                        {{end}}
+                        <div class="series-title">
+                            {{if .IMDBID}}
+                                <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank">{{.SeriesTitle}}</a>
+                            {{else}}
+                                {{.SeriesTitle}}
+                            {{end}}
+                            <span style="color: #8899aa; font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}})</span>
+                        </div>
+                    </div>
+                    <div class="episode-list">
+                        {{range .Episodes}}
+                        <div class="episode-item">
+                            <span class="episode-number">S{{printf "%02d" .SeasonNum}}E{{printf "%02d" .EpisodeNum}}</span>
+                            <span class="episode-title">{{if .Title}}{{.Title}}{{else}}TBA{{end}}</span>
+                            {{if .AirDate}}<span class="episode-date">{{formatDateWithDay .AirDate}}</span>{{end}}
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+            {{else}}
+                <div class="empty">No shows scheduled for this week</div>
+            {{end}}
+            
+            <h3>Movies <span class="count-badge">{{len .UpcomingMovies}}</span></h3>
+            {{if .UpcomingMovies}}
+                {{range .UpcomingMovies}}
+                <div class="movie-item">
+                    {{if $.ShowPosters}}
+                        {{if .PosterURL}}
+                            <img src="{{.PosterURL}}" alt="{{.Title}}" class="movie-poster" />
+                        {{else}}
+                            <div class="movie-poster-placeholder">🎬</div>
+                        {{end}}
+                    {{end}}
+                    <div class="movie-content">
+                        <div class="movie-title">
+                            {{if .IMDBID}}
+                                <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank">{{.Title}}</a>
+                            {{else}}
+                                {{.Title}}
+                            {{end}}
+                        </div>
+                        <div class="movie-year">({{.Year}}){{if .ReleaseDate}} • {{formatDateWithDay .ReleaseDate}}{{end}}</div>
+                    </div>
+                </div>
+                {{end}}
+            {{else}}
+                <div class="empty">No movies scheduled for this week</div>
+            {{end}}
+        </div>
+        
+        {{if .ShowDownloaded}}
+        <div class="section downloaded-section">
+            <h2>📥 Downloaded This Week</h2>
+            <h3>TV Shows <span class="count-badge">{{len .DownloadedSeriesGroups}}</span></h3>
+            {{if .DownloadedSeriesGroups}}
+                {{range .DownloadedSeriesGroups}}
+                <div class="series-group">
+                    <div class="series-header">
+                        {{if $.ShowPosters}}
+                            {{if .PosterURL}}
+                                <img src="{{.PosterURL}}" alt="{{.SeriesTitle}}" class="poster" />
+                            {{else}}
+                                <div class="poster-placeholder">📺</div>
+                            {{end}}
+                        {{end}}
+                        <div class="series-title">
+                            {{if .IMDBID}}
+                                <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank">{{.SeriesTitle}}</a>
+                            {{else}}
+                                {{.SeriesTitle}}
+                            {{end}}
+                            <span style="color: #8899aa; font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}})</span>
+                        </div>
+                    </div>
+                    <div class="episode-list">
+                        {{range .Episodes}}
+                        <div class="episode-item">
+                            <span class="episode-number">S{{printf "%02d" .SeasonNum}}E{{printf "%02d" .EpisodeNum}}</span>
+                            <span class="episode-title">{{if .Title}}{{.Title}}{{else}}Episode {{.EpisodeNum}}{{end}}</span>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+            {{else}}
+                <div class="empty">No shows downloaded this week</div>
+            {{end}}
+            
+            <h3>Movies <span class="count-badge">{{len .DownloadedMovies}}</span></h3>
+            {{if .DownloadedMovies}}
+                {{range .DownloadedMovies}}
+                <div class="movie-item">
+                    {{if $.ShowPosters}}
+                        {{if .PosterURL}}
+                            <img src="{{.PosterURL}}" alt="{{.Title}}" class="movie-poster" />
+                        {{else}}
+                            <div class="movie-poster-placeholder">🎬</div>
+                        {{end}}
+                    {{end}}
+                    <div class="movie-content">
+                        <div class="movie-title">
+                            {{if .IMDBID}}
+                                <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank">{{.Title}}</a>
+                            {{else}}
+                                {{.Title}}
+                            {{end}}
+                        </div>
+                        <div class="movie-year">({{.Year}})</div>
+                    </div>
+                </div>
+                {{end}}
+            {{else}}
+                <div class="empty">No movies downloaded this week</div>
+            {{end}}
+        </div>
+        {{end}}
+        
+        <div class="footer">Generated by Newslettar • {{.WeekEnd}}</div>
+    </div>
+</body>
+</html>
