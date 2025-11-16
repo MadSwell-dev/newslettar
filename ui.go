@@ -394,7 +394,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             <button class="tab active" role="tab" aria-selected="true" aria-controls="config-tab" onclick="showTab('config')">⚙️ Configuration</button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="template-tab" onclick="showTab('template')">📝 Email Template</button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="logs-tab" onclick="showTab('logs')">📋 Logs</button>
-            <button class="tab" role="tab" aria-selected="false" aria-controls="update-tab" onclick="showTab('update')">🔄 Update</button>
+            <button class="tab" id="update-tab-button" role="tab" aria-selected="false" aria-controls="update-tab" onclick="showTab('update')" style="display: none;">🔄 Update</button>
         </div>
 
         <div id="config-tab" class="tab-content active" role="tabpanel">
@@ -967,9 +967,11 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                     });
                     html += '</ul>';
                     document.getElementById('update-btn').style.display = 'inline-block';
+                    document.getElementById('update-tab-button').style.display = 'inline-block';
                 } else {
                     html += '<p style="color: #8899aa; margin-top: 15px;">You are running the latest version!</p>';
                     document.getElementById('update-btn').style.display = 'none';
+                    document.getElementById('update-tab-button').style.display = 'none';
                 }
 
                 html += '</div>';
