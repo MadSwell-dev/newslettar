@@ -1,12 +1,11 @@
 {
-  "version": "1.1.1",
+  "version": "1.1.2",
   "released": "2025-11-16",
   "changelog": [
-    "Install script now uses 'git clone' for automatic file discovery (future-proof)",
-    "Update button handler uses git fetch + git reset instead of wget (consistent approach)",
-    "No more hardcoded file lists in installer or update commands",
-    "Faster updates: single git operation vs multiple wget calls",
-    "All installation methods now self-healing: always gets latest repository state",
-    "Previous: Split monolithic main.go into 9 focused modules for better maintainability"
+    "Cleaned up UI header to show only version number (removed 'Enhanced UI' and 'Timezone-Aware' labels)",
+    "Update button now properly shows only when an upgrade is available",
+    "Improved visual clarity of the header section",
+    "Previous: Install script now uses 'git clone' for automatic file discovery",
+    "Previous: Update handler uses git fetch + git reset for consistent updates"
   ]
 }

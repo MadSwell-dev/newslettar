@@ -387,7 +387,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
     <div class="container">
         <div class="header">
             <h1>📺 Newslettar</h1>
-            <p class="version">Version ` + version + ` • Enhanced UI • Timezone-Aware</p>
+            <p class="version">Version ` + version + `</p>
         </div>
 
         <div class="tabs" role="tablist">
