@@ -14,7 +14,7 @@ import (
 //go:embed templates/*.html
 var templateFS embed.FS
 
-const version = "1.2.0"
+const version = "1.2.1"
 
 // Global HTTP client (reused for all requests - 3-5x faster)
 var httpClient = &http.Client{
