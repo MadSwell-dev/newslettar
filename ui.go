@@ -487,17 +487,14 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 <h3 style="margin-bottom: 15px; color: #667eea;">Trakt Settings (Optional)</h3>
                 <div class="info-banner" style="margin-bottom: 20px;">
                     <p style="font-size: 0.9em;">
-                        ℹ️ Trakt integration enables trending content sections in your newsletter. Get your API credentials from
-                        <a href="https://trakt.tv/oauth/applications" target="_blank" style="color: #667eea; text-decoration: underline;">https://trakt.tv/oauth/applications</a>
+                        ℹ️ Trakt integration enables trending content sections in your newsletter.
+                        <a href="https://trakt.tv/oauth/applications" target="_blank" style="color: #667eea; text-decoration: underline;">Create an app</a>
+                        and copy your <strong>Client ID</strong> (Client Secret is not needed).
                     </p>
                 </div>
                 <div class="form-group">
                     <label for="trakt_client_id">Trakt Client ID</label>
                     <input type="text" name="trakt_client_id" id="trakt_client_id" placeholder="Your Trakt Client ID" aria-label="Trakt Client ID">
-                </div>
-                <div class="form-group">
-                    <label for="trakt_api_key">Trakt API Key</label>
-                    <input type="text" name="trakt_api_key" id="trakt_api_key" placeholder="Your Trakt API Key" aria-label="Trakt API Key">
                 </div>
 
                 <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
@@ -631,7 +628,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             <h3 style="margin-bottom: 15px;">Trakt Trending Sections</h3>
             <div class="info-banner" style="margin-bottom: 20px;">
                 <p style="font-size: 0.9em;">
-                    ℹ️ Requires Trakt API credentials in Configuration tab. Toggles are inactive without credentials.
+                    ℹ️ Requires Trakt Client ID in Configuration tab. Toggles work only when Client ID is configured.
                 </p>
             </div>
 
@@ -891,7 +888,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 document.querySelector('[name="radarr_url"]').value = data.radarr_url || '';
                 document.querySelector('[name="radarr_api_key"]').value = data.radarr_api_key || '';
                 document.querySelector('[name="trakt_client_id"]').value = data.trakt_client_id || '';
-                document.querySelector('[name="trakt_api_key"]').value = data.trakt_api_key || '';
                 document.querySelector('[name="smtp_host"]').value = data.smtp_host || 'smtp.mailgun.org';
                 document.querySelector('[name="smtp_port"]').value = data.smtp_port || '587';
                 document.querySelector('[name="smtp_user"]').value = data.smtp_user || '';

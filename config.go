@@ -67,7 +67,6 @@ func loadConfig() *Config {
 		RadarrURL:                  getEnvFromFile(envMap, "RADARR_URL", ""),
 		RadarrAPIKey:               getEnvFromFile(envMap, "RADARR_API_KEY", ""),
 		TraktClientID:              getEnvFromFile(envMap, "TRAKT_CLIENT_ID", ""),
-		TraktAPIKey:                getEnvFromFile(envMap, "TRAKT_API_KEY", ""),
 		SMTPHost:                   smtpHost,
 		SMTPPort:                   smtpPort,
 		SMTPUser:                   smtpUser,
