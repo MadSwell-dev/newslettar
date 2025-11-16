@@ -1,11 +1,13 @@
 {
-  "version": "1.1.3",
+  "version": "1.1.4",
   "released": "2025-11-16",
   "changelog": [
-    "Update tab now hidden when no update is available (cleaner UI)",
-    "Update tab and button only appear when a new version is detected",
-    "Confirmed update handler uses correct Go binary path (/usr/local/go/bin/go)",
-    "Previous: Cleaned up UI header to show only version number",
-    "Previous: Install script uses git clone for automatic file discovery"
+    "Added quality profiles toggle - Display Radarr/Sonarr quality settings (e.g., HD-1080p) in email",
+    "Added series description toggle - Show short overview for each TV series",
+    "Added episode description toggle - Display episode descriptions in newsletter",
+    "Quality profiles appear as green badges next to titles",
+    "Descriptions shown in italic gray text when enabled",
+    "Previous: Update tab now hidden when no update is available (cleaner UI)",
+    "Previous: Confirmed update handler uses correct Go binary path"
   ]
 }
