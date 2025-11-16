@@ -6,10 +6,10 @@ type Config struct {
 	SonarrAPIKey         string
 	RadarrURL            string
 	RadarrAPIKey         string
-	MailgunSMTP          string
-	MailgunPort          string
-	MailgunUser          string
-	MailgunPass          string
+	SMTPHost             string
+	SMTPPort             string
+	SMTPUser             string
+	SMTPPass             string
 	FromEmail            string
 	FromName             string
 	ToEmails             []string
@@ -117,10 +117,10 @@ type WebConfig struct {
 	SonarrAPIKey        string `json:"sonarr_api_key"`
 	RadarrURL           string `json:"radarr_url"`
 	RadarrAPIKey        string `json:"radarr_api_key"`
-	MailgunSMTP         string `json:"mailgun_smtp"`
-	MailgunPort         string `json:"mailgun_port"`
-	MailgunUser         string `json:"mailgun_user"`
-	MailgunPass         string `json:"mailgun_pass"`
+	SMTPHost            string `json:"smtp_host"`
+	SMTPPort            string `json:"smtp_port"`
+	SMTPUser            string `json:"smtp_user"`
+	SMTPPass            string `json:"smtp_pass"`
 	FromEmail           string `json:"from_email"`
 	FromName            string `json:"from_name"`
 	ToEmails            string `json:"to_emails"`

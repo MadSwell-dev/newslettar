@@ -198,8 +198,8 @@ func sendEmail(cfg *Config, subject, htmlBody string) error {
 	}
 	message += "\r\n" + htmlBody
 
-	auth := smtp.PlainAuth("", cfg.MailgunUser, cfg.MailgunPass, cfg.MailgunSMTP)
-	addr := fmt.Sprintf("%s:%s", cfg.MailgunSMTP, cfg.MailgunPort)
+	auth := smtp.PlainAuth("", cfg.SMTPUser, cfg.SMTPPass, cfg.SMTPHost)
+	addr := fmt.Sprintf("%s:%s", cfg.SMTPHost, cfg.SMTPPort)
 
 	return smtp.SendMail(addr, auth, cfg.FromEmail, cfg.ToEmails, []byte(message))
 }

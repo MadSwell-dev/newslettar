@@ -4,6 +4,7 @@ import "time"
 
 // Configuration defaults
 const (
+	// SMTP defaults (Mailgun as reasonable default, but works with any SMTP provider)
 	DefaultSMTPHost      = "smtp.mailgun.org"
 	DefaultSMTPPort      = "587"
 	DefaultFromName      = "Newslettar"

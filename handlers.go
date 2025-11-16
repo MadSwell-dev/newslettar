@@ -203,17 +203,17 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.RadarrAPIKey != "" {
 			envMap["RADARR_API_KEY"] = webCfg.RadarrAPIKey
 		}
-		if webCfg.MailgunSMTP != "" {
-			envMap["MAILGUN_SMTP"] = webCfg.MailgunSMTP
+		if webCfg.SMTPHost != "" {
+			envMap["SMTP_HOST"] = webCfg.SMTPHost
 		}
-		if webCfg.MailgunPort != "" {
-			envMap["MAILGUN_PORT"] = webCfg.MailgunPort
+		if webCfg.SMTPPort != "" {
+			envMap["SMTP_PORT"] = webCfg.SMTPPort
 		}
-		if webCfg.MailgunUser != "" {
-			envMap["MAILGUN_USER"] = webCfg.MailgunUser
+		if webCfg.SMTPUser != "" {
+			envMap["SMTP_USER"] = webCfg.SMTPUser
 		}
-		if webCfg.MailgunPass != "" {
-			envMap["MAILGUN_PASS"] = webCfg.MailgunPass
+		if webCfg.SMTPPass != "" {
+			envMap["SMTP_PASS"] = webCfg.SMTPPass
 		}
 		if webCfg.FromEmail != "" {
 			envMap["FROM_EMAIL"] = webCfg.FromEmail
@@ -270,16 +270,17 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 
 	// GET request - return current config
 	envMap := readEnvFile()
+	cfg := getConfig()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"sonarr_url":      getEnvFromFile(envMap, "SONARR_URL", ""),
 		"sonarr_api_key":  getEnvFromFile(envMap, "SONARR_API_KEY", ""),
 		"radarr_url":      getEnvFromFile(envMap, "RADARR_URL", ""),
 		"radarr_api_key":  getEnvFromFile(envMap, "RADARR_API_KEY", ""),
-		"mailgun_smtp":    getEnvFromFile(envMap, "MAILGUN_SMTP", DefaultSMTPHost),
-		"mailgun_port":    getEnvFromFile(envMap, "MAILGUN_PORT", DefaultSMTPPort),
-		"mailgun_user":    getEnvFromFile(envMap, "MAILGUN_USER", ""),
-		"mailgun_pass":    getEnvFromFile(envMap, "MAILGUN_PASS", ""),
+		"smtp_host":       cfg.SMTPHost,
+		"smtp_port":       cfg.SMTPPort,
+		"smtp_user":       cfg.SMTPUser,
+		"smtp_pass":       cfg.SMTPPass,
 		"from_email":      getEnvFromFile(envMap, "FROM_EMAIL", ""),
 		"from_name":       getEnvFromFile(envMap, "FROM_NAME", DefaultFromName),
 		"to_emails":       getEnvFromFile(envMap, "TO_EMAILS", ""),

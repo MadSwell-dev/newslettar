@@ -43,15 +43,33 @@ func loadConfig() *Config {
 		}
 	}
 
+	// Support backward compatibility with old MAILGUN_* env vars
+	smtpHost := getEnvFromFile(envMap, "SMTP_HOST", "")
+	if smtpHost == "" {
+		smtpHost = getEnvFromFile(envMap, "MAILGUN_SMTP", DefaultSMTPHost)
+	}
+	smtpPort := getEnvFromFile(envMap, "SMTP_PORT", "")
+	if smtpPort == "" {
+		smtpPort = getEnvFromFile(envMap, "MAILGUN_PORT", DefaultSMTPPort)
+	}
+	smtpUser := getEnvFromFile(envMap, "SMTP_USER", "")
+	if smtpUser == "" {
+		smtpUser = getEnvFromFile(envMap, "MAILGUN_USER", "")
+	}
+	smtpPass := getEnvFromFile(envMap, "SMTP_PASS", "")
+	if smtpPass == "" {
+		smtpPass = getEnvFromFile(envMap, "MAILGUN_PASS", "")
+	}
+
 	return &Config{
 		SonarrURL:           getEnvFromFile(envMap, "SONARR_URL", ""),
 		SonarrAPIKey:        getEnvFromFile(envMap, "SONARR_API_KEY", ""),
 		RadarrURL:           getEnvFromFile(envMap, "RADARR_URL", ""),
 		RadarrAPIKey:        getEnvFromFile(envMap, "RADARR_API_KEY", ""),
-		MailgunSMTP:         getEnvFromFile(envMap, "MAILGUN_SMTP", DefaultSMTPHost),
-		MailgunPort:         getEnvFromFile(envMap, "MAILGUN_PORT", DefaultSMTPPort),
-		MailgunUser:         getEnvFromFile(envMap, "MAILGUN_USER", ""),
-		MailgunPass:         getEnvFromFile(envMap, "MAILGUN_PASS", ""),
+		SMTPHost:            smtpHost,
+		SMTPPort:            smtpPort,
+		SMTPUser:            smtpUser,
+		SMTPPass:            smtpPass,
 		FromEmail:           getEnvFromFile(envMap, "FROM_EMAIL", ""),
 		FromName:            getEnvFromFile(envMap, "FROM_NAME", DefaultFromName),
 		ToEmails:            toEmails,
@@ -126,7 +144,7 @@ func validateConfig(cfg *Config) []string {
 	var warnings []string
 
 	// Check for email configuration (only warn if partially configured)
-	hasEmailConfig := cfg.MailgunUser != "" || cfg.MailgunPass != "" || cfg.FromEmail != "" || len(cfg.ToEmails) > 0
+	hasEmailConfig := cfg.SMTPUser != "" || cfg.SMTPPass != "" || cfg.FromEmail != "" || len(cfg.ToEmails) > 0
 	if hasEmailConfig {
 		if cfg.FromEmail == "" {
 			warnings = append(warnings, "FROM_EMAIL is not set - email sending will fail")
@@ -134,11 +152,11 @@ func validateConfig(cfg *Config) []string {
 		if len(cfg.ToEmails) == 0 {
 			warnings = append(warnings, "TO_EMAILS is not set - email sending will fail")
 		}
-		if cfg.MailgunUser == "" {
-			warnings = append(warnings, "MAILGUN_USER is not set - email sending may fail")
+		if cfg.SMTPUser == "" {
+			warnings = append(warnings, "SMTP_USER is not set - email sending may fail")
 		}
-		if cfg.MailgunPass == "" {
-			warnings = append(warnings, "MAILGUN_PASS is not set - email sending may fail")
+		if cfg.SMTPPass == "" {
+			warnings = append(warnings, "SMTP_PASS is not set - email sending may fail")
 		}
 	}
 
