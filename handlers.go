@@ -493,7 +493,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			git fetch origin main -q
 			git reset --hard origin/main -q
 			echo "Building with optimization flags..."
-			/usr/local/go/bin/go build -ldflags="-s -w" -trimpath -o newslettar main.go
+			/usr/local/go/bin/go build -ldflags="-s -w" -trimpath -o newslettar .
 			echo "Restoring .env..."
 			mv .env.backup .env
 			echo "Restarting service..."
