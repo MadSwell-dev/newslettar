@@ -105,10 +105,11 @@ if [ $CLONE_EXIT -ne 0 ]; then
 else
     # Clone claims success - verify files exist
     echo -e "${BLUE}  Checking clone contents...${NC}"
+    echo -e "${BLUE}  DEBUG: Listing $TEMP_CLONE:${NC}"
+    ls -la "$TEMP_CLONE/" 2>&1 | head -15
+    
     if ! ls "$TEMP_CLONE"/*.go >/dev/null 2>&1; then
-        echo -e "${RED}Git clone succeeded but files are missing! Contents of $TEMP_CLONE:${NC}"
-        ls -la "$TEMP_CLONE/" 2>&1
-        echo -e "${RED}Falling back to direct file downloads...${NC}"
+        echo -e "${RED}Git clone succeeded but .go files are missing! Falling back to direct file downloads...${NC}"
         rm -rf "$TEMP_CLONE"
     else
         # Files exist, proceed with copy
@@ -116,28 +117,7 @@ else
     fi
 fi
 
-# Check if we still have TEMP_CLONE or need to use fallback
-if [ ! -d "$TEMP_CLONE" ] || [ ! -f "$TEMP_CLONE/main.go" ]; then
-    
-    # Fallback: download individual files
-    mkdir -p "$INSTALL_DIR/templates"
-    for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod go.sum version.json; do
-        echo -e "${BLUE}  Downloading ${file}...${NC}"
-        wget -q -O "$INSTALL_DIR/$file" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/${file}" || {
-            echo -e "${RED}Failed to download $file${NC}"
-            exit 1
-        }
-    done
-    
-    
-    echo -e "${BLUE}  Downloading email template...${NC}"
-    wget -q -O "$INSTALL_DIR/templates/email.html" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html" || {
-        echo -e "${RED}Failed to download email template${NC}"
-        exit 1
-    }
-fi
-
-# If we have TEMP_CLONE with files, copy them
+# Check if we have a successful clone directory with files
 if [ -d "$TEMP_CLONE" ] && [ -f "$TEMP_CLONE/main.go" ]; then
     echo -e "${BLUE}  Copying files from clone...${NC}"
     
@@ -152,8 +132,28 @@ if [ -d "$TEMP_CLONE" ] && [ -f "$TEMP_CLONE/main.go" ]; then
     cp -r "$TEMP_CLONE"/.git "$INSTALL_DIR/" 2>/dev/null || true
     cp "$TEMP_CLONE"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
     rm -rf "$TEMP_CLONE"
+    
+    echo -e "${BLUE}  Clone copy complete${NC}"
 fi
 
+# If clone didn't work, fall back to wget
+if [ ! -f "$INSTALL_DIR/main.go" ]; then
+    echo -e "${YELLOW}  Using fallback method: downloading files directly...${NC}"
+    mkdir -p "$INSTALL_DIR/templates"
+    for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod go.sum version.json; do
+        echo -e "${BLUE}    Downloading ${file}...${NC}"
+        wget -q -O "$INSTALL_DIR/$file" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/${file}" || {
+            echo -e "${RED}Failed to download $file${NC}"
+            exit 1
+        }
+    done
+    
+    echo -e "${BLUE}    Downloading email template...${NC}"
+    wget -q -O "$INSTALL_DIR/templates/email.html" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html" || {
+        echo -e "${RED}Failed to download email template${NC}"
+        exit 1
+    }
+fi
 
 echo -e "${GREEN}✓ Application downloaded${NC}"
 
