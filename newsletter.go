@@ -35,12 +35,32 @@ func runNewsletter() {
 	var wg sync.WaitGroup
 	var downloadedEpisodes, upcomingEpisodes []Episode
 	var downloadedMovies, upcomingMovies []Movie
+	var traktAnticipatedSeries, traktWatchedSeries []TraktShow
+	var traktAnticipatedMovies, traktWatchedMovies []TraktMovie
 	var errSonarrHistory, errSonarrCalendar, errRadarrHistory, errRadarrCalendar error
 
 	log.Println("📡 Fetching data in parallel...")
 	startFetch := time.Now()
 
-	wg.Add(4)
+	// Count API calls (4 for Sonarr/Radarr + up to 4 for Trakt if enabled)
+	apiCalls := 4
+	if cfg.ShowTraktAnticipatedSeries || cfg.ShowTraktWatchedSeries ||
+		cfg.ShowTraktAnticipatedMovies || cfg.ShowTraktWatchedMovies {
+		if cfg.ShowTraktAnticipatedSeries {
+			apiCalls++
+		}
+		if cfg.ShowTraktWatchedSeries {
+			apiCalls++
+		}
+		if cfg.ShowTraktAnticipatedMovies {
+			apiCalls++
+		}
+		if cfg.ShowTraktWatchedMovies {
+			apiCalls++
+		}
+	}
+
+	wg.Add(apiCalls)
 
 	go func() {
 		defer wg.Done()
@@ -85,6 +105,63 @@ func runNewsletter() {
 			log.Printf("✓ Found %d upcoming movies", len(upcomingMovies))
 		}
 	}()
+
+	// Fetch Trakt data if enabled
+	if cfg.ShowTraktAnticipatedSeries {
+		go func() {
+			defer wg.Done()
+			log.Println("🔥 Fetching Trakt anticipated series...")
+			series, err := fetchTraktAnticipatedSeries(ctx, cfg)
+			if err != nil {
+				log.Printf("⚠️  Trakt anticipated series error: %v", err)
+			} else {
+				traktAnticipatedSeries = series
+				log.Printf("✓ Found %d anticipated series", len(series))
+			}
+		}()
+	}
+
+	if cfg.ShowTraktWatchedSeries {
+		go func() {
+			defer wg.Done()
+			log.Println("👀 Fetching Trakt watched series...")
+			series, err := fetchTraktWatchedSeries(ctx, cfg)
+			if err != nil {
+				log.Printf("⚠️  Trakt watched series error: %v", err)
+			} else {
+				traktWatchedSeries = series
+				log.Printf("✓ Found %d watched series", len(series))
+			}
+		}()
+	}
+
+	if cfg.ShowTraktAnticipatedMovies {
+		go func() {
+			defer wg.Done()
+			log.Println("🔥 Fetching Trakt anticipated movies...")
+			movies, err := fetchTraktAnticipatedMovies(ctx, cfg)
+			if err != nil {
+				log.Printf("⚠️  Trakt anticipated movies error: %v", err)
+			} else {
+				traktAnticipatedMovies = movies
+				log.Printf("✓ Found %d anticipated movies", len(movies))
+			}
+		}()
+	}
+
+	if cfg.ShowTraktWatchedMovies {
+		go func() {
+			defer wg.Done()
+			log.Println("👀 Fetching Trakt watched movies...")
+			movies, err := fetchTraktWatchedMovies(ctx, cfg)
+			if err != nil {
+				log.Printf("⚠️  Trakt watched movies error: %v", err)
+			} else {
+				traktWatchedMovies = movies
+				log.Printf("✓ Found %d watched movies", len(movies))
+			}
+		}()
+	}
 
 	wg.Wait()
 	fetchDuration := time.Since(startFetch)
@@ -151,10 +228,14 @@ func runNewsletter() {
 		UpcomingMovies:         upcomingMovies,
 		DownloadedSeriesGroups: groupEpisodesBySeries(downloadedEpisodes),
 		DownloadedMovies:       downloadedMovies,
+		TraktAnticipatedSeries: traktAnticipatedSeries,
+		TraktWatchedSeries:     traktWatchedSeries,
+		TraktAnticipatedMovies: traktAnticipatedMovies,
+		TraktWatchedMovies:     traktWatchedMovies,
 	}
 
 	log.Println("📝 Generating newsletter HTML...")
-	html, err := generateNewsletterHTML(data, cfg.ShowPosters, cfg.ShowDownloaded, cfg.ShowSeriesOverview, cfg.ShowEpisodeOverview)
+	html, err := generateNewsletterHTML(data, cfg)
 	if err != nil {
 		log.Fatalf("❌ Failed to generate HTML: %v", err)
 	}
@@ -177,19 +258,29 @@ func runNewsletter() {
 }
 
 // Generate newsletter HTML using precompiled template
-func generateNewsletterHTML(data NewsletterData, showPosters, showDownloaded, showSeriesOverview, showEpisodeOverview bool) (string, error) {
+func generateNewsletterHTML(data NewsletterData, cfg *Config) (string, error) {
 	templateData := struct {
 		NewsletterData
-		ShowPosters         bool
-		ShowDownloaded      bool
-		ShowSeriesOverview  bool
-		ShowEpisodeOverview bool
+		ShowPosters                bool
+		ShowDownloaded             bool
+		ShowSeriesOverview         bool
+		ShowEpisodeOverview        bool
+		DarkMode                   bool
+		ShowTraktAnticipatedSeries bool
+		ShowTraktWatchedSeries     bool
+		ShowTraktAnticipatedMovies bool
+		ShowTraktWatchedMovies     bool
 	}{
-		NewsletterData:      data,
-		ShowPosters:         showPosters,
-		ShowDownloaded:      showDownloaded,
-		ShowSeriesOverview:  showSeriesOverview,
-		ShowEpisodeOverview: showEpisodeOverview,
+		NewsletterData:             data,
+		ShowPosters:                cfg.ShowPosters,
+		ShowDownloaded:             cfg.ShowDownloaded,
+		ShowSeriesOverview:         cfg.ShowSeriesOverview,
+		ShowEpisodeOverview:        cfg.ShowEpisodeOverview,
+		DarkMode:                   cfg.DarkMode,
+		ShowTraktAnticipatedSeries: cfg.ShowTraktAnticipatedSeries,
+		ShowTraktWatchedSeries:     cfg.ShowTraktWatchedSeries,
+		ShowTraktAnticipatedMovies: cfg.ShowTraktAnticipatedMovies,
+		ShowTraktWatchedMovies:     cfg.ShowTraktWatchedMovies,
 	}
 
 	var buf bytes.Buffer
