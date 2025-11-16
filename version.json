@@ -1,14 +1,8 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "released": "2025-11-16",
   "changelog": [
-    "Major code optimization: Eliminated ~150 lines of duplicate code with Go generics",
-    "Performance: Optimized episode grouping from O(N²) to O(N) - huge speedup for large libraries",
-    "Generic SMTP: Renamed MAILGUN_* to SMTP_* (works with any provider: Gmail, SendGrid, etc.)",
-    "Configurable tuning: Added API_PAGE_SIZE, MAX_RETRIES, PREVIEW_RETRIES, API_TIMEOUT env vars",
-    "Better error handling: Fixed ignored errors in API calls and date parsing",
-    "Configuration validation: Startup warnings for missing/incomplete configuration",
-    "Centralized defaults: New constants.go for all default values",
-    "Backward compatible: Old MAILGUN_* env vars still work automatically"
+    "Bug fix: Removed ShowQualityProfiles references from email template",
+    "Bug fix: Updated UI JavaScript to use new smtp_* field names for config saves"
   ]
 }
