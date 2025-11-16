@@ -423,6 +423,7 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 			envContent.WriteString(fmt.Sprintf("%s=%s\n", key, value))
 		}
 
+		log.Printf("DEBUG: Writing .env file. TRAKT_CLIENT_ID in map: %v", envMap["TRAKT_CLIENT_ID"])
 		if err := os.WriteFile(".env", []byte(envContent.String()), 0644); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -442,11 +443,11 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 	cfg := getConfig()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"sonarr_url":                    getEnvFromFile(envMap, "SONARR_URL", ""),
-		"sonarr_api_key":                getEnvFromFile(envMap, "SONARR_API_KEY", ""),
-		"radarr_url":                    getEnvFromFile(envMap, "RADARR_URL", ""),
-		"radarr_api_key":                getEnvFromFile(envMap, "RADARR_API_KEY", ""),
-		"trakt_client_id":               getEnvFromFile(envMap, "TRAKT_CLIENT_ID", ""),
+		"sonarr_url":                    getEnvFromFileOnly(envMap, "SONARR_URL", ""),
+		"sonarr_api_key":                getEnvFromFileOnly(envMap, "SONARR_API_KEY", ""),
+		"radarr_url":                    getEnvFromFileOnly(envMap, "RADARR_URL", ""),
+		"radarr_api_key":                getEnvFromFileOnly(envMap, "RADARR_API_KEY", ""),
+		"trakt_client_id":               getEnvFromFileOnly(envMap, "TRAKT_CLIENT_ID", ""),
 		"smtp_host":                     cfg.SMTPHost,
 		"smtp_port":                     cfg.SMTPPort,
 		"smtp_user":                     cfg.SMTPUser,
