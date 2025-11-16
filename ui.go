@@ -486,20 +486,20 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
                 <h3 style="margin-bottom: 15px; color: #667eea;">Email Settings</h3>
                 <div class="form-group">
-                    <label for="mailgun_smtp">SMTP Server</label>
-                    <input type="text" name="mailgun_smtp" id="mailgun_smtp" placeholder="smtp.mailgun.org" aria-label="SMTP Server">
+                    <label for="smtp_host">SMTP Server</label>
+                    <input type="text" name="smtp_host" id="smtp_host" placeholder="smtp.mailgun.org" aria-label="SMTP Server">
                 </div>
                 <div class="form-group">
-                    <label for="mailgun_port">SMTP Port</label>
-                    <input type="number" name="mailgun_port" id="mailgun_port" placeholder="587" aria-label="SMTP Port">
+                    <label for="smtp_port">SMTP Port</label>
+                    <input type="number" name="smtp_port" id="smtp_port" placeholder="587" aria-label="SMTP Port">
                 </div>
                 <div class="form-group">
-                    <label for="mailgun_user">SMTP Username</label>
-                    <input type="text" name="mailgun_user" id="mailgun_user" placeholder="postmaster@yourdomain.com" aria-label="SMTP Username">
+                    <label for="smtp_user">SMTP Username</label>
+                    <input type="text" name="smtp_user" id="smtp_user" placeholder="postmaster@yourdomain.com" aria-label="SMTP Username">
                 </div>
                 <div class="form-group">
-                    <label for="mailgun_pass">SMTP Password</label>
-                    <input type="password" name="mailgun_pass" id="mailgun_pass" placeholder="Your SMTP password" aria-label="SMTP Password">
+                    <label for="smtp_pass">SMTP Password</label>
+                    <input type="password" name="smtp_pass" id="smtp_pass" placeholder="Your SMTP password" aria-label="SMTP Password">
                 </div>
                 <div class="form-group">
                     <label for="from_name">From Name</label>
@@ -798,10 +798,10 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 document.querySelector('[name="sonarr_api_key"]').value = data.sonarr_api_key || '';
                 document.querySelector('[name="radarr_url"]').value = data.radarr_url || '';
                 document.querySelector('[name="radarr_api_key"]').value = data.radarr_api_key || '';
-                document.querySelector('[name="mailgun_smtp"]').value = data.mailgun_smtp || 'smtp.mailgun.org';
-                document.querySelector('[name="mailgun_port"]').value = data.mailgun_port || '587';
-                document.querySelector('[name="mailgun_user"]').value = data.mailgun_user || '';
-                document.querySelector('[name="mailgun_pass"]').value = data.mailgun_pass || '';
+                document.querySelector('[name="smtp_host"]').value = data.smtp_host || 'smtp.mailgun.org';
+                document.querySelector('[name="smtp_port"]').value = data.smtp_port || '587';
+                document.querySelector('[name="smtp_user"]').value = data.smtp_user || '';
+                document.querySelector('[name="smtp_pass"]').value = data.smtp_pass || '';
                 document.querySelector('[name="from_email"]').value = data.from_email || '';
                 document.querySelector('[name="from_name"]').value = data.from_name || 'Newslettar';
                 document.querySelector('[name="to_emails"]').value = data.to_emails || '';
@@ -876,10 +876,10 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             } else {
                 endpoint = '/api/test-email';
                 payload = {
-                    smtp: data.mailgun_smtp,
-                    port: data.mailgun_port,
-                    user: data.mailgun_user,
-                    pass: data.mailgun_pass
+                    smtp: data.smtp_host,
+                    port: data.smtp_port,
+                    user: data.smtp_user,
+                    pass: data.smtp_pass
                 };
             }
 
