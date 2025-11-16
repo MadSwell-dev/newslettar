@@ -114,22 +114,24 @@ if [ $? -ne 0 ] || [ ! -f "$TEMP_CLONE/main.go" ]; then
         exit 1
     }
 else
-    # Copy all files from temp directory to INSTALL_DIR
-    cp -r "$TEMP_CLONE"/* "$INSTALL_DIR/" || {
-        echo -e "${RED}Failed to copy files${NC}"
-        exit 1
-    }
+    # Copy all files explicitly to ensure nothing is missed
+    cp "$TEMP_CLONE"/main.go "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy main.go${NC}"; exit 1; }
+    cp "$TEMP_CLONE"/types.go "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy types.go${NC}"; exit 1; }
+    cp "$TEMP_CLONE"/config.go "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy config.go${NC}"; exit 1; }
+    cp "$TEMP_CLONE"/api.go "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy api.go${NC}"; exit 1; }
+    cp "$TEMP_CLONE"/newsletter.go "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy newsletter.go${NC}"; exit 1; }
+    cp "$TEMP_CLONE"/handlers.go "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy handlers.go${NC}"; exit 1; }
+    cp "$TEMP_CLONE"/server.go "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy server.go${NC}"; exit 1; }
+    cp "$TEMP_CLONE"/utils.go "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy utils.go${NC}"; exit 1; }
+    cp "$TEMP_CLONE"/ui.go "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy ui.go${NC}"; exit 1; }
+    cp "$TEMP_CLONE"/go.mod "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy go.mod${NC}"; exit 1; }
+    cp "$TEMP_CLONE"/go.sum "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy go.sum${NC}"; exit 1; }
+    cp "$TEMP_CLONE"/version.json "$INSTALL_DIR/" || { echo -e "${RED}Failed to copy version.json${NC}"; exit 1; }
+    mkdir -p "$INSTALL_DIR/templates"
+    cp "$TEMP_CLONE"/templates/email.html "$INSTALL_DIR/templates/" || { echo -e "${RED}Failed to copy email.html${NC}"; exit 1; }
     cp -r "$TEMP_CLONE"/.git "$INSTALL_DIR/" 2>/dev/null || true
     cp "$TEMP_CLONE"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
     rm -rf "$TEMP_CLONE"
-fi
-
-# Verify critical files exist
-if [ ! -f "$INSTALL_DIR/main.go" ] || [ ! -f "$INSTALL_DIR/config.go" ]; then
-    echo -e "${RED}ERROR: Source files missing in $INSTALL_DIR${NC}"
-    echo -e "${RED}Files present:${NC}"
-    ls -la "$INSTALL_DIR"
-    exit 1
 fi
 
 echo -e "${GREEN}✓ Application downloaded${NC}"
