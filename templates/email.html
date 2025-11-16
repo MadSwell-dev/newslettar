@@ -210,7 +210,7 @@
                         {{range .Episodes}}
                         <div class="episode-item">
                             <span class="episode-number">S{{printf "%02d" .SeasonNum}}E{{printf "%02d" .EpisodeNum}}</span>
-                            <span class="episode-title">{{if .Title}}{{.Title}}{{else}}Episode {{.EpisodeNum}}{{end}}{{if not .Monitored}} <span style="color: #ff9800; font-size: 0.85em;">○</span>{{end}}{{if and $.ShowRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
+                            <span class="episode-title">{{if .Title}}{{.Title}}{{else}}Episode {{.EpisodeNum}}{{end}}{{if and $.ShowRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
                             {{if $.ShowEpisodeOverview}}
                                 {{if .Overview}}
                                     <span class="episode-overview">{{.Overview}}</span>
@@ -243,7 +243,6 @@
                             {{else}}
                                 {{.Title}}
                             {{end}}
-                            {{if not .Monitored}} <span style="color: #ff9800; font-size: 0.85em;">○</span>{{end}}
                         </div>
                         <div class="movie-year">({{.Year}}){{if and $.ShowRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</div>
                         {{if $.ShowSeriesOverview}}
