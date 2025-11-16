@@ -1,11 +1,9 @@
 {
-  "version": "1.4.7",
+  "version": "1.4.9",
   "released": "2025-11-16",
   "changelog": [
-    "Enhancement: Improved Trakt item layout - title/metadata on separate line above description",
-    "Enhancement: Description text limited to 200 characters with ellipsis for readability",
-    "Enhancement: Reduced Trakt section font size to make it less prominent than main content",
-    "Enhancement: Better visual hierarchy with smaller headings and muted description text",
-    "Enhancement: Improved spacing between Trakt items for better readability"
+    "Feature: Added checkmark indicator (✓) for Trakt items already in your Sonarr/Radarr library",
+    "Enhancement: Cross-references Trakt trending content with your monitored series and movies",
+    "Enhancement: Green checkmark appears next to titles already in your collection"
   ]
 }

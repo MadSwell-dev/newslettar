@@ -260,17 +260,17 @@
 
         {{if or .TraktAnticipatedSeries .TraktWatchedSeries .TraktAnticipatedMovies .TraktWatchedMovies}}
         <div class="section trakt-section" style="font-size: 0.9em;">
-            <h2 style="font-size: 1.3em;">🔥 Trending on Trakt</h2>
+            <h2 style="font-size: 1.3em;">🔥 Trending</h2>
 
             {{if .TraktAnticipatedSeries}}
             <h3 style="font-size: 1.1em;">Most Anticipated Series (Next Week) <span class="count-badge">{{len .TraktAnticipatedSeries}}</span></h3>
             {{range .TraktAnticipatedSeries}}
-            <div class="trakt-item" style="margin-bottom: 12px;">
-                <div>
-                    <strong>{{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}</strong> <span style="color: #8899aa;">({{.Year}}){{if .Network}} • {{.Network}}{{end}}{{if .ReleaseDate}} • {{formatDateWithDay .ReleaseDate}}{{end}}{{if gt .Rating 0.0}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
+            <div class="trakt-item" style="margin-bottom: 14px;">
+                <div style="display: block; margin-bottom: 4px;">
+                    <strong style="font-size: 1.05em;">{{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}</strong>{{if .InLibrary}} <span style="color: #22c55e; font-weight: bold;" title="In your library">✓</span>{{end}} <span style="color: #8899aa; font-size: 0.95em;">({{.Year}}){{if .Network}} • {{.Network}}{{end}}{{if .ReleaseDate}} • {{formatDateWithDay .ReleaseDate}}{{end}}{{if gt .Rating 0.0}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
                 </div>
                 {{if .Overview}}
-                    <div style="color: #8899aa; margin-top: 3px; font-size: 0.95em;">{{truncate .Overview 200}}</div>
+                    <div style="display: block; color: #8899aa; font-size: 0.93em; line-height: 1.4;">{{truncate .Overview 200}}</div>
                 {{end}}
             </div>
             {{end}}
@@ -279,12 +279,12 @@
             {{if .TraktWatchedSeries}}
             <h3 style="font-size: 1.1em;">Most Watched Series (Last Week) <span class="count-badge">{{len .TraktWatchedSeries}}</span></h3>
             {{range .TraktWatchedSeries}}
-            <div class="trakt-item" style="margin-bottom: 12px;">
-                <div>
-                    <strong>{{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}</strong> <span style="color: #8899aa;">({{.Year}}){{if .Network}} • {{.Network}}{{end}}{{if gt .Rating 0.0}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
+            <div class="trakt-item" style="margin-bottom: 14px;">
+                <div style="display: block; margin-bottom: 4px;">
+                    <strong style="font-size: 1.05em;">{{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}</strong>{{if .InLibrary}} <span style="color: #22c55e; font-weight: bold;" title="In your library">✓</span>{{end}} <span style="color: #8899aa; font-size: 0.95em;">({{.Year}}){{if .Network}} • {{.Network}}{{end}}{{if gt .Rating 0.0}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
                 </div>
                 {{if .Overview}}
-                    <div style="color: #8899aa; margin-top: 3px; font-size: 0.95em;">{{truncate .Overview 200}}</div>
+                    <div style="display: block; color: #8899aa; font-size: 0.93em; line-height: 1.4;">{{truncate .Overview 200}}</div>
                 {{end}}
             </div>
             {{end}}
@@ -293,12 +293,12 @@
             {{if .TraktAnticipatedMovies}}
             <h3 style="font-size: 1.1em;">Most Anticipated Movies (Next Week) <span class="count-badge">{{len .TraktAnticipatedMovies}}</span></h3>
             {{range .TraktAnticipatedMovies}}
-            <div class="trakt-item" style="margin-bottom: 12px;">
-                <div>
-                    <strong>{{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}</strong> <span style="color: #8899aa;">({{.Year}}){{if .ReleaseDate}} • {{formatDateWithDay .ReleaseDate}}{{end}}{{if gt .Rating 0.0}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
+            <div class="trakt-item" style="margin-bottom: 14px;">
+                <div style="display: block; margin-bottom: 4px;">
+                    <strong style="font-size: 1.05em;">{{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}</strong>{{if .InLibrary}} <span style="color: #22c55e; font-weight: bold;" title="In your library">✓</span>{{end}} <span style="color: #8899aa; font-size: 0.95em;">({{.Year}}){{if .ReleaseDate}} • {{formatDateWithDay .ReleaseDate}}{{end}}{{if gt .Rating 0.0}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
                 </div>
                 {{if .Overview}}
-                    <div style="color: #8899aa; margin-top: 3px; font-size: 0.95em;">{{truncate .Overview 200}}</div>
+                    <div style="display: block; color: #8899aa; font-size: 0.93em; line-height: 1.4;">{{truncate .Overview 200}}</div>
                 {{end}}
             </div>
             {{end}}
@@ -307,12 +307,12 @@
             {{if .TraktWatchedMovies}}
             <h3 style="font-size: 1.1em;">Most Watched Movies (Last Week) <span class="count-badge">{{len .TraktWatchedMovies}}</span></h3>
             {{range .TraktWatchedMovies}}
-            <div class="trakt-item" style="margin-bottom: 12px;">
-                <div>
-                    <strong>{{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}</strong> <span style="color: #8899aa;">({{.Year}}){{if gt .Rating 0.0}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
+            <div class="trakt-item" style="margin-bottom: 14px;">
+                <div style="display: block; margin-bottom: 4px;">
+                    <strong style="font-size: 1.05em;">{{if .IMDBID}}<a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: inherit; text-decoration: none;">{{.Title}}</a>{{else}}{{.Title}}{{end}}</strong>{{if .InLibrary}} <span style="color: #22c55e; font-weight: bold;" title="In your library">✓</span>{{end}} <span style="color: #8899aa; font-size: 0.95em;">({{.Year}}){{if gt .Rating 0.0}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
                 </div>
                 {{if .Overview}}
-                    <div style="color: #8899aa; margin-top: 3px; font-size: 0.95em;">{{truncate .Overview 200}}</div>
+                    <div style="display: block; color: #8899aa; font-size: 0.93em; line-height: 1.4;">{{truncate .Overview 200}}</div>
                 {{end}}
             </div>
             {{end}}
