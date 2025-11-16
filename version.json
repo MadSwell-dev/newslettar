@@ -1,15 +1,11 @@
 {
-  "version": "1.4.0",
+  "version": "1.4.1",
   "released": "2025-11-16",
   "changelog": [
-    "Feature: Trakt API integration for trending content (most anticipated and most watched series/movies)",
-    "Feature: Dark mode toggle for email templates (enabled by default)",
-    "Feature: Light mode option for users who prefer traditional white backgrounds",
-    "Configuration: Added TRAKT_CLIENT_ID and TRAKT_API_KEY for Trakt integration",
-    "Configuration: Added DARK_MODE toggle (default: true)",
-    "Configuration: Added 4 new template toggles for Trakt features (anticipated/watched series/movies)",
-    "Enhancement: Parallel data fetching for Trakt API with 5-minute cache TTL",
-    "Enhancement: Graceful handling when Trakt credentials are not provided",
-    "Enhancement: Conditional email template sections based on feature toggles"
+    "Fix: Added missing UI fields for Trakt configuration (Client ID and API Key)",
+    "Fix: Added missing UI toggles for Dark Mode in Email Template tab",
+    "Fix: Added missing UI toggles for Trakt features (4 trending sections)",
+    "Enhancement: Added helpful info banners explaining Trakt integration",
+    "Enhancement: JavaScript now properly loads and saves all new configuration fields"
   ]
 }
