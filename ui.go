@@ -628,19 +628,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
             <div class="template-option">
                 <div>
-                    <strong>Show Episode Ratings</strong>
-                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
-                        Display episode ratings on each episode from Sonarr/Radarr
-                    </p>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="show-episode-ratings" onchange="saveTemplateSettings()" aria-label="Toggle episode ratings display">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <div class="template-option">
-                <div>
                     <strong>Dark Mode</strong>
                     <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
                         Use dark theme for email newsletters (recommended). When disabled, uses traditional light theme with white background.
@@ -675,9 +662,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div id="trakt-anticipated-series-limit-container" style="display: none; margin-top: 10px;">
-                        <label for="trakt-anticipated-series-limit" style="font-size: 0.9em; color: #a0b0c0;">Number of results (default: 5)</label>
-                        <input type="number" id="trakt-anticipated-series-limit" min="1" max="20" placeholder="5" style="width: 100px; margin-top: 5px;" onchange="saveTemplateSettings()">
+                    <div id="trakt-anticipated-series-limit-container" style="display: none; margin-top: 10px; padding: 10px; background: #1a2332; border-radius: 6px; border-left: 3px solid #667eea;">
+                        <label for="trakt-anticipated-series-limit" style="font-size: 0.85em; color: #a0b0c0; display: block; margin-bottom: 6px;">Number of results (1-20, default: 5)</label>
+                        <input type="number" id="trakt-anticipated-series-limit" min="1" max="20" placeholder="5" style="width: 80px; padding: 6px 10px; background: #0f1419; border: 2px solid #2a3444; border-radius: 6px; color: #e8e8e8; font-size: 14px;" onchange="saveTemplateSettings()">
                     </div>
                 </div>
             </div>
@@ -696,9 +683,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div id="trakt-watched-series-limit-container" style="display: none; margin-top: 10px;">
-                        <label for="trakt-watched-series-limit" style="font-size: 0.9em; color: #a0b0c0;">Number of results (default: 5)</label>
-                        <input type="number" id="trakt-watched-series-limit" min="1" max="20" placeholder="5" style="width: 100px; margin-top: 5px;" onchange="saveTemplateSettings()">
+                    <div id="trakt-watched-series-limit-container" style="display: none; margin-top: 10px; padding: 10px; background: #1a2332; border-radius: 6px; border-left: 3px solid #667eea;">
+                        <label for="trakt-watched-series-limit" style="font-size: 0.85em; color: #a0b0c0; display: block; margin-bottom: 6px;">Number of results (1-20, default: 5)</label>
+                        <input type="number" id="trakt-watched-series-limit" min="1" max="20" placeholder="5" style="width: 80px; padding: 6px 10px; background: #0f1419; border: 2px solid #2a3444; border-radius: 6px; color: #e8e8e8; font-size: 14px;" onchange="saveTemplateSettings()">
                     </div>
                 </div>
             </div>
@@ -717,9 +704,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div id="trakt-anticipated-movies-limit-container" style="display: none; margin-top: 10px;">
-                        <label for="trakt-anticipated-movies-limit" style="font-size: 0.9em; color: #a0b0c0;">Number of results (default: 5)</label>
-                        <input type="number" id="trakt-anticipated-movies-limit" min="1" max="20" placeholder="5" style="width: 100px; margin-top: 5px;" onchange="saveTemplateSettings()">
+                    <div id="trakt-anticipated-movies-limit-container" style="display: none; margin-top: 10px; padding: 10px; background: #1a2332; border-radius: 6px; border-left: 3px solid #667eea;">
+                        <label for="trakt-anticipated-movies-limit" style="font-size: 0.85em; color: #a0b0c0; display: block; margin-bottom: 6px;">Number of results (1-20, default: 5)</label>
+                        <input type="number" id="trakt-anticipated-movies-limit" min="1" max="20" placeholder="5" style="width: 80px; padding: 6px 10px; background: #0f1419; border: 2px solid #2a3444; border-radius: 6px; color: #e8e8e8; font-size: 14px;" onchange="saveTemplateSettings()">
                     </div>
                 </div>
             </div>
@@ -738,9 +725,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div id="trakt-watched-movies-limit-container" style="display: none; margin-top: 10px;">
-                        <label for="trakt-watched-movies-limit" style="font-size: 0.9em; color: #a0b0c0;">Number of results (default: 5)</label>
-                        <input type="number" id="trakt-watched-movies-limit" min="1" max="20" placeholder="5" style="width: 100px; margin-top: 5px;" onchange="saveTemplateSettings()">
+                    <div id="trakt-watched-movies-limit-container" style="display: none; margin-top: 10px; padding: 10px; background: #1a2332; border-radius: 6px; border-left: 3px solid #667eea;">
+                        <label for="trakt-watched-movies-limit" style="font-size: 0.85em; color: #a0b0c0; display: block; margin-bottom: 6px;">Number of results (1-20, default: 5)</label>
+                        <input type="number" id="trakt-watched-movies-limit" min="1" max="20" placeholder="5" style="width: 80px; padding: 6px 10px; background: #0f1419; border: 2px solid #2a3444; border-radius: 6px; color: #e8e8e8; font-size: 14px;" onchange="saveTemplateSettings()">
                     </div>
                 </div>
             </div>
@@ -992,7 +979,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 document.getElementById('show-episode-overview').checked = data.show_episode_overview !== 'false';
                 document.getElementById('show-unmonitored').checked = data.show_unmonitored !== 'false';
                 document.getElementById('show-series-ratings').checked = data.show_series_ratings !== 'false';
-                document.getElementById('show-episode-ratings').checked = data.show_episode_ratings !== 'false';
                 document.getElementById('dark-mode').checked = data.dark_mode !== 'false';
                 document.getElementById('show-trakt-anticipated-series').checked = data.show_trakt_anticipated_series !== 'false';
                 document.getElementById('show-trakt-watched-series').checked = data.show_trakt_watched_series !== 'false';
@@ -1205,7 +1191,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             const showEpisodeOverview = document.getElementById('show-episode-overview').checked;
             const showUnmonitored = document.getElementById('show-unmonitored').checked;
             const showSeriesRatings = document.getElementById('show-series-ratings').checked;
-            const showEpisodeRatings = document.getElementById('show-episode-ratings').checked;
             const darkMode = document.getElementById('dark-mode').checked;
             const showTraktAnticipatedSeries = document.getElementById('show-trakt-anticipated-series').checked;
             const showTraktWatchedSeries = document.getElementById('show-trakt-watched-series').checked;
@@ -1227,7 +1212,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                         show_episode_overview: showEpisodeOverview ? 'true' : 'false',
                         show_unmonitored: showUnmonitored ? 'true' : 'false',
                         show_series_ratings: showSeriesRatings ? 'true' : 'false',
-                        show_episode_ratings: showEpisodeRatings ? 'true' : 'false',
                         dark_mode: darkMode ? 'true' : 'false',
                         show_trakt_anticipated_series: showTraktAnticipatedSeries ? 'true' : 'false',
                         show_trakt_watched_series: showTraktWatchedSeries ? 'true' : 'false',

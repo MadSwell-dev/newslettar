@@ -73,7 +73,6 @@ type Config struct {
 	ShowEpisodeOverview        bool
 	ShowUnmonitored            bool
 	ShowSeriesRatings          bool
-	ShowEpisodeRatings         bool
 	DarkMode                   bool
 	ShowTraktAnticipatedSeries      bool
 	ShowTraktWatchedSeries          bool
@@ -240,7 +239,6 @@ type WebConfig struct {
 	ShowEpisodeOverview        string `json:"show_episode_overview"`
 	ShowUnmonitored            string `json:"show_unmonitored"`
 	ShowSeriesRatings          string `json:"show_series_ratings"`
-	ShowEpisodeRatings         string `json:"show_episode_ratings"`
 	DarkMode                   string `json:"dark_mode"`
 	ShowTraktAnticipatedSeries      string `json:"show_trakt_anticipated_series"`
 	ShowTraktWatchedSeries          string `json:"show_trakt_watched_series"`
