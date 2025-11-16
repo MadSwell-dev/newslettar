@@ -91,54 +91,41 @@ echo -e "${BLUE}  Cloning from GitHub (this may take a moment)...${NC}"
 # Clean up any leftover temp directories from failed attempts
 rm -rf /tmp/temp_clone temp_clone 2>/dev/null || true
 
-# Clone into a temporary directory first, then move contents
-TEMP_DIR=$(mktemp -d)
-git clone --depth 1 --branch main "https://github.com/agencefanfare/newslettar.git" "$TEMP_DIR" 2>&1
+# Clone directly into install directory
+cd "$INSTALL_DIR"
+git clone --depth 1 --branch main "https://github.com/agencefanfare/newslettar.git" . 2>&1
 if [ $? -ne 0 ]; then
     echo -e "${RED}Git clone failed. Falling back to direct file downloads...${NC}"
     
     # Fallback: download individual files
-    mkdir -p "$INSTALL_DIR/templates"
+    mkdir -p templates
     for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod version.json; do
         echo -e "${BLUE}  Downloading ${file}...${NC}"
-        wget -q -O "$INSTALL_DIR/$file" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/${file}" || {
+        wget -q -O "$file" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/${file}" || {
             echo -e "${RED}Failed to download $file${NC}"
             exit 1
         }
     done
     
     echo -e "${BLUE}  Downloading email template...${NC}"
-    wget -q -O "$INSTALL_DIR/templates/email.html" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html" || {
+    wget -q -O templates/email.html "https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html" || {
         echo -e "${RED}Failed to download email template${NC}"
         exit 1
     }
 else
-    # Copy all files from temp directory to INSTALL_DIR
-    echo -e "${BLUE}  Copying files to installation directory...${NC}"
-    cp -r "$TEMP_DIR"/* "$INSTALL_DIR/" || {
-        echo -e "${RED}Failed to copy files from $TEMP_DIR${NC}"
-        ls -la "$TEMP_DIR"
-        exit 1
-    }
-    cp -r "$TEMP_DIR"/.git "$INSTALL_DIR/" 2>/dev/null || true
-    cp "$TEMP_DIR"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
-    
-    # Verify files were copied
-    if [ ! -f "$INSTALL_DIR/main.go" ]; then
-        echo -e "${RED}ERROR: main.go not found in $INSTALL_DIR after copy${NC}"
-        echo -e "${RED}Files in $INSTALL_DIR:${NC}"
-        ls -la "$INSTALL_DIR"
+    # Verify files were cloned
+    if [ ! -f "main.go" ]; then
+        echo -e "${RED}ERROR: main.go not found after clone${NC}"
+        echo -e "${RED}Files in current directory:${NC}"
+        ls -la
         exit 1
     fi
 fi
 
-# Clean up temp directory
-rm -rf "$TEMP_DIR"
-
 echo -e "${GREEN}✓ Application downloaded${NC}"
 
 echo -e "${YELLOW}[5/8] Installing dependencies...${NC}"
-cd $INSTALL_DIR
+cd "$INSTALL_DIR"
 /usr/local/go/bin/go mod tidy
 echo -e "${GREEN}✓ Dependencies installed${NC}"
 
@@ -150,7 +137,7 @@ BINARY_SIZE=$(du -h newslettar | cut -f1)
 echo -e "${GREEN}✓ Built successfully (${BINARY_SIZE})${NC}"
 
 echo -e "${YELLOW}[7/8] Creating configuration...${NC}"
-cat > $INSTALL_DIR/.env << 'EOF'
+cat > .env << 'EOF'
 # Sonarr Configuration
 SONARR_URL=http://localhost:8989
 SONARR_API_KEY=
