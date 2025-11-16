@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -345,10 +346,21 @@ func fetchTraktShows(ctx context.Context, cfg *Config, url string, filterToNextW
 	nextWeekStart := now
 	nextWeekEnd := now.AddDate(0, 0, 7)
 
+	// Determine limit based on which endpoint we're fetching from
+	limit := 5 // Default limit
+	if strings.Contains(url, "/anticipated") {
+		limit = cfg.TraktAnticipatedSeriesLimit
+	} else if strings.Contains(url, "/watched") {
+		limit = cfg.TraktWatchedSeriesLimit
+	}
+	if limit <= 0 {
+		limit = 5 // Fallback to 5 if invalid
+	}
+
 	// Convert to our format
-	shows := make([]TraktShow, 0, 5)
+	shows := make([]TraktShow, 0, limit)
 	for _, resp := range responses {
-		if len(shows) >= 5 { // Limit to top 5
+		if len(shows) >= limit {
 			break
 		}
 
@@ -435,10 +447,21 @@ func fetchTraktMovies(ctx context.Context, cfg *Config, url string, filterToNext
 	nextWeekStart := now
 	nextWeekEnd := now.AddDate(0, 0, 7)
 
+	// Determine limit based on which endpoint we're fetching from
+	limit := 5 // Default limit
+	if strings.Contains(url, "/anticipated") {
+		limit = cfg.TraktAnticipatedMoviesLimit
+	} else if strings.Contains(url, "/watched") {
+		limit = cfg.TraktWatchedMoviesLimit
+	}
+	if limit <= 0 {
+		limit = 5 // Fallback to 5 if invalid
+	}
+
 	// Convert to our format
-	movies := make([]TraktMovie, 0, 5)
+	movies := make([]TraktMovie, 0, limit)
 	for _, resp := range responses {
-		if len(movies) >= 5 { // Limit to top 5
+		if len(movies) >= limit {
 			break
 		}
 

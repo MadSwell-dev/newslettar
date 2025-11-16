@@ -236,7 +236,7 @@ func fetchSonarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 			Overview:       entry.Overview,
 			SeriesOverview: entry.Series.Overview,
 			Monitored:      entry.Series.Monitored,
-			Rating:         entry.Series.Ratings.Value,
+			Rating:         entry.Series.Ratings.Value, // Store series rating (used to populate SeriesGroup.SeriesRating)
 		}
 
 		if ep.AirDate != "" {

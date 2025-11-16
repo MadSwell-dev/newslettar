@@ -662,55 +662,87 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             </div>
 
             <div class="template-option">
-                <div>
-                    <strong>Show Most Anticipated Series</strong>
-                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
-                        Display trending series people are most excited about
-                    </p>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>Show Most Anticipated Series</strong>
+                            <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                                Display trending series people are most excited about
+                            </p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="show-trakt-anticipated-series" onchange="toggleTraktLimit('anticipated-series')" aria-label="Toggle Trakt anticipated series">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div id="trakt-anticipated-series-limit-container" style="display: none; margin-top: 10px;">
+                        <label for="trakt-anticipated-series-limit" style="font-size: 0.9em; color: #a0b0c0;">Number of results (default: 5)</label>
+                        <input type="number" id="trakt-anticipated-series-limit" min="1" max="20" placeholder="5" style="width: 100px; margin-top: 5px;" onchange="saveTemplateSettings()">
+                    </div>
                 </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="show-trakt-anticipated-series" onchange="saveTemplateSettings()" aria-label="Toggle Trakt anticipated series">
-                    <span class="toggle-slider"></span>
-                </label>
             </div>
 
             <div class="template-option">
-                <div>
-                    <strong>Show Most Watched Series</strong>
-                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
-                        Display most watched series from the last week
-                    </p>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>Show Most Watched Series</strong>
+                            <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                                Display most watched series from the last week
+                            </p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="show-trakt-watched-series" onchange="toggleTraktLimit('watched-series')" aria-label="Toggle Trakt watched series">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div id="trakt-watched-series-limit-container" style="display: none; margin-top: 10px;">
+                        <label for="trakt-watched-series-limit" style="font-size: 0.9em; color: #a0b0c0;">Number of results (default: 5)</label>
+                        <input type="number" id="trakt-watched-series-limit" min="1" max="20" placeholder="5" style="width: 100px; margin-top: 5px;" onchange="saveTemplateSettings()">
+                    </div>
                 </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="show-trakt-watched-series" onchange="saveTemplateSettings()" aria-label="Toggle Trakt watched series">
-                    <span class="toggle-slider"></span>
-                </label>
             </div>
 
             <div class="template-option">
-                <div>
-                    <strong>Show Most Anticipated Movies</strong>
-                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
-                        Display upcoming movies generating the most buzz
-                    </p>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>Show Most Anticipated Movies</strong>
+                            <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                                Display upcoming movies generating the most buzz
+                            </p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="show-trakt-anticipated-movies" onchange="toggleTraktLimit('anticipated-movies')" aria-label="Toggle Trakt anticipated movies">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div id="trakt-anticipated-movies-limit-container" style="display: none; margin-top: 10px;">
+                        <label for="trakt-anticipated-movies-limit" style="font-size: 0.9em; color: #a0b0c0;">Number of results (default: 5)</label>
+                        <input type="number" id="trakt-anticipated-movies-limit" min="1" max="20" placeholder="5" style="width: 100px; margin-top: 5px;" onchange="saveTemplateSettings()">
+                    </div>
                 </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="show-trakt-anticipated-movies" onchange="saveTemplateSettings()" aria-label="Toggle Trakt anticipated movies">
-                    <span class="toggle-slider"></span>
-                </label>
             </div>
 
             <div class="template-option">
-                <div>
-                    <strong>Show Most Watched Movies</strong>
-                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
-                        Display most watched movies from the last week
-                    </p>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>Show Most Watched Movies</strong>
+                            <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                                Display most watched movies from the last week
+                            </p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="show-trakt-watched-movies" onchange="toggleTraktLimit('watched-movies')" aria-label="Toggle Trakt watched movies">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div id="trakt-watched-movies-limit-container" style="display: none; margin-top: 10px;">
+                        <label for="trakt-watched-movies-limit" style="font-size: 0.9em; color: #a0b0c0;">Number of results (default: 5)</label>
+                        <input type="number" id="trakt-watched-movies-limit" min="1" max="20" placeholder="5" style="width: 100px; margin-top: 5px;" onchange="saveTemplateSettings()">
+                    </div>
                 </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="show-trakt-watched-movies" onchange="saveTemplateSettings()" aria-label="Toggle Trakt watched movies">
-                    <span class="toggle-slider"></span>
-                </label>
             </div>
 
             <p style="margin-top: 20px; color: #8899aa; font-size: 0.9em;">
@@ -967,6 +999,21 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 document.getElementById('show-trakt-anticipated-movies').checked = data.show_trakt_anticipated_movies !== 'false';
                 document.getElementById('show-trakt-watched-movies').checked = data.show_trakt_watched_movies !== 'false';
 
+                document.getElementById('trakt-anticipated-series-limit').value = data.trakt_anticipated_series_limit || '5';
+                document.getElementById('trakt-watched-series-limit').value = data.trakt_watched_series_limit || '5';
+                document.getElementById('trakt-anticipated-movies-limit').value = data.trakt_anticipated_movies_limit || '5';
+                document.getElementById('trakt-watched-movies-limit').value = data.trakt_watched_movies_limit || '5';
+
+                // Show/hide limit containers based on toggle state
+                document.getElementById('trakt-anticipated-series-limit-container').style.display =
+                    data.show_trakt_anticipated_series !== 'false' ? 'block' : 'none';
+                document.getElementById('trakt-watched-series-limit-container').style.display =
+                    data.show_trakt_watched_series !== 'false' ? 'block' : 'none';
+                document.getElementById('trakt-anticipated-movies-limit-container').style.display =
+                    data.show_trakt_anticipated_movies !== 'false' ? 'block' : 'none';
+                document.getElementById('trakt-watched-movies-limit-container').style.display =
+                    data.show_trakt_watched_movies !== 'false' ? 'block' : 'none';
+
                 document.getElementById('current-timezone').textContent = data.timezone || 'UTC';
                 
                 await updateTimezoneInfo();
@@ -1144,6 +1191,13 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             }
         }
 
+        function toggleTraktLimit(type) {
+            const checkbox = document.getElementById('show-trakt-' + type);
+            const container = document.getElementById('trakt-' + type + '-limit-container');
+            container.style.display = checkbox.checked ? 'block' : 'none';
+            saveTemplateSettings();
+        }
+
         async function saveTemplateSettings() {
             const showPosters = document.getElementById('show-posters').checked;
             const showDownloaded = document.getElementById('show-downloaded').checked;
@@ -1157,6 +1211,10 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             const showTraktWatchedSeries = document.getElementById('show-trakt-watched-series').checked;
             const showTraktAnticipatedMovies = document.getElementById('show-trakt-anticipated-movies').checked;
             const showTraktWatchedMovies = document.getElementById('show-trakt-watched-movies').checked;
+            const traktAnticipatedSeriesLimit = document.getElementById('trakt-anticipated-series-limit').value || '5';
+            const traktWatchedSeriesLimit = document.getElementById('trakt-watched-series-limit').value || '5';
+            const traktAnticipatedMoviesLimit = document.getElementById('trakt-anticipated-movies-limit').value || '5';
+            const traktWatchedMoviesLimit = document.getElementById('trakt-watched-movies-limit').value || '5';
 
             try {
                 await fetch('/api/config', {
@@ -1174,7 +1232,11 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                         show_trakt_anticipated_series: showTraktAnticipatedSeries ? 'true' : 'false',
                         show_trakt_watched_series: showTraktWatchedSeries ? 'true' : 'false',
                         show_trakt_anticipated_movies: showTraktAnticipatedMovies ? 'true' : 'false',
-                        show_trakt_watched_movies: showTraktWatchedMovies ? 'true' : 'false'
+                        show_trakt_watched_movies: showTraktWatchedMovies ? 'true' : 'false',
+                        trakt_anticipated_series_limit: traktAnticipatedSeriesLimit,
+                        trakt_watched_series_limit: traktWatchedSeriesLimit,
+                        trakt_anticipated_movies_limit: traktAnticipatedMoviesLimit,
+                        trakt_watched_movies_limit: traktWatchedMoviesLimit
                     })
                 });
 
