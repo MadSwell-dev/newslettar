@@ -170,6 +170,7 @@ type TraktShow struct {
 	ReleaseDate string
 	Network     string
 	IMDBID      string
+	Rating      float64
 }
 
 type TraktMovie struct {
@@ -179,6 +180,7 @@ type TraktMovie struct {
 	Overview    string
 	ReleaseDate string
 	IMDBID      string
+	Rating      float64
 }
 
 type NewsletterData struct {

@@ -1,12 +1,12 @@
 {
-  "version": "1.4.5",
+  "version": "1.4.6",
   "released": "2025-11-16",
   "changelog": [
-    "Enhancement: Trakt section now hidden when no data is available (no more empty section)",
-    "Enhancement: Added 'Test Trakt' button to validate Client ID before saving",
-    "Enhancement: Trakt toggles are now greyed out and disabled when no Client ID is configured",
-    "Enhancement: IMDB links now appear directly on titles (clickable title) instead of separate icon",
-    "Enhancement: Simplified Trakt items to compact list format (removed placeholder images)",
-    "Fix: Trakt section visibility logic improved to only show when actual data exists"
+    "Fix: Configuration deletion now works correctly (no more fallback to system environment variables)",
+    "Enhancement: Improved Trakt layout - title, year, network, date, and rating all on one line",
+    "Enhancement: Added ratings (out of 10) to all Trakt items with star icon",
+    "Enhancement: Trakt Client ID is now validated before saving (prevents invalid IDs)",
+    "Fix: Config fields now properly deleted from .env file when cleared in UI",
+    "Enhancement: Added debug logging for config operations"
   ]
 }

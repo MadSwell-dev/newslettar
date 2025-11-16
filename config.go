@@ -62,11 +62,11 @@ func loadConfig() *Config {
 	}
 
 	return &Config{
-		SonarrURL:                  getEnvFromFile(envMap, "SONARR_URL", ""),
-		SonarrAPIKey:               getEnvFromFile(envMap, "SONARR_API_KEY", ""),
-		RadarrURL:                  getEnvFromFile(envMap, "RADARR_URL", ""),
-		RadarrAPIKey:               getEnvFromFile(envMap, "RADARR_API_KEY", ""),
-		TraktClientID:              getEnvFromFile(envMap, "TRAKT_CLIENT_ID", ""),
+		SonarrURL:                  getEnvFromFileOnly(envMap, "SONARR_URL", ""),
+		SonarrAPIKey:               getEnvFromFileOnly(envMap, "SONARR_API_KEY", ""),
+		RadarrURL:                  getEnvFromFileOnly(envMap, "RADARR_URL", ""),
+		RadarrAPIKey:               getEnvFromFileOnly(envMap, "RADARR_API_KEY", ""),
+		TraktClientID:              getEnvFromFileOnly(envMap, "TRAKT_CLIENT_ID", ""),
 		SMTPHost:                   smtpHost,
 		SMTPPort:                   smtpPort,
 		SMTPUser:                   smtpUser,
@@ -130,6 +130,15 @@ func getEnvFromFile(envMap map[string]string, key, defaultValue string) string {
 		return val
 	}
 	if val := os.Getenv(key); val != "" {
+		return val
+	}
+	return defaultValue
+}
+
+// getEnvFromFileOnly reads only from the env file, not from system environment variables
+// Use this for user-configurable fields that can be deleted via UI
+func getEnvFromFileOnly(envMap map[string]string, key, defaultValue string) string {
+	if val, exists := envMap[key]; exists {
 		return val
 	}
 	return defaultValue

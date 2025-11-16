@@ -903,17 +903,20 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             }
         }
 
+        let originalTraktClientId = '';
+
         async function loadConfig() {
             showLoading();
             try {
                 const resp = await fetch('/api/config');
                 const data = await resp.json();
-                
+
                 document.querySelector('[name="sonarr_url"]').value = data.sonarr_url || '';
                 document.querySelector('[name="sonarr_api_key"]').value = data.sonarr_api_key || '';
                 document.querySelector('[name="radarr_url"]').value = data.radarr_url || '';
                 document.querySelector('[name="radarr_api_key"]').value = data.radarr_api_key || '';
                 document.querySelector('[name="trakt_client_id"]').value = data.trakt_client_id || '';
+                originalTraktClientId = data.trakt_client_id || '';
                 document.querySelector('[name="smtp_host"]').value = data.smtp_host || 'smtp.mailgun.org';
                 document.querySelector('[name="smtp_port"]').value = data.smtp_port || '587';
                 document.querySelector('[name="smtp_user"]').value = data.smtp_user || '';
@@ -948,15 +951,35 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
         document.getElementById('config-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
-            
+
             const submitBtn = e.target.querySelector('button[type="submit"]');
             submitBtn.classList.add('loading');
             submitBtn.disabled = true;
-            
+
             try {
+                // Validate Trakt Client ID if it changed and is not empty
+                const currentTraktClientId = data.trakt_client_id || '';
+                if (currentTraktClientId !== originalTraktClientId && currentTraktClientId !== '') {
+                    showNotification('Validating Trakt Client ID...', 'info');
+
+                    const testResp = await fetch('/api/test-trakt', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ client_id: currentTraktClientId })
+                    });
+
+                    const testResult = await testResp.json();
+                    if (!testResult.success) {
+                        showNotification('Invalid Trakt Client ID: ' + testResult.message, 'error');
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                }
+
                 const resp = await fetch('/api/config', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -965,6 +988,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
                 if (resp.ok) {
                     showNotification('Configuration saved successfully!', 'success');
+                    originalTraktClientId = currentTraktClientId;
                     setTimeout(() => location.reload(), 2000);
                 } else {
                     showNotification('Failed to save configuration', 'error');
