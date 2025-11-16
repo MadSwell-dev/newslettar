@@ -66,15 +66,35 @@ echo -e "${BLUE}Method: Git clone${NC}"
 
 # Create temp directory for clone
 TEMP_CLONE=$(mktemp -d)
+echo -e "${BLUE}  Temp directory: $TEMP_CLONE${NC}"
 git clone --depth 1 --branch main "https://github.com/agencefanfare/newslettar.git" "$TEMP_CLONE" 2>&1
 
-if [ $? -eq 0 ] && [ -f "$TEMP_CLONE/main.go" ]; then
-    # Copy files from temp to install directory
-    cp -r "$TEMP_CLONE"/* "$INSTALL_DIR/" 2>/dev/null
-    cp -r "$TEMP_CLONE"/.git "$INSTALL_DIR/" 2>/dev/null || true
-    cp "$TEMP_CLONE"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
-    rm -rf "$TEMP_CLONE"
-    echo -e "${GREEN}✓ Source code downloaded${NC}"
+if [ $? -eq 0 ]; then
+    echo -e "${BLUE}  Clone successful, checking files...${NC}"
+    ls -la "$TEMP_CLONE" | head -15
+    
+    if [ -f "$TEMP_CLONE/main.go" ]; then
+        # Copy files from temp to install directory
+        echo -e "${BLUE}  Copying files to $INSTALL_DIR...${NC}"
+        cp -v "$TEMP_CLONE"/*.go "$INSTALL_DIR/" 2>&1
+        cp -v "$TEMP_CLONE"/go.mod "$INSTALL_DIR/" 2>&1
+        cp -v "$TEMP_CLONE"/go.sum "$INSTALL_DIR/" 2>&1
+        cp -v "$TEMP_CLONE"/version.json "$INSTALL_DIR/" 2>&1
+        mkdir -p "$INSTALL_DIR/templates"
+        cp -v "$TEMP_CLONE"/templates/* "$INSTALL_DIR/templates/" 2>&1
+        cp -r "$TEMP_CLONE"/.git "$INSTALL_DIR/" 2>/dev/null || true
+        cp "$TEMP_CLONE"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
+        
+        echo -e "${BLUE}  Verifying copy...${NC}"
+        ls -la "$INSTALL_DIR" | head -15
+        
+        rm -rf "$TEMP_CLONE"
+        echo -e "${GREEN}✓ Source code downloaded${NC}"
+    else
+        echo -e "${RED}ERROR: main.go not found in $TEMP_CLONE${NC}"
+        ls -la "$TEMP_CLONE"
+        exit 1
+    fi
 else
     echo -e "${YELLOW}Git clone failed, trying wget fallback...${NC}"
     rm -rf "$TEMP_CLONE"
