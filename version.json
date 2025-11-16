@@ -1,10 +1,12 @@
 {
-  "version": "1.4.2",
+  "version": "1.4.3",
   "released": "2025-11-16",
   "changelog": [
-    "Fix: Simplified Trakt configuration - only Client ID is needed (removed unnecessary API Key field)",
-    "Enhancement: Updated UI to clarify that Client Secret is not required for trending content",
-    "Enhancement: Removed redundant validation checks for non-existent API Key field",
-    "Documentation: Added note explaining Client ID vs Client Secret usage"
+    "Fix: Trakt results now limited to top 5 items per section (was 10)",
+    "Fix: Anticipated content filtered to show only releases in the next 7 days",
+    "Fix: Configuration fields can now be properly cleared by deleting and saving",
+    "Enhancement: Added release dates to anticipated series and movies",
+    "Enhancement: Removed Trakt poster images (not available from API, show placeholders instead)",
+    "Enhancement: Updated section headers to clarify 'Next Week' for anticipated content"
   ]
 }

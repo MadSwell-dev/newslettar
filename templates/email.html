@@ -264,17 +264,13 @@
 
             {{if .ShowTraktAnticipatedSeries}}
             {{if .TraktAnticipatedSeries}}
-            <h3>Most Anticipated Series <span class="count-badge">{{len .TraktAnticipatedSeries}}</span></h3>
+            <h3>Most Anticipated Series (Next Week) <span class="count-badge">{{len .TraktAnticipatedSeries}}</span></h3>
             {{range .TraktAnticipatedSeries}}
             <div class="trakt-item">
-                {{if .ImageURL}}
-                    <img src="{{.ImageURL}}" alt="{{.Title}}" class="movie-poster" />
-                {{else}}
-                    <div class="movie-poster-placeholder">📺</div>
-                {{end}}
+                <div class="movie-poster-placeholder">📺</div>
                 <div class="movie-content">
                     <div class="movie-title">{{.Title}}</div>
-                    <div class="movie-year">({{.Year}})</div>
+                    <div class="movie-year">({{.Year}}){{if .ReleaseDate}} • Premieres {{formatDateWithDay .ReleaseDate}}{{end}}</div>
                     {{if .Overview}}
                         <div class="series-overview">{{.Overview}}</div>
                     {{end}}
@@ -289,11 +285,7 @@
             <h3>Most Watched Series (Last Week) <span class="count-badge">{{len .TraktWatchedSeries}}</span></h3>
             {{range .TraktWatchedSeries}}
             <div class="trakt-item">
-                {{if .ImageURL}}
-                    <img src="{{.ImageURL}}" alt="{{.Title}}" class="movie-poster" />
-                {{else}}
-                    <div class="movie-poster-placeholder">📺</div>
-                {{end}}
+                <div class="movie-poster-placeholder">📺</div>
                 <div class="movie-content">
                     <div class="movie-title">{{.Title}}</div>
                     <div class="movie-year">({{.Year}})</div>
@@ -308,17 +300,13 @@
 
             {{if .ShowTraktAnticipatedMovies}}
             {{if .TraktAnticipatedMovies}}
-            <h3>Most Anticipated Movies <span class="count-badge">{{len .TraktAnticipatedMovies}}</span></h3>
+            <h3>Most Anticipated Movies (Next Week) <span class="count-badge">{{len .TraktAnticipatedMovies}}</span></h3>
             {{range .TraktAnticipatedMovies}}
             <div class="trakt-item">
-                {{if .ImageURL}}
-                    <img src="{{.ImageURL}}" alt="{{.Title}}" class="movie-poster" />
-                {{else}}
-                    <div class="movie-poster-placeholder">🎬</div>
-                {{end}}
+                <div class="movie-poster-placeholder">🎬</div>
                 <div class="movie-content">
                     <div class="movie-title">{{.Title}}</div>
-                    <div class="movie-year">({{.Year}})</div>
+                    <div class="movie-year">({{.Year}}){{if .ReleaseDate}} • Releases {{formatDateWithDay .ReleaseDate}}{{end}}</div>
                     {{if .Overview}}
                         <div class="series-overview">{{.Overview}}</div>
                     {{end}}
@@ -333,11 +321,7 @@
             <h3>Most Watched Movies (Last Week) <span class="count-badge">{{len .TraktWatchedMovies}}</span></h3>
             {{range .TraktWatchedMovies}}
             <div class="trakt-item">
-                {{if .ImageURL}}
-                    <img src="{{.ImageURL}}" alt="{{.Title}}" class="movie-poster" />
-                {{else}}
-                    <div class="movie-poster-placeholder">🎬</div>
-                {{end}}
+                <div class="movie-poster-placeholder">🎬</div>
                 <div class="movie-content">
                     <div class="movie-title">{{.Title}}</div>
                     <div class="movie-year">({{.Year}})</div>

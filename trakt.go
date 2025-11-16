@@ -13,9 +13,10 @@ import (
 // Trakt API response structures
 type traktShowResponse struct {
 	Show struct {
-		Title string `json:"title"`
-		Year  int    `json:"year"`
-		IDs   struct {
+		Title      string `json:"title"`
+		Year       int    `json:"year"`
+		FirstAired string `json:"first_aired"`
+		IDs        struct {
 			Slug string `json:"slug"`
 			TVDB int    `json:"tvdb"`
 			IMDB string `json:"imdb"`
@@ -27,9 +28,10 @@ type traktShowResponse struct {
 
 type traktMovieResponse struct {
 	Movie struct {
-		Title string `json:"title"`
-		Year  int    `json:"year"`
-		IDs   struct {
+		Title    string `json:"title"`
+		Year     int    `json:"year"`
+		Released string `json:"released"`
+		IDs      struct {
 			Slug string `json:"slug"`
 			IMDB string `json:"imdb"`
 			TMDB int    `json:"tmdb"`
@@ -52,7 +54,7 @@ func fetchTraktAnticipatedSeries(ctx context.Context, cfg *Config) ([]TraktShow,
 	}
 
 	url := "https://api.trakt.tv/shows/anticipated"
-	shows, err := fetchTraktShows(ctx, cfg, url)
+	shows, err := fetchTraktShows(ctx, cfg, url, true) // Filter to next week only
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +78,7 @@ func fetchTraktWatchedSeries(ctx context.Context, cfg *Config) ([]TraktShow, err
 	}
 
 	url := "https://api.trakt.tv/shows/watched/weekly"
-	shows, err := fetchTraktShows(ctx, cfg, url)
+	shows, err := fetchTraktShows(ctx, cfg, url, false) // No date filtering for watched
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +102,7 @@ func fetchTraktAnticipatedMovies(ctx context.Context, cfg *Config) ([]TraktMovie
 	}
 
 	url := "https://api.trakt.tv/movies/anticipated"
-	movies, err := fetchTraktMovies(ctx, cfg, url)
+	movies, err := fetchTraktMovies(ctx, cfg, url, true) // Filter to next week only
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +126,7 @@ func fetchTraktWatchedMovies(ctx context.Context, cfg *Config) ([]TraktMovie, er
 	}
 
 	url := "https://api.trakt.tv/movies/watched/weekly"
-	movies, err := fetchTraktMovies(ctx, cfg, url)
+	movies, err := fetchTraktMovies(ctx, cfg, url, false) // No date filtering for watched
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +137,12 @@ func fetchTraktWatchedMovies(ctx context.Context, cfg *Config) ([]TraktMovie, er
 }
 
 // fetchTraktShows is a helper function to fetch shows from Trakt API
-func fetchTraktShows(ctx context.Context, cfg *Config, url string) ([]TraktShow, error) {
+func fetchTraktShows(ctx context.Context, cfg *Config, url string, filterToNextWeek bool) ([]TraktShow, error) {
+	// Add extended parameter to get full details
+	if len(url) > 0 && url[len(url)-1] != '?' {
+		url += "?extended=full"
+	}
+
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Trakt request: %w", err)
@@ -171,23 +178,39 @@ func fetchTraktShows(ctx context.Context, cfg *Config, url string) ([]TraktShow,
 		return nil, fmt.Errorf("failed to parse Trakt response: %w", err)
 	}
 
-	// Convert to our format and fetch images
-	shows := make([]TraktShow, 0, len(responses))
-	for i, resp := range responses {
-		if i >= 10 { // Limit to top 10
+	// Calculate next week's date range for filtering
+	now := time.Now()
+	nextWeekStart := now
+	nextWeekEnd := now.AddDate(0, 0, 7)
+
+	// Convert to our format
+	shows := make([]TraktShow, 0, 5)
+	for _, resp := range responses {
+		if len(shows) >= 5 { // Limit to top 5
 			break
 		}
 
-		show := TraktShow{
-			Title:    resp.Show.Title,
-			Year:     resp.Show.Year,
-			Overview: resp.Show.Overview,
+		// If filtering to next week and we have a first_aired date, check it
+		if filterToNextWeek && resp.Show.FirstAired != "" {
+			firstAired, err := time.Parse(time.RFC3339, resp.Show.FirstAired)
+			if err == nil {
+				// Skip if not premiering in the next 7 days
+				if firstAired.Before(nextWeekStart) || firstAired.After(nextWeekEnd) {
+					continue
+				}
+			}
 		}
 
-		// Try to get poster from TMDB if available
-		if resp.Show.IDs.TMDB != 0 {
-			show.ImageURL = fmt.Sprintf("https://image.tmdb.org/t/p/w500/%d", resp.Show.IDs.TMDB)
+		show := TraktShow{
+			Title:       resp.Show.Title,
+			Year:        resp.Show.Year,
+			Overview:    resp.Show.Overview,
+			ReleaseDate: resp.Show.FirstAired,
 		}
+
+		// Images are not available from Trakt API directly
+		// Would need TMDB/TVDB API integration for posters
+		show.ImageURL = ""
 
 		shows = append(shows, show)
 	}
@@ -197,7 +220,12 @@ func fetchTraktShows(ctx context.Context, cfg *Config, url string) ([]TraktShow,
 }
 
 // fetchTraktMovies is a helper function to fetch movies from Trakt API
-func fetchTraktMovies(ctx context.Context, cfg *Config, url string) ([]TraktMovie, error) {
+func fetchTraktMovies(ctx context.Context, cfg *Config, url string, filterToNextWeek bool) ([]TraktMovie, error) {
+	// Add extended parameter to get full details
+	if len(url) > 0 && url[len(url)-1] != '?' {
+		url += "?extended=full"
+	}
+
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Trakt request: %w", err)
@@ -233,23 +261,39 @@ func fetchTraktMovies(ctx context.Context, cfg *Config, url string) ([]TraktMovi
 		return nil, fmt.Errorf("failed to parse Trakt response: %w", err)
 	}
 
-	// Convert to our format and fetch images
-	movies := make([]TraktMovie, 0, len(responses))
-	for i, resp := range responses {
-		if i >= 10 { // Limit to top 10
+	// Calculate next week's date range for filtering
+	now := time.Now()
+	nextWeekStart := now
+	nextWeekEnd := now.AddDate(0, 0, 7)
+
+	// Convert to our format
+	movies := make([]TraktMovie, 0, 5)
+	for _, resp := range responses {
+		if len(movies) >= 5 { // Limit to top 5
 			break
 		}
 
-		movie := TraktMovie{
-			Title:    resp.Movie.Title,
-			Year:     resp.Movie.Year,
-			Overview: resp.Movie.Overview,
+		// If filtering to next week and we have a released date, check it
+		if filterToNextWeek && resp.Movie.Released != "" {
+			released, err := time.Parse("2006-01-02", resp.Movie.Released)
+			if err == nil {
+				// Skip if not releasing in the next 7 days
+				if released.Before(nextWeekStart) || released.After(nextWeekEnd) {
+					continue
+				}
+			}
 		}
 
-		// Try to get poster from TMDB if available
-		if resp.Movie.IDs.TMDB != 0 {
-			movie.ImageURL = fmt.Sprintf("https://image.tmdb.org/t/p/w500/%d", resp.Movie.IDs.TMDB)
+		movie := TraktMovie{
+			Title:       resp.Movie.Title,
+			Year:        resp.Movie.Year,
+			Overview:    resp.Movie.Overview,
+			ReleaseDate: resp.Movie.Released,
 		}
+
+		// Images are not available from Trakt API directly
+		// Would need TMDB/TVDB API integration for posters
+		movie.ImageURL = ""
 
 		movies = append(movies, movie)
 	}
