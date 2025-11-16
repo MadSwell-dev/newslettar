@@ -361,6 +361,7 @@ func sendEmailBatch(cfg *Config, subject, htmlBody string, recipients []string) 
 func initEmailTemplate() (*template.Template, error) {
 	return template.New("email.html").Funcs(template.FuncMap{
 		"formatDateWithDay": formatDateWithDay,
+		"truncate":          truncateString,
 	}).ParseFS(templateFS, "templates/email.html")
 }
 
