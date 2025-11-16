@@ -72,6 +72,7 @@ type Config struct {
 	ShowSeriesOverview         bool
 	ShowEpisodeOverview        bool
 	ShowUnmonitored            bool
+	ShowRatings                bool
 	DarkMode                   bool
 	ShowTraktAnticipatedSeries bool
 	ShowTraktWatchedSeries     bool
@@ -102,6 +103,7 @@ type Episode struct {
 	Overview       string
 	SeriesOverview string
 	Monitored      bool
+	Rating         float64
 }
 
 type Movie struct {
@@ -114,6 +116,7 @@ type Movie struct {
 	TmdbID      int
 	Overview    string
 	Monitored   bool
+	Rating      float64
 }
 
 // For Sonarr calendar response (nested series data)
@@ -129,7 +132,10 @@ type CalendarEpisode struct {
 		ImdbId    string `json:"imdbId"`
 		Overview  string `json:"overview"`
 		Monitored bool   `json:"monitored"`
-		Images    []struct {
+		Ratings   struct {
+			Value float64 `json:"value"`
+		} `json:"ratings"`
+		Images []struct {
 			CoverType string `json:"coverType"`
 			Url       string `json:"url"`       // Local URL if available
 			RemoteUrl string `json:"remoteUrl"` // Fallback remote URL
@@ -146,7 +152,15 @@ type CalendarMovie struct {
 	TmdbId          int    `json:"tmdbId"`
 	Overview        string `json:"overview"`
 	Monitored       bool   `json:"monitored"`
-	Images          []struct {
+	Ratings         struct {
+		Imdb struct {
+			Value float64 `json:"value"`
+		} `json:"imdb"`
+		Tmdb struct {
+			Value float64 `json:"value"`
+		} `json:"tmdb"`
+	} `json:"ratings"`
+	Images []struct {
 		CoverType string `json:"coverType"`
 		Url       string `json:"url"`       // Local URL if available
 		RemoteUrl string `json:"remoteUrl"` // Fallback remote URL
@@ -219,6 +233,7 @@ type WebConfig struct {
 	ShowSeriesOverview         string `json:"show_series_overview"`
 	ShowEpisodeOverview        string `json:"show_episode_overview"`
 	ShowUnmonitored            string `json:"show_unmonitored"`
+	ShowRatings                string `json:"show_ratings"`
 	DarkMode                   string `json:"dark_mode"`
 	ShowTraktAnticipatedSeries string `json:"show_trakt_anticipated_series"`
 	ShowTraktWatchedSeries     string `json:"show_trakt_watched_series"`

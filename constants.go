@@ -16,6 +16,7 @@ const (
 	DefaultShowSeriesOverview         = "false"
 	DefaultShowEpisodeOverview        = "false"
 	DefaultShowUnmonitored            = "false"
+	DefaultShowRatings                = "false"
 	DefaultDarkMode                   = "true"
 	DefaultShowTraktAnticipatedSeries = "false"
 	DefaultShowTraktWatchedSeries     = "false"

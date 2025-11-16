@@ -236,6 +236,7 @@ func fetchSonarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 			Overview:       entry.Overview,
 			SeriesOverview: entry.Series.Overview,
 			Monitored:      entry.Series.Monitored,
+			Rating:         entry.Series.Ratings.Value,
 		}
 
 		if ep.AirDate != "" {
@@ -400,6 +401,12 @@ func fetchRadarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 			}
 		}
 
+		// Prefer IMDB rating, fallback to TMDB rating
+		rating := entry.Ratings.Imdb.Value
+		if rating == 0 {
+			rating = entry.Ratings.Tmdb.Value
+		}
+
 		mv := Movie{
 			Title:       entry.Title,
 			Year:        entry.Year,
@@ -409,6 +416,7 @@ func fetchRadarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 			TmdbID:      entry.TmdbId,
 			Overview:    entry.Overview,
 			Monitored:   entry.Monitored,
+			Rating:      rating,
 		}
 
 		if mv.ReleaseDate != "" {
