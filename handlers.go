@@ -307,51 +307,82 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 
 		envMap := readEnvFile()
 
-		// Only update fields that were provided
+		// Update configuration fields (allow empty values to clear them)
+		// For empty values, delete the key from the map
 		if webCfg.SonarrURL != "" {
 			envMap["SONARR_URL"] = webCfg.SonarrURL
+		} else {
+			delete(envMap, "SONARR_URL")
 		}
 		if webCfg.SonarrAPIKey != "" {
 			envMap["SONARR_API_KEY"] = webCfg.SonarrAPIKey
+		} else {
+			delete(envMap, "SONARR_API_KEY")
 		}
 		if webCfg.RadarrURL != "" {
 			envMap["RADARR_URL"] = webCfg.RadarrURL
+		} else {
+			delete(envMap, "RADARR_URL")
 		}
 		if webCfg.RadarrAPIKey != "" {
 			envMap["RADARR_API_KEY"] = webCfg.RadarrAPIKey
+		} else {
+			delete(envMap, "RADARR_API_KEY")
 		}
 		if webCfg.TraktClientID != "" {
 			envMap["TRAKT_CLIENT_ID"] = webCfg.TraktClientID
+		} else {
+			delete(envMap, "TRAKT_CLIENT_ID")
 		}
 		if webCfg.SMTPHost != "" {
 			envMap["SMTP_HOST"] = webCfg.SMTPHost
+		} else {
+			delete(envMap, "SMTP_HOST")
 		}
 		if webCfg.SMTPPort != "" {
 			envMap["SMTP_PORT"] = webCfg.SMTPPort
+		} else {
+			delete(envMap, "SMTP_PORT")
 		}
 		if webCfg.SMTPUser != "" {
 			envMap["SMTP_USER"] = webCfg.SMTPUser
+		} else {
+			delete(envMap, "SMTP_USER")
 		}
 		if webCfg.SMTPPass != "" {
 			envMap["SMTP_PASS"] = webCfg.SMTPPass
+		} else {
+			delete(envMap, "SMTP_PASS")
 		}
 		if webCfg.FromEmail != "" {
 			envMap["FROM_EMAIL"] = webCfg.FromEmail
+		} else {
+			delete(envMap, "FROM_EMAIL")
 		}
 		if webCfg.FromName != "" {
 			envMap["FROM_NAME"] = webCfg.FromName
+		} else {
+			delete(envMap, "FROM_NAME")
 		}
 		if webCfg.ToEmails != "" {
 			envMap["TO_EMAILS"] = webCfg.ToEmails
+		} else {
+			delete(envMap, "TO_EMAILS")
 		}
 		if webCfg.Timezone != "" {
 			envMap["TIMEZONE"] = webCfg.Timezone
+		} else {
+			delete(envMap, "TIMEZONE")
 		}
 		if webCfg.ScheduleDay != "" {
 			envMap["SCHEDULE_DAY"] = webCfg.ScheduleDay
+		} else {
+			delete(envMap, "SCHEDULE_DAY")
 		}
 		if webCfg.ScheduleTime != "" {
 			envMap["SCHEDULE_TIME"] = webCfg.ScheduleTime
+		} else {
+			delete(envMap, "SCHEDULE_TIME")
 		}
 		if webCfg.ShowPosters != "" {
 			envMap["SHOW_POSTERS"] = webCfg.ShowPosters

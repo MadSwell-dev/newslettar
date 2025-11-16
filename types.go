@@ -163,17 +163,19 @@ type SeriesGroup struct {
 }
 
 type TraktShow struct {
-	Title    string
-	Year     int
-	ImageURL string
-	Overview string
+	Title       string
+	Year        int
+	ImageURL    string
+	Overview    string
+	ReleaseDate string
 }
 
 type TraktMovie struct {
-	Title    string
-	Year     int
-	ImageURL string
-	Overview string
+	Title       string
+	Year        int
+	ImageURL    string
+	Overview    string
+	ReleaseDate string
 }
 
 type NewsletterData struct {
