@@ -2,33 +2,73 @@
 
 Docker provides the easiest and most reliable way to deploy Newslettar. It handles all dependencies automatically and ensures consistency across different systems.
 
-## Quick Start (3 commands)
+## Quick Start (2 methods)
+
+### Method 1: Using Setup Script (Recommended)
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/agencefanfare/newslettar.git
 cd newslettar
+bash docker-setup.sh
+nano data/.env  # Edit with your settings
+```
 
-# 2. Configure your settings (copy the template)
+### Method 2: Using docker-compose
+
+```bash
+git clone https://github.com/agencefanfare/newslettar.git
+cd newslettar
 mkdir -p data
 cp .env.example data/.env
-nano data/.env  # Edit with your Sonarr/Radarr/Email settings
-
-# 3. Start the container
+nano data/.env  # Edit with your settings
 docker-compose up -d
 ```
 
-That's it! Open `http://localhost:8080` in your browser.
+Then open `http://localhost:8080` in your browser.
 
 ## Requirements
 
 - Docker: [Install Docker](https://docs.docker.com/get-docker/)
-- Docker Compose: Usually comes with Docker Desktop (or install separately)
+- For docker-compose method: Docker Compose 1.29+ (usually included with Docker)
 - ~300MB disk space for the image
+- Port 8080 available (or change it in docker-compose.yml)
 
 ## Configuration
 
-### Using docker-compose (Recommended)
+### Using Setup Script (Easiest - Works everywhere)
+
+1. **Clone and run setup:**
+   ```bash
+   git clone https://github.com/agencefanfare/newslettar.git
+   cd newslettar
+   bash docker-setup.sh
+   ```
+
+2. **Script will prompt you to edit configuration:**
+   ```bash
+   nano data/.env
+   ```
+
+3. **Key settings to configure:**
+   - `SONARR_URL` and `SONARR_API_KEY` - Your Sonarr instance
+   - `RADARR_URL` and `RADARR_API_KEY` - Your Radarr instance
+   - `MAILGUN_SMTP`, `MAILGUN_USER`, `MAILGUN_PASS` - Email configuration
+   - `FROM_EMAIL` and `TO_EMAILS` - Email addresses
+   - `TIMEZONE` - Your timezone (e.g., `America/New_York`, `Europe/London`)
+   - `SCHEDULE_DAY` and `SCHEDULE_TIME` - When to send newsletters
+
+4. **Start container:**
+   ```bash
+   docker start newslettar
+   # or run setup script again
+   ```
+
+5. **Access the web UI:**
+   ```bash
+   # Open: http://localhost:8080
+   ```
+
+### Using docker-compose (If installed)
 
 1. **Clone the repository:**
    ```bash
@@ -40,34 +80,20 @@ That's it! Open `http://localhost:8080` in your browser.
    ```bash
    mkdir -p data
    cp .env.example data/.env
-   ```
-
-3. **Edit `.env` file with your settings:**
-   ```bash
    nano data/.env
    ```
-   
-   Key settings to configure:
-   - `SONARR_URL` and `SONARR_API_KEY` - Your Sonarr instance
-   - `RADARR_URL` and `RADARR_API_KEY` - Your Radarr instance
-   - `MAILGUN_*` - Email configuration
-   - `TIMEZONE` - Your timezone (e.g., `America/New_York`, `Europe/London`)
-   - `SCHEDULE_DAY` and `SCHEDULE_TIME` - When to send newsletters
 
-4. **Start the container:**
+3. **Start the containers:**
    ```bash
    docker-compose up -d
    ```
 
-5. **Access the web UI:**
+4. **Access the web UI:**
    ```bash
-   # Find the container IP (if not localhost)
-   docker-compose exec newslettar hostname -I
-   
-   # Open in browser: http://localhost:8080
+   # Open: http://localhost:8080
    ```
 
-### Manual Docker commands (if not using compose)
+### Manual Docker commands (if not using scripts)
 
 ```bash
 # Build the image
