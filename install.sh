@@ -157,6 +157,10 @@ fi
 
 echo -e "${GREEN}✓ Application downloaded${NC}"
 
+# Debug: show what's actually in the install directory
+echo -e "${BLUE}  DEBUG: Files in $INSTALL_DIR:${NC}"
+ls -la "$INSTALL_DIR/" 2>&1 | head -20
+
 # Verify all critical files were copied
 MISSING=""
 for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod version.json; do
@@ -173,6 +177,9 @@ fi
 
 echo -e "${YELLOW}[5/8] Installing dependencies...${NC}"
 cd "$INSTALL_DIR"
+echo -e "${BLUE}  DEBUG: Current directory: $(pwd)${NC}"
+echo -e "${BLUE}  DEBUG: Files in current directory:${NC}"
+ls -la | head -20
 /usr/local/go/bin/go mod tidy
 echo -e "${GREEN}✓ Dependencies installed${NC}"
 
