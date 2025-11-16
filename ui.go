@@ -615,6 +615,19 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
             <div class="template-option">
                 <div>
+                    <strong>Show Ratings</strong>
+                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                        Display ratings for movies and series from Sonarr/Radarr
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="show-ratings" onchange="saveTemplateSettings()" aria-label="Toggle ratings display">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="template-option">
+                <div>
                     <strong>Dark Mode</strong>
                     <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
                         Use dark theme for email newsletters (recommended). When disabled, uses traditional light theme with white background.
@@ -933,6 +946,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 document.getElementById('show-series-overview').checked = data.show_series_overview !== 'false';
                 document.getElementById('show-episode-overview').checked = data.show_episode_overview !== 'false';
                 document.getElementById('show-unmonitored').checked = data.show_unmonitored !== 'false';
+                document.getElementById('show-ratings').checked = data.show_ratings !== 'false';
                 document.getElementById('dark-mode').checked = data.dark_mode !== 'false';
                 document.getElementById('show-trakt-anticipated-series').checked = data.show_trakt_anticipated_series !== 'false';
                 document.getElementById('show-trakt-watched-series').checked = data.show_trakt_watched_series !== 'false';
@@ -1122,6 +1136,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             const showSeriesOverview = document.getElementById('show-series-overview').checked;
             const showEpisodeOverview = document.getElementById('show-episode-overview').checked;
             const showUnmonitored = document.getElementById('show-unmonitored').checked;
+            const showRatings = document.getElementById('show-ratings').checked;
             const darkMode = document.getElementById('dark-mode').checked;
             const showTraktAnticipatedSeries = document.getElementById('show-trakt-anticipated-series').checked;
             const showTraktWatchedSeries = document.getElementById('show-trakt-watched-series').checked;
@@ -1138,6 +1153,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                         show_series_overview: showSeriesOverview ? 'true' : 'false',
                         show_episode_overview: showEpisodeOverview ? 'true' : 'false',
                         show_unmonitored: showUnmonitored ? 'true' : 'false',
+                        show_ratings: showRatings ? 'true' : 'false',
                         dark_mode: darkMode ? 'true' : 'false',
                         show_trakt_anticipated_series: showTraktAnticipatedSeries ? 'true' : 'false',
                         show_trakt_watched_series: showTraktWatchedSeries ? 'true' : 'false',

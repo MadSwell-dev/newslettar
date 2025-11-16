@@ -1,9 +1,11 @@
 {
-  "version": "1.4.11",
+  "version": "1.4.12",
   "released": "2025-11-16",
   "changelog": [
-    "Fix: Corrected Trakt section layout to display title/metadata on top with description underneath",
-    "Fix: Changed .trakt-item from flexbox to block layout for proper vertical stacking",
-    "Enhancement: Full-width layout for better readability of Trakt trending items"
+    "Feature: Added ratings toggle for Sonarr/Radarr releases",
+    "Enhancement: Display IMDB/TMDB ratings for movies (⭐ X.X/10)",
+    "Enhancement: Display series ratings for TV episodes from Sonarr",
+    "Enhancement: Ratings shown for both upcoming and downloaded content when enabled",
+    "Performance: Zero extra API calls - ratings parsed from existing responses"
   ]
 }
