@@ -169,6 +169,14 @@ func formatDateWithDay(dateStr string) string {
 	return t.Format("Monday, January 2, 2006")
 }
 
+// Truncate string to maxLength characters, adding "..." if truncated
+func truncateString(s string, maxLength int) string {
+	if len(s) <= maxLength {
+		return s
+	}
+	return s[:maxLength] + "..."
+}
+
 // Convert day/time to cron expression
 func convertToCronExpression(day, timeStr string) string {
 	// Parse time (HH:MM)
