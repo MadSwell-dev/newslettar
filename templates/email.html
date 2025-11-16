@@ -112,7 +112,7 @@
                                 {{else}}
                                     {{.SeriesTitle}}
                                 {{end}}
-                                <span style="{{if $.DarkMode}}color: #8899aa;{{else}}color: #666;{{end}} font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}}){{if and $.ShowSeriesRatings .Episodes}}{{if gt (index .Episodes 0).Rating 0.0}} • ⭐ {{printf "%.1f" (index .Episodes 0).Rating}}/10{{end}}{{end}}</span>
+                                <span style="{{if $.DarkMode}}color: #8899aa;{{else}}color: #666;{{end}} font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}}){{if and $.ShowSeriesRatings (gt .SeriesRating 0.0)}} • ⭐ {{printf "%.1f" .SeriesRating}}/10{{end}}</span>
                             </div>
                             {{if $.ShowSeriesOverview}}
                                 {{if .Overview}}
@@ -197,7 +197,7 @@
                                 {{else}}
                                     {{.SeriesTitle}}
                                 {{end}}
-                                <span style="{{if $.DarkMode}}color: #8899aa;{{else}}color: #666;{{end}} font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}}){{if and $.ShowSeriesRatings .Episodes}}{{if gt (index .Episodes 0).Rating 0.0}} • ⭐ {{printf "%.1f" (index .Episodes 0).Rating}}/10{{end}}{{end}}</span>
+                                <span style="{{if $.DarkMode}}color: #8899aa;{{else}}color: #666;{{end}} font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}}){{if and $.ShowSeriesRatings (gt .SeriesRating 0.0)}} • ⭐ {{printf "%.1f" .SeriesRating}}/10{{end}}</span>
                             </div>
                             {{if $.ShowSeriesOverview}}
                                 {{if .Overview}}

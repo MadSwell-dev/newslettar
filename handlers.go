@@ -393,6 +393,18 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.ShowTraktWatchedMovies != "" {
 			envMap["SHOW_TRAKT_WATCHED_MOVIES"] = webCfg.ShowTraktWatchedMovies
 		}
+		if webCfg.TraktAnticipatedSeriesLimit != "" {
+			envMap["TRAKT_ANTICIPATED_SERIES_LIMIT"] = webCfg.TraktAnticipatedSeriesLimit
+		}
+		if webCfg.TraktWatchedSeriesLimit != "" {
+			envMap["TRAKT_WATCHED_SERIES_LIMIT"] = webCfg.TraktWatchedSeriesLimit
+		}
+		if webCfg.TraktAnticipatedMoviesLimit != "" {
+			envMap["TRAKT_ANTICIPATED_MOVIES_LIMIT"] = webCfg.TraktAnticipatedMoviesLimit
+		}
+		if webCfg.TraktWatchedMoviesLimit != "" {
+			envMap["TRAKT_WATCHED_MOVIES_LIMIT"] = webCfg.TraktWatchedMoviesLimit
+		}
 
 		var envContent strings.Builder
 		for key, value := range envMap {
@@ -442,10 +454,14 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		"show_series_ratings":           getEnvFromFile(envMap, "SHOW_SERIES_RATINGS", DefaultShowSeriesRatings),
 		"show_episode_ratings":          getEnvFromFile(envMap, "SHOW_EPISODE_RATINGS", DefaultShowEpisodeRatings),
 		"dark_mode":                     getEnvFromFile(envMap, "DARK_MODE", DefaultDarkMode),
-		"show_trakt_anticipated_series": getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_SERIES", DefaultShowTraktAnticipatedSeries),
-		"show_trakt_watched_series":     getEnvFromFile(envMap, "SHOW_TRAKT_WATCHED_SERIES", DefaultShowTraktWatchedSeries),
-		"show_trakt_anticipated_movies": getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_MOVIES", DefaultShowTraktAnticipatedMovies),
-		"show_trakt_watched_movies":     getEnvFromFile(envMap, "SHOW_TRAKT_WATCHED_MOVIES", DefaultShowTraktWatchedMovies),
+		"show_trakt_anticipated_series":      getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_SERIES", DefaultShowTraktAnticipatedSeries),
+		"show_trakt_watched_series":          getEnvFromFile(envMap, "SHOW_TRAKT_WATCHED_SERIES", DefaultShowTraktWatchedSeries),
+		"show_trakt_anticipated_movies":      getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_MOVIES", DefaultShowTraktAnticipatedMovies),
+		"show_trakt_watched_movies":          getEnvFromFile(envMap, "SHOW_TRAKT_WATCHED_MOVIES", DefaultShowTraktWatchedMovies),
+		"trakt_anticipated_series_limit":     getEnvFromFile(envMap, "TRAKT_ANTICIPATED_SERIES_LIMIT", "5"),
+		"trakt_watched_series_limit":         getEnvFromFile(envMap, "TRAKT_WATCHED_SERIES_LIMIT", "5"),
+		"trakt_anticipated_movies_limit":     getEnvFromFile(envMap, "TRAKT_ANTICIPATED_MOVIES_LIMIT", "5"),
+		"trakt_watched_movies_limit":         getEnvFromFile(envMap, "TRAKT_WATCHED_MOVIES_LIMIT", "5"),
 	})
 }
 

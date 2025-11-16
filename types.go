@@ -75,10 +75,14 @@ type Config struct {
 	ShowSeriesRatings          bool
 	ShowEpisodeRatings         bool
 	DarkMode                   bool
-	ShowTraktAnticipatedSeries bool
-	ShowTraktWatchedSeries     bool
-	ShowTraktAnticipatedMovies bool
-	ShowTraktWatchedMovies     bool
+	ShowTraktAnticipatedSeries      bool
+	ShowTraktWatchedSeries          bool
+	ShowTraktAnticipatedMovies      bool
+	ShowTraktWatchedMovies          bool
+	TraktAnticipatedSeriesLimit     int
+	TraktWatchedSeriesLimit         int
+	TraktAnticipatedMoviesLimit     int
+	TraktWatchedMoviesLimit         int
 	// Performance tuning
 	APIPageSize     int
 	MaxRetries      int
@@ -169,12 +173,13 @@ type CalendarMovie struct {
 }
 
 type SeriesGroup struct {
-	SeriesTitle string
-	PosterURL   string
-	Episodes    []Episode
-	IMDBID      string
-	TvdbID      int
-	Overview    string
+	SeriesTitle  string
+	PosterURL    string
+	Episodes     []Episode
+	IMDBID       string
+	TvdbID       int
+	Overview     string
+	SeriesRating float64
 }
 
 type TraktShow struct {
@@ -237,8 +242,12 @@ type WebConfig struct {
 	ShowSeriesRatings          string `json:"show_series_ratings"`
 	ShowEpisodeRatings         string `json:"show_episode_ratings"`
 	DarkMode                   string `json:"dark_mode"`
-	ShowTraktAnticipatedSeries string `json:"show_trakt_anticipated_series"`
-	ShowTraktWatchedSeries     string `json:"show_trakt_watched_series"`
-	ShowTraktAnticipatedMovies string `json:"show_trakt_anticipated_movies"`
-	ShowTraktWatchedMovies     string `json:"show_trakt_watched_movies"`
+	ShowTraktAnticipatedSeries      string `json:"show_trakt_anticipated_series"`
+	ShowTraktWatchedSeries          string `json:"show_trakt_watched_series"`
+	ShowTraktAnticipatedMovies      string `json:"show_trakt_anticipated_movies"`
+	ShowTraktWatchedMovies          string `json:"show_trakt_watched_movies"`
+	TraktAnticipatedSeriesLimit     string `json:"trakt_anticipated_series_limit"`
+	TraktWatchedSeriesLimit         string `json:"trakt_watched_series_limit"`
+	TraktAnticipatedMoviesLimit     string `json:"trakt_anticipated_movies_limit"`
+	TraktWatchedMoviesLimit         string `json:"trakt_watched_movies_limit"`
 }

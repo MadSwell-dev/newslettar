@@ -116,12 +116,13 @@ func groupEpisodesBySeries(episodes []Episode) []SeriesGroup {
 		group, exists := seriesMap[ep.SeriesTitle]
 		if !exists {
 			group = &SeriesGroup{
-				SeriesTitle: ep.SeriesTitle,
-				PosterURL:   ep.PosterURL,
-				Episodes:    []Episode{},
-				IMDBID:      ep.IMDBID,
-				TvdbID:      ep.TvdbID,
-				Overview:    ep.SeriesOverview,
+				SeriesTitle:  ep.SeriesTitle,
+				PosterURL:    ep.PosterURL,
+				Episodes:     []Episode{},
+				IMDBID:       ep.IMDBID,
+				TvdbID:       ep.TvdbID,
+				Overview:     ep.SeriesOverview,
+				SeriesRating: ep.Rating, // Get series rating from first episode
 			}
 			seriesMap[ep.SeriesTitle] = group
 		}
@@ -135,6 +136,8 @@ func groupEpisodesBySeries(episodes []Episode) []SeriesGroup {
 
 		if !seenEpisodes[key] {
 			seenEpisodes[key] = true
+			// Clear episode rating since it's actually the series rating (episodes don't have individual ratings in Sonarr)
+			ep.Rating = 0.0
 			group.Episodes = append(group.Episodes, ep)
 		}
 	}
