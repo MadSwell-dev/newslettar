@@ -108,9 +108,13 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 			Date      time.Time `json:"date"`
 			EventType string    `json:"eventType"`
 			Series    struct {
-				Title  string `json:"title"`
-				TvdbID int    `json:"tvdbId"`
-				ImdbID string `json:"imdbId"`
+				Title          string `json:"title"`
+				TvdbID         int    `json:"tvdbId"`
+				ImdbID         string `json:"imdbId"`
+				Overview       string `json:"overview"`
+				QualityProfile struct {
+					Name string `json:"name"`
+				} `json:"qualityProfile"`
 				Images []struct {
 					CoverType string `json:"coverType"`
 					RemoteURL string `json:"remoteUrl"`
@@ -121,6 +125,7 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 				EpisodeNumber int    `json:"episodeNumber"`
 				Title         string `json:"title"`
 				AirDate       string `json:"airDate"`
+				Overview      string `json:"overview"`
 			} `json:"episode"`
 		} `json:"records"`
 	}
@@ -150,15 +155,18 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 		}
 
 		episodes = append(episodes, Episode{
-			SeriesTitle: record.Series.Title,
-			SeasonNum:   record.Episode.SeasonNumber,
-			EpisodeNum:  record.Episode.EpisodeNumber,
-			Title:       record.Episode.Title,
-			AirDate:     record.Episode.AirDate,
-			Downloaded:  true,
-			PosterURL:   posterURL,
-			IMDBID:      record.Series.ImdbID,
-			TvdbID:      record.Series.TvdbID,
+			SeriesTitle:    record.Series.Title,
+			SeasonNum:      record.Episode.SeasonNumber,
+			EpisodeNum:     record.Episode.EpisodeNumber,
+			Title:          record.Episode.Title,
+			AirDate:        record.Episode.AirDate,
+			Downloaded:     true,
+			PosterURL:      posterURL,
+			IMDBID:         record.Series.ImdbID,
+			TvdbID:         record.Series.TvdbID,
+			Overview:       record.Episode.Overview,
+			SeriesOverview: record.Series.Overview,
+			QualityProfile: record.Series.QualityProfile.Name,
 		})
 	}
 
@@ -208,14 +216,17 @@ func fetchSonarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 		}
 
 		ep := Episode{
-			SeriesTitle: entry.Series.Title,
-			SeasonNum:   entry.SeasonNumber,
-			EpisodeNum:  entry.EpisodeNumber,
-			Title:       entry.Title,
-			AirDate:     entry.AirDate,
-			PosterURL:   posterURL,
-			IMDBID:      entry.Series.ImdbId,
-			TvdbID:      entry.Series.TvdbId,
+			SeriesTitle:    entry.Series.Title,
+			SeasonNum:      entry.SeasonNumber,
+			EpisodeNum:     entry.EpisodeNumber,
+			Title:          entry.Title,
+			AirDate:        entry.AirDate,
+			PosterURL:      posterURL,
+			IMDBID:         entry.Series.ImdbId,
+			TvdbID:         entry.Series.TvdbId,
+			Overview:       entry.Overview,
+			SeriesOverview: entry.Series.Overview,
+			QualityProfile: entry.Series.QualityProfile.Name,
 		}
 
 		if ep.AirDate != "" {
@@ -257,12 +268,16 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 			Date      time.Time `json:"date"`
 			EventType string    `json:"eventType"`
 			Movie     struct {
-				Title     string `json:"title"`
-				Year      int    `json:"year"`
-				TmdbID    int    `json:"tmdbId"`
-				ImdbID    string `json:"imdbId"`
-				InCinemas string `json:"inCinemas"`
-				Images    []struct {
+				Title          string `json:"title"`
+				Year           int    `json:"year"`
+				TmdbID         int    `json:"tmdbId"`
+				ImdbID         string `json:"imdbId"`
+				InCinemas      string `json:"inCinemas"`
+				Overview       string `json:"overview"`
+				QualityProfile struct {
+					Name string `json:"name"`
+				} `json:"qualityProfile"`
+				Images []struct {
 					CoverType string `json:"coverType"`
 					RemoteURL string `json:"remoteUrl"`
 				} `json:"images"`
@@ -295,13 +310,15 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 		}
 
 		movies = append(movies, Movie{
-			Title:       record.Movie.Title,
-			Year:        record.Movie.Year,
-			ReleaseDate: record.Movie.InCinemas,
-			Downloaded:  true,
-			PosterURL:   posterURL,
-			IMDBID:      record.Movie.ImdbID,
-			TmdbID:      record.Movie.TmdbID,
+			Title:          record.Movie.Title,
+			Year:           record.Movie.Year,
+			ReleaseDate:    record.Movie.InCinemas,
+			Downloaded:     true,
+			PosterURL:      posterURL,
+			IMDBID:         record.Movie.ImdbID,
+			TmdbID:         record.Movie.TmdbID,
+			Overview:       record.Movie.Overview,
+			QualityProfile: record.Movie.QualityProfile.Name,
 		})
 	}
 
@@ -351,12 +368,14 @@ func fetchRadarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 		}
 
 		mv := Movie{
-			Title:       entry.Title,
-			Year:        entry.Year,
-			ReleaseDate: entry.PhysicalRelease,
-			PosterURL:   posterURL,
-			IMDBID:      entry.ImdbId,
-			TmdbID:      entry.TmdbId,
+			Title:          entry.Title,
+			Year:           entry.Year,
+			ReleaseDate:    entry.PhysicalRelease,
+			PosterURL:      posterURL,
+			IMDBID:         entry.ImdbId,
+			TmdbID:         entry.TmdbId,
+			Overview:       entry.Overview,
+			QualityProfile: entry.QualityProfile.Name,
 		}
 
 		if mv.ReleaseDate != "" {

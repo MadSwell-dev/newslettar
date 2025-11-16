@@ -555,6 +555,45 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 </label>
             </div>
 
+            <div class="template-option">
+                <div>
+                    <strong>Show Quality Profiles</strong>
+                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                        Display quality profile (e.g., HD-1080p) for shows and movies
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="show-quality-profiles" onchange="saveTemplateSettings()" aria-label="Toggle quality profiles">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="template-option">
+                <div>
+                    <strong>Show Series Descriptions</strong>
+                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                        Display short description for each TV series
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="show-series-overview" onchange="saveTemplateSettings()" aria-label="Toggle series descriptions">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="template-option">
+                <div>
+                    <strong>Show Episode Descriptions</strong>
+                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                        Display description for each episode
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="show-episode-overview" onchange="saveTemplateSettings()" aria-label="Toggle episode descriptions">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
             <p style="margin-top: 20px; color: #8899aa; font-size: 0.9em;">
                 ℹ️ Changes are saved automatically when you toggle switches.
             </p>
@@ -771,6 +810,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 
                 document.getElementById('show-posters').checked = data.show_posters !== 'false';
                 document.getElementById('show-downloaded').checked = data.show_downloaded !== 'false';
+                document.getElementById('show-quality-profiles').checked = data.show_quality_profiles !== 'false';
+                document.getElementById('show-series-overview').checked = data.show_series_overview !== 'false';
+                document.getElementById('show-episode-overview').checked = data.show_episode_overview !== 'false';
                 
                 document.getElementById('current-timezone').textContent = data.timezone || 'UTC';
                 
@@ -928,6 +970,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         async function saveTemplateSettings() {
             const showPosters = document.getElementById('show-posters').checked;
             const showDownloaded = document.getElementById('show-downloaded').checked;
+            const showQualityProfiles = document.getElementById('show-quality-profiles').checked;
+            const showSeriesOverview = document.getElementById('show-series-overview').checked;
+            const showEpisodeOverview = document.getElementById('show-episode-overview').checked;
 
             try {
                 await fetch('/api/config', {
@@ -935,7 +980,10 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         show_posters: showPosters ? 'true' : 'false',
-                        show_downloaded: showDownloaded ? 'true' : 'false'
+                        show_downloaded: showDownloaded ? 'true' : 'false',
+                        show_quality_profiles: showQualityProfiles ? 'true' : 'false',
+                        show_series_overview: showSeriesOverview ? 'true' : 'false',
+                        show_episode_overview: showEpisodeOverview ? 'true' : 'false'
                     })
                 });
 
