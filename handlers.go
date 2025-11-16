@@ -25,6 +25,7 @@ func registerHandlers() {
 	http.HandleFunc("/api/config", configHandler)
 	http.HandleFunc("/api/test-sonarr", testSonarrHandler)
 	http.HandleFunc("/api/test-radarr", testRadarrHandler)
+	http.HandleFunc("/api/test-trakt", testTraktHandler)
 	http.HandleFunc("/api/test-email", testEmailHandler)
 	http.HandleFunc("/api/send", sendHandler)
 	http.HandleFunc("/api/logs", logsHandler)
@@ -514,6 +515,52 @@ func testSonarrHandler(w http.ResponseWriter, r *http.Request) {
 
 func testRadarrHandler(w http.ResponseWriter, r *http.Request) {
 	testAPIHandler(w, r, "Radarr")
+}
+
+func testTraktHandler(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		ClientID string `json:"client_id"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	success := false
+	message := "Missing Client ID"
+
+	if req.ClientID != "" {
+		// Test Trakt API by fetching trending shows (limit 1 for speed)
+		httpReq, err := http.NewRequest("GET", "https://api.trakt.tv/shows/trending?limit=1", nil)
+		if err == nil {
+			httpReq.Header.Set("Content-Type", "application/json")
+			httpReq.Header.Set("trakt-api-version", "2")
+			httpReq.Header.Set("trakt-api-key", req.ClientID)
+
+			resp, err := httpClient.Do(httpReq)
+			if err != nil {
+				message = fmt.Sprintf("Connection failed: %v", err)
+			} else if resp.StatusCode == 200 {
+				success = true
+				message = "Trakt connection successful!"
+				resp.Body.Close()
+			} else if resp.StatusCode == 401 {
+				message = "Invalid Client ID"
+				resp.Body.Close()
+			} else {
+				message = fmt.Sprintf("Connection failed: HTTP %d", resp.StatusCode)
+				resp.Body.Close()
+			}
+		} else {
+			message = fmt.Sprintf("Failed to create request: %v", err)
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": success,
+		"message": message,
+	})
 }
 
 func testEmailHandler(w http.ResponseWriter, r *http.Request) {
