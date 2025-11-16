@@ -93,10 +93,31 @@ rm -rf /tmp/temp_clone temp_clone 2>/dev/null || true
 
 # Clone into a temporary directory, then copy files
 TEMP_CLONE=$(mktemp -d)
+echo -e "${BLUE}  Temp directory: $TEMP_CLONE${NC}"
 git clone --depth 1 --branch main "https://github.com/agencefanfare/newslettar.git" "$TEMP_CLONE" 2>&1
-if [ $? -ne 0 ] || [ ! -f "$TEMP_CLONE/main.go" ]; then
-    echo -e "${RED}Git clone failed. Falling back to direct file downloads...${NC}"
+CLONE_EXIT=$?
+echo -e "${BLUE}  Git clone exit code: $CLONE_EXIT${NC}"
+
+# Check if clone succeeded
+if [ $CLONE_EXIT -ne 0 ]; then
+    echo -e "${RED}Git clone failed (exit code: $CLONE_EXIT). Falling back to direct file downloads...${NC}"
     rm -rf "$TEMP_CLONE"
+else
+    # Clone claims success - verify files exist
+    echo -e "${BLUE}  Checking clone contents...${NC}"
+    if ! ls "$TEMP_CLONE"/*.go >/dev/null 2>&1; then
+        echo -e "${RED}Git clone succeeded but files are missing! Contents of $TEMP_CLONE:${NC}"
+        ls -la "$TEMP_CLONE/" 2>&1
+        echo -e "${RED}Falling back to direct file downloads...${NC}"
+        rm -rf "$TEMP_CLONE"
+    else
+        # Files exist, proceed with copy
+        echo -e "${BLUE}  Found .go files in clone${NC}"
+    fi
+fi
+
+# Check if we still have TEMP_CLONE or need to use fallback
+if [ ! -d "$TEMP_CLONE" ] || [ ! -f "$TEMP_CLONE/main.go" ]; then
     
     # Fallback: download individual files
     mkdir -p "$INSTALL_DIR/templates"
@@ -108,15 +129,17 @@ if [ $? -ne 0 ] || [ ! -f "$TEMP_CLONE/main.go" ]; then
         }
     done
     
+    
     echo -e "${BLUE}  Downloading email template...${NC}"
     wget -q -O "$INSTALL_DIR/templates/email.html" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html" || {
         echo -e "${RED}Failed to download email template${NC}"
         exit 1
     }
-else
-    # Debug: show what's actually in the temp directory
-    echo -e "${BLUE}  DEBUG: Contents of $TEMP_CLONE:${NC}"
-    ls -la "$TEMP_CLONE/" | head -20
+fi
+
+# If we have TEMP_CLONE with files, copy them
+if [ -d "$TEMP_CLONE" ] && [ -f "$TEMP_CLONE/main.go" ]; then
+    echo -e "${BLUE}  Copying files from clone...${NC}"
     
     # Use find to reliably copy all files
     find "$TEMP_CLONE" -maxdepth 1 -type f -name "*.go" -exec cp {} "$INSTALL_DIR/" \;
@@ -126,14 +149,11 @@ else
     mkdir -p "$INSTALL_DIR/templates"
     find "$TEMP_CLONE/templates" -type f -exec cp {} "$INSTALL_DIR/templates/" \;
     
-    # Debug: show what was copied
-    echo -e "${BLUE}  DEBUG: Contents of $INSTALL_DIR after copy:${NC}"
-    ls -la "$INSTALL_DIR/" | head -20
-    
     cp -r "$TEMP_CLONE"/.git "$INSTALL_DIR/" 2>/dev/null || true
     cp "$TEMP_CLONE"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
     rm -rf "$TEMP_CLONE"
 fi
+
 
 echo -e "${GREEN}✓ Application downloaded${NC}"
 
