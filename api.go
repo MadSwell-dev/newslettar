@@ -10,73 +10,50 @@ import (
 	"time"
 )
 
-// Retry wrappers for API calls
-func fetchSonarrHistoryWithRetry(ctx context.Context, cfg *Config, since time.Time, maxRetries int) ([]Episode, error) {
-	var episodes []Episode
+// Generic retry wrapper - reduces code duplication from 67 lines to 20 lines
+func retryWithBackoff[T any](operation func() (T, error), operationName string, maxRetries int) (T, error) {
+	var result T
 	var err error
+
 	for i := 0; i < maxRetries; i++ {
-		episodes, err = fetchSonarrHistory(ctx, cfg, since)
+		result, err = operation()
 		if err == nil {
-			return episodes, nil
+			return result, nil
 		}
+
 		if i < maxRetries-1 {
 			wait := time.Duration(i+1) * time.Second
-			log.Printf("⏳ Retrying Sonarr history in %v... (attempt %d/%d)", wait, i+2, maxRetries)
+			log.Printf("⏳ Retrying %s in %v... (attempt %d/%d)", operationName, wait, i+2, maxRetries)
 			time.Sleep(wait)
 		}
 	}
-	return episodes, err
+
+	return result, err
+}
+
+// Retry wrappers for API calls
+func fetchSonarrHistoryWithRetry(ctx context.Context, cfg *Config, since time.Time, maxRetries int) ([]Episode, error) {
+	return retryWithBackoff(func() ([]Episode, error) {
+		return fetchSonarrHistory(ctx, cfg, since)
+	}, "Sonarr history", maxRetries)
 }
 
 func fetchSonarrCalendarWithRetry(ctx context.Context, cfg *Config, start, end time.Time, maxRetries int) ([]Episode, error) {
-	var episodes []Episode
-	var err error
-	for i := 0; i < maxRetries; i++ {
-		episodes, err = fetchSonarrCalendar(ctx, cfg, start, end)
-		if err == nil {
-			return episodes, nil
-		}
-		if i < maxRetries-1 {
-			wait := time.Duration(i+1) * time.Second
-			log.Printf("⏳ Retrying Sonarr calendar in %v... (attempt %d/%d)", wait, i+2, maxRetries)
-			time.Sleep(wait)
-		}
-	}
-	return episodes, err
+	return retryWithBackoff(func() ([]Episode, error) {
+		return fetchSonarrCalendar(ctx, cfg, start, end)
+	}, "Sonarr calendar", maxRetries)
 }
 
 func fetchRadarrHistoryWithRetry(ctx context.Context, cfg *Config, since time.Time, maxRetries int) ([]Movie, error) {
-	var movies []Movie
-	var err error
-	for i := 0; i < maxRetries; i++ {
-		movies, err = fetchRadarrHistory(ctx, cfg, since)
-		if err == nil {
-			return movies, nil
-		}
-		if i < maxRetries-1 {
-			wait := time.Duration(i+1) * time.Second
-			log.Printf("⏳ Retrying Radarr history in %v... (attempt %d/%d)", wait, i+2, maxRetries)
-			time.Sleep(wait)
-		}
-	}
-	return movies, err
+	return retryWithBackoff(func() ([]Movie, error) {
+		return fetchRadarrHistory(ctx, cfg, since)
+	}, "Radarr history", maxRetries)
 }
 
 func fetchRadarrCalendarWithRetry(ctx context.Context, cfg *Config, start, end time.Time, maxRetries int) ([]Movie, error) {
-	var movies []Movie
-	var err error
-	for i := 0; i < maxRetries; i++ {
-		movies, err = fetchRadarrCalendar(ctx, cfg, start, end)
-		if err == nil {
-			return movies, nil
-		}
-		if i < maxRetries-1 {
-			wait := time.Duration(i+1) * time.Second
-			log.Printf("⏳ Retrying Radarr calendar in %v... (attempt %d/%d)", wait, i+2, maxRetries)
-			time.Sleep(wait)
-		}
-	}
-	return movies, err
+	return retryWithBackoff(func() ([]Movie, error) {
+		return fetchRadarrCalendar(ctx, cfg, start, end)
+	}, "Radarr calendar", maxRetries)
 }
 
 func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Episode, error) {
@@ -84,7 +61,7 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 		return nil, fmt.Errorf("Sonarr not configured")
 	}
 
-	url := fmt.Sprintf("%s/api/v3/history?pageSize=1000&sortKey=date&sortDirection=descending&includeEpisode=true&includeSeries=true", cfg.SonarrURL)
+	url := fmt.Sprintf("%s/api/v3/history?pageSize=%d&sortKey=date&sortDirection=descending&includeEpisode=true&includeSeries=true", cfg.SonarrURL, cfg.APIPageSize)
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -98,7 +75,10 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		body, _ := io.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("HTTP %d (failed to read error body: %v)", resp.StatusCode, err)
+		}
 		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
 	}
 
@@ -228,8 +208,11 @@ func fetchSonarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 		}
 
 		if ep.AirDate != "" {
-			airDate, _ := time.Parse("2006-01-02", ep.AirDate)
-			ep.AirDate = airDate.Format("2006-01-02")
+			airDate, err := time.Parse("2006-01-02", ep.AirDate)
+			if err == nil {
+				ep.AirDate = airDate.Format("2006-01-02")
+			}
+			// If parsing fails, keep original date string
 		}
 
 		episodes = append(episodes, ep)
@@ -243,7 +226,7 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 		return nil, fmt.Errorf("Radarr not configured")
 	}
 
-	url := fmt.Sprintf("%s/api/v3/history?pageSize=1000&sortKey=date&sortDirection=descending&includeMovie=true", cfg.RadarrURL)
+	url := fmt.Sprintf("%s/api/v3/history?pageSize=%d&sortKey=date&sortDirection=descending&includeMovie=true", cfg.RadarrURL, cfg.APIPageSize)
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -257,7 +240,10 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		body, _ := io.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("HTTP %d (failed to read error body: %v)", resp.StatusCode, err)
+		}
 		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
 	}
 
@@ -375,8 +361,11 @@ func fetchRadarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 		}
 
 		if mv.ReleaseDate != "" {
-			releaseDate, _ := time.Parse("2006-01-02", mv.ReleaseDate)
-			mv.ReleaseDate = releaseDate.Format("2006-01-02")
+			releaseDate, err := time.Parse("2006-01-02", mv.ReleaseDate)
+			if err == nil {
+				mv.ReleaseDate = releaseDate.Format("2006-01-02")
+			}
+			// If parsing fails, keep original date string
 		}
 
 		movies = append(movies, mv)

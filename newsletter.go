@@ -28,7 +28,7 @@ func runNewsletter() {
 	log.Printf("📅 Week range: %s to %s", weekStart.Format("2006-01-02"), weekEnd.Format("2006-01-02"))
 
 	// Use a cancellable context for all fetches
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.APITimeout)*time.Second)
 	defer cancel()
 
 	// Parallel API calls (3-4x faster!)
@@ -45,7 +45,7 @@ func runNewsletter() {
 	go func() {
 		defer wg.Done()
 		log.Println("📺 Fetching Sonarr history...")
-		downloadedEpisodes, errSonarrHistory = fetchSonarrHistoryWithRetry(ctx, cfg, weekStart, 3)
+		downloadedEpisodes, errSonarrHistory = fetchSonarrHistoryWithRetry(ctx, cfg, weekStart, cfg.MaxRetries)
 		if errSonarrHistory != nil {
 			log.Printf("⚠️  Sonarr history error: %v", errSonarrHistory)
 		} else {
@@ -56,7 +56,7 @@ func runNewsletter() {
 	go func() {
 		defer wg.Done()
 		log.Println("📺 Fetching Sonarr calendar...")
-		upcomingEpisodes, errSonarrCalendar = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), 3)
+		upcomingEpisodes, errSonarrCalendar = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.MaxRetries)
 		if errSonarrCalendar != nil {
 			log.Printf("⚠️  Sonarr calendar error: %v", errSonarrCalendar)
 		} else {
@@ -67,7 +67,7 @@ func runNewsletter() {
 	go func() {
 		defer wg.Done()
 		log.Println("🎬 Fetching Radarr history...")
-		downloadedMovies, errRadarrHistory = fetchRadarrHistoryWithRetry(ctx, cfg, weekStart, 3)
+		downloadedMovies, errRadarrHistory = fetchRadarrHistoryWithRetry(ctx, cfg, weekStart, cfg.MaxRetries)
 		if errRadarrHistory != nil {
 			log.Printf("⚠️  Radarr history error: %v", errRadarrHistory)
 		} else {
@@ -78,7 +78,7 @@ func runNewsletter() {
 	go func() {
 		defer wg.Done()
 		log.Println("🎬 Fetching Radarr calendar...")
-		upcomingMovies, errRadarrCalendar = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), 3)
+		upcomingMovies, errRadarrCalendar = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.MaxRetries)
 		if errRadarrCalendar != nil {
 			log.Printf("⚠️  Radarr calendar error: %v", errRadarrCalendar)
 		} else {
@@ -198,8 +198,8 @@ func sendEmail(cfg *Config, subject, htmlBody string) error {
 	}
 	message += "\r\n" + htmlBody
 
-	auth := smtp.PlainAuth("", cfg.MailgunUser, cfg.MailgunPass, cfg.MailgunSMTP)
-	addr := fmt.Sprintf("%s:%s", cfg.MailgunSMTP, cfg.MailgunPort)
+	auth := smtp.PlainAuth("", cfg.SMTPUser, cfg.SMTPPass, cfg.SMTPHost)
+	addr := fmt.Sprintf("%s:%s", cfg.SMTPHost, cfg.SMTPPort)
 
 	return smtp.SendMail(addr, auth, cfg.FromEmail, cfg.ToEmails, []byte(message))
 }
@@ -254,23 +254,35 @@ func getNextScheduledRun(day, timeStr string, loc *time.Location) string {
 	return nextRun.Format("Monday, January 2, 2006 at 3:04 PM MST")
 }
 
-// Filter functions to exclude unmonitored items
-func filterMonitoredEpisodes(episodes []Episode) []Episode {
-	filtered := []Episode{}
-	for _, ep := range episodes {
-		if ep.Monitored {
-			filtered = append(filtered, ep)
+// Monitorable is a constraint for types that have a Monitored field
+type Monitorable interface {
+	Episode | Movie
+}
+
+// Generic filter function to exclude unmonitored items - eliminates code duplication
+func filterMonitored[T Monitorable](items []T) []T {
+	filtered := make([]T, 0, len(items))
+	for _, item := range items {
+		// Type switch to access Monitored field (Go generics limitation workaround)
+		var monitored bool
+		switch any(item).(type) {
+		case Episode:
+			monitored = any(item).(Episode).Monitored
+		case Movie:
+			monitored = any(item).(Movie).Monitored
+		}
+		if monitored {
+			filtered = append(filtered, item)
 		}
 	}
 	return filtered
 }
 
+// Convenience wrappers for backward compatibility and type safety
+func filterMonitoredEpisodes(episodes []Episode) []Episode {
+	return filterMonitored[Episode](episodes)
+}
+
 func filterMonitoredMovies(movies []Movie) []Movie {
-	filtered := []Movie{}
-	for _, mv := range movies {
-		if mv.Monitored {
-			filtered = append(filtered, mv)
-		}
-	}
-	return filtered
+	return filterMonitored[Movie](movies)
 }

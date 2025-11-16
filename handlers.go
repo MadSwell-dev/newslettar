@@ -75,7 +75,7 @@ func uiHandler(w http.ResponseWriter, r *http.Request) {
 func timezoneInfoHandler(w http.ResponseWriter, r *http.Request) {
 	tz := r.URL.Query().Get("tz")
 	if tz == "" {
-		tz = "UTC"
+		tz = DefaultTimezone
 	}
 
 	loc := getTimezone(tz)
@@ -107,7 +107,7 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 	weekEnd := now
 
 	// Parallel API calls with context
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.APITimeout)*time.Second)
 	defer cancel()
 
 	var wg sync.WaitGroup
@@ -118,22 +118,22 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		defer wg.Done()
-		downloadedEpisodes, _ = fetchSonarrHistoryWithRetry(ctx, cfg, weekStart, 2)
+		downloadedEpisodes, _ = fetchSonarrHistoryWithRetry(ctx, cfg, weekStart, cfg.PreviewRetries)
 	}()
 
 	go func() {
 		defer wg.Done()
-		upcomingEpisodes, _ = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), 2)
+		upcomingEpisodes, _ = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.PreviewRetries)
 	}()
 
 	go func() {
 		defer wg.Done()
-		downloadedMovies, _ = fetchRadarrHistoryWithRetry(ctx, cfg, weekStart, 2)
+		downloadedMovies, _ = fetchRadarrHistoryWithRetry(ctx, cfg, weekStart, cfg.PreviewRetries)
 	}()
 
 	go func() {
 		defer wg.Done()
-		upcomingMovies, _ = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), 2)
+		upcomingMovies, _ = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.PreviewRetries)
 	}()
 
 	wg.Wait()
@@ -203,17 +203,17 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.RadarrAPIKey != "" {
 			envMap["RADARR_API_KEY"] = webCfg.RadarrAPIKey
 		}
-		if webCfg.MailgunSMTP != "" {
-			envMap["MAILGUN_SMTP"] = webCfg.MailgunSMTP
+		if webCfg.SMTPHost != "" {
+			envMap["SMTP_HOST"] = webCfg.SMTPHost
 		}
-		if webCfg.MailgunPort != "" {
-			envMap["MAILGUN_PORT"] = webCfg.MailgunPort
+		if webCfg.SMTPPort != "" {
+			envMap["SMTP_PORT"] = webCfg.SMTPPort
 		}
-		if webCfg.MailgunUser != "" {
-			envMap["MAILGUN_USER"] = webCfg.MailgunUser
+		if webCfg.SMTPUser != "" {
+			envMap["SMTP_USER"] = webCfg.SMTPUser
 		}
-		if webCfg.MailgunPass != "" {
-			envMap["MAILGUN_PASS"] = webCfg.MailgunPass
+		if webCfg.SMTPPass != "" {
+			envMap["SMTP_PASS"] = webCfg.SMTPPass
 		}
 		if webCfg.FromEmail != "" {
 			envMap["FROM_EMAIL"] = webCfg.FromEmail
@@ -270,104 +270,76 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 
 	// GET request - return current config
 	envMap := readEnvFile()
+	cfg := getConfig()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"sonarr_url":      getEnvFromFile(envMap, "SONARR_URL", ""),
 		"sonarr_api_key":  getEnvFromFile(envMap, "SONARR_API_KEY", ""),
 		"radarr_url":      getEnvFromFile(envMap, "RADARR_URL", ""),
 		"radarr_api_key":  getEnvFromFile(envMap, "RADARR_API_KEY", ""),
-		"mailgun_smtp":    getEnvFromFile(envMap, "MAILGUN_SMTP", "smtp.mailgun.org"),
-		"mailgun_port":    getEnvFromFile(envMap, "MAILGUN_PORT", "587"),
-		"mailgun_user":    getEnvFromFile(envMap, "MAILGUN_USER", ""),
-		"mailgun_pass":    getEnvFromFile(envMap, "MAILGUN_PASS", ""),
+		"smtp_host":       cfg.SMTPHost,
+		"smtp_port":       cfg.SMTPPort,
+		"smtp_user":       cfg.SMTPUser,
+		"smtp_pass":       cfg.SMTPPass,
 		"from_email":      getEnvFromFile(envMap, "FROM_EMAIL", ""),
-		"from_name":       getEnvFromFile(envMap, "FROM_NAME", "Newslettar"),
+		"from_name":       getEnvFromFile(envMap, "FROM_NAME", DefaultFromName),
 		"to_emails":       getEnvFromFile(envMap, "TO_EMAILS", ""),
-		"timezone":              getEnvFromFile(envMap, "TIMEZONE", "UTC"),
-		"schedule_day":          getEnvFromFile(envMap, "SCHEDULE_DAY", "Sun"),
-		"schedule_time":         getEnvFromFile(envMap, "SCHEDULE_TIME", "09:00"),
-		"show_posters":          getEnvFromFile(envMap, "SHOW_POSTERS", "true"),
-		"show_downloaded":       getEnvFromFile(envMap, "SHOW_DOWNLOADED", "true"),
-		"show_series_overview":  getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", "false"),
-		"show_episode_overview": getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", "false"),
-		"show_unmonitored":      getEnvFromFile(envMap, "SHOW_UNMONITORED", "false"),
+		"timezone":              getEnvFromFile(envMap, "TIMEZONE", DefaultTimezone),
+		"schedule_day":          getEnvFromFile(envMap, "SCHEDULE_DAY", DefaultScheduleDay),
+		"schedule_time":         getEnvFromFile(envMap, "SCHEDULE_TIME", DefaultScheduleTime),
+		"show_posters":          getEnvFromFile(envMap, "SHOW_POSTERS", DefaultShowPosters),
+		"show_downloaded":       getEnvFromFile(envMap, "SHOW_DOWNLOADED", DefaultShowDownloaded),
+		"show_series_overview":  getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", DefaultShowSeriesOverview),
+		"show_episode_overview": getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", DefaultShowEpisodeOverview),
+		"show_unmonitored":      getEnvFromFile(envMap, "SHOW_UNMONITORED", DefaultShowUnmonitored),
+	})
+}
+
+// Generic API test handler - eliminates 74 lines of duplication
+func testAPIHandler(w http.ResponseWriter, r *http.Request, serviceName string) {
+	var req struct {
+		URL    string `json:"url"`
+		APIKey string `json:"api_key"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	success := false
+	message := "Missing URL or API key"
+
+	if req.URL != "" && req.APIKey != "" {
+		httpReq, err := http.NewRequest("GET", req.URL+"/api/v3/system/status", nil)
+		if err == nil {
+			httpReq.Header.Set("X-Api-Key", req.APIKey)
+			resp, err := httpClient.Do(httpReq)
+			if err != nil {
+				message = fmt.Sprintf("Connection failed: %v", err)
+			} else if resp.StatusCode == 200 {
+				success = true
+				message = fmt.Sprintf("%s connection successful!", serviceName)
+				resp.Body.Close()
+			} else {
+				message = fmt.Sprintf("Connection failed: HTTP %d", resp.StatusCode)
+				resp.Body.Close()
+			}
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": success,
+		"message": message,
 	})
 }
 
 func testSonarrHandler(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		URL    string `json:"url"`
-		APIKey string `json:"api_key"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	success := false
-	message := "Missing URL or API key"
-
-	if req.URL != "" && req.APIKey != "" {
-		httpReq, err := http.NewRequest("GET", req.URL+"/api/v3/system/status", nil)
-		if err == nil {
-			httpReq.Header.Set("X-Api-Key", req.APIKey)
-			resp, err := httpClient.Do(httpReq)
-			if err != nil {
-				message = fmt.Sprintf("Connection failed: %v", err)
-			} else if resp.StatusCode == 200 {
-				success = true
-				message = "Sonarr connection successful!"
-				resp.Body.Close()
-			} else {
-				message = fmt.Sprintf("Connection failed: HTTP %d", resp.StatusCode)
-				resp.Body.Close()
-			}
-		}
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": success,
-		"message": message,
-	})
+	testAPIHandler(w, r, "Sonarr")
 }
 
 func testRadarrHandler(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		URL    string `json:"url"`
-		APIKey string `json:"api_key"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	success := false
-	message := "Missing URL or API key"
-
-	if req.URL != "" && req.APIKey != "" {
-		httpReq, err := http.NewRequest("GET", req.URL+"/api/v3/system/status", nil)
-		if err == nil {
-			httpReq.Header.Set("X-Api-Key", req.APIKey)
-			resp, err := httpClient.Do(httpReq)
-			if err != nil {
-				message = fmt.Sprintf("Connection failed: %v", err)
-			} else if resp.StatusCode == 200 {
-				success = true
-				message = "Radarr connection successful!"
-				resp.Body.Close()
-			} else {
-				message = fmt.Sprintf("Connection failed: HTTP %d", resp.StatusCode)
-				resp.Body.Close()
-			}
-		}
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": success,
-		"message": message,
-	})
+	testAPIHandler(w, r, "Radarr")
 }
 
 func testEmailHandler(w http.ResponseWriter, r *http.Request) {

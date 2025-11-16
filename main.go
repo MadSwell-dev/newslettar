@@ -14,7 +14,7 @@ import (
 //go:embed templates/*.html
 var templateFS embed.FS
 
-const version = "1.1.6"
+const version = "1.2.0"
 
 // Global HTTP client (reused for all requests - 3-5x faster)
 var httpClient = &http.Client{
@@ -41,6 +41,15 @@ func main() {
 
 	// Load config once at startup
 	cachedConfig = loadConfig()
+
+	// Validate configuration and display warnings
+	warnings := validateConfig(cachedConfig)
+	if len(warnings) > 0 {
+		log.Println("⚠️  Configuration warnings:")
+		for _, warning := range warnings {
+			log.Printf("   - %s", warning)
+		}
+	}
 
 	// Precompile email template with custom functions
 	var err error
