@@ -70,42 +70,36 @@ echo -e "${BLUE}  Temp directory: $TEMP_CLONE${NC}"
 git clone --depth 1 --branch main "https://github.com/agencefanfare/newslettar.git" "$TEMP_CLONE" 2>&1
 
 if [ $? -eq 0 ]; then
-    echo -e "${BLUE}  Clone successful, checking files...${NC}"
-    ls -la "$TEMP_CLONE" | head -20
+    echo -e "${BLUE}  Clone successful${NC}"
     
     if [ -f "$TEMP_CLONE/main.go" ]; then
-        # Copy all files explicitly to ensure nothing is missed
+        # Use find to copy each file individually for reliability
         echo -e "${BLUE}  Copying files to $INSTALL_DIR...${NC}"
-        cp "$TEMP_CLONE"/api.go "$INSTALL_DIR/" || echo "Failed to copy api.go"
-        cp "$TEMP_CLONE"/config.go "$INSTALL_DIR/" || echo "Failed to copy config.go"
-        cp "$TEMP_CLONE"/handlers.go "$INSTALL_DIR/" || echo "Failed to copy handlers.go"
-        cp "$TEMP_CLONE"/main.go "$INSTALL_DIR/" || echo "Failed to copy main.go"
-        cp "$TEMP_CLONE"/newsletter.go "$INSTALL_DIR/" || echo "Failed to copy newsletter.go"
-        cp "$TEMP_CLONE"/server.go "$INSTALL_DIR/" || echo "Failed to copy server.go"
-        cp "$TEMP_CLONE"/types.go "$INSTALL_DIR/" || echo "Failed to copy types.go"
-        cp "$TEMP_CLONE"/ui.go "$INSTALL_DIR/" || echo "Failed to copy ui.go"
-        cp "$TEMP_CLONE"/utils.go "$INSTALL_DIR/" || echo "Failed to copy utils.go"
-        cp "$TEMP_CLONE"/go.mod "$INSTALL_DIR/" || echo "Failed to copy go.mod"
-        cp "$TEMP_CLONE"/go.sum "$INSTALL_DIR/" || echo "Failed to copy go.sum"
-        cp "$TEMP_CLONE"/version.json "$INSTALL_DIR/" || echo "Failed to copy version.json"
+        find "$TEMP_CLONE" -maxdepth 1 -type f -name "*.go" -exec cp {} "$INSTALL_DIR/" \;
+        find "$TEMP_CLONE" -maxdepth 1 -type f -name "go.mod" -exec cp {} "$INSTALL_DIR/" \;
+        find "$TEMP_CLONE" -maxdepth 1 -type f -name "go.sum" -exec cp {} "$INSTALL_DIR/" \;
+        find "$TEMP_CLONE" -maxdepth 1 -type f -name "version.json" -exec cp {} "$INSTALL_DIR/" \;
         mkdir -p "$INSTALL_DIR/templates"
-        cp "$TEMP_CLONE"/templates/email.html "$INSTALL_DIR/templates/" || echo "Failed to copy email.html"
+        find "$TEMP_CLONE/templates" -type f -exec cp {} "$INSTALL_DIR/templates/" \;
         cp -r "$TEMP_CLONE"/.git "$INSTALL_DIR/" 2>/dev/null || true
         cp "$TEMP_CLONE"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
         
         echo -e "${BLUE}  Verifying copy...${NC}"
-        ls -la "$INSTALL_DIR" | head -20
+        ls -la "$INSTALL_DIR"/*.go 2>/dev/null | wc -l
+        echo " Go files copied"
         
-        # Final check: ensure all critical files exist
+        # Verify all critical files exist
         MISSING=""
-        for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod; do
+        for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod version.json; do
             if [ ! -f "$INSTALL_DIR/$file" ]; then
-                MISSING="$MISSING $file"
+                MISSING="$MISSING\n  - $file"
             fi
         done
         
         if [ -n "$MISSING" ]; then
             echo -e "${RED}ERROR: Missing files:$MISSING${NC}"
+            echo -e "${RED}Files in $INSTALL_DIR:${NC}"
+            ls -la "$INSTALL_DIR"
             exit 1
         fi
         
@@ -120,11 +114,11 @@ else
     echo -e "${YELLOW}Git clone failed, trying wget fallback...${NC}"
     rm -rf "$TEMP_CLONE"
     mkdir -p "$INSTALL_DIR/templates"
+    echo -e "${BLUE}  Downloading files...${NC}"
     for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod go.sum version.json; do
-        echo -e "${BLUE}  Downloading ${file}...${NC}"
-        wget -q -O "$INSTALL_DIR/$file" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/${file}" || echo -e "${RED}Failed: $file${NC}"
+        wget -q -O "$INSTALL_DIR/$file" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/${file}" 2>/dev/null && echo -e "${BLUE}  ✓ $file${NC}" || echo -e "${RED}  ✗ $file${NC}"
     done
-    wget -q -O "$INSTALL_DIR/templates/email.html" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html" || echo -e "${RED}Failed: email.html${NC}"
+    wget -q -O "$INSTALL_DIR/templates/email.html" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html" 2>/dev/null && echo -e "${BLUE}  ✓ email.html${NC}" || echo -e "${RED}  ✗ email.html${NC}"
     echo -e "${GREEN}✓ Source code downloaded (fallback)${NC}"
 fi
 echo ""
