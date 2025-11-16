@@ -61,6 +61,7 @@ func loadConfig() *Config {
 		ShowQualityProfiles: getEnvFromFile(envMap, "SHOW_QUALITY_PROFILES", "false") != "false",
 		ShowSeriesOverview:  getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", "false") != "false",
 		ShowEpisodeOverview: getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", "false") != "false",
+		ShowUnmonitored:     getEnvFromFile(envMap, "SHOW_UNMONITORED", "false") != "false",
 	}
 }
 

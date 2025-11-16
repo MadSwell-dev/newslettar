@@ -112,6 +112,7 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 				TvdbID         int    `json:"tvdbId"`
 				ImdbID         string `json:"imdbId"`
 				Overview       string `json:"overview"`
+				Monitored      bool   `json:"monitored"`
 				QualityProfile struct {
 					Name string `json:"name"`
 				} `json:"qualityProfile"`
@@ -167,6 +168,7 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 			Overview:       record.Episode.Overview,
 			SeriesOverview: record.Series.Overview,
 			QualityProfile: record.Series.QualityProfile.Name,
+			Monitored:      record.Series.Monitored,
 		})
 	}
 
@@ -227,6 +229,7 @@ func fetchSonarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 			Overview:       entry.Overview,
 			SeriesOverview: entry.Series.Overview,
 			QualityProfile: entry.Series.QualityProfile.Name,
+			Monitored:      entry.Series.Monitored,
 		}
 
 		if ep.AirDate != "" {
@@ -274,6 +277,7 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 				ImdbID         string `json:"imdbId"`
 				InCinemas      string `json:"inCinemas"`
 				Overview       string `json:"overview"`
+				Monitored      bool   `json:"monitored"`
 				QualityProfile struct {
 					Name string `json:"name"`
 				} `json:"qualityProfile"`
@@ -319,6 +323,7 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 			TmdbID:         record.Movie.TmdbID,
 			Overview:       record.Movie.Overview,
 			QualityProfile: record.Movie.QualityProfile.Name,
+			Monitored:      record.Movie.Monitored,
 		})
 	}
 
@@ -376,6 +381,7 @@ func fetchRadarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 			TmdbID:         entry.TmdbId,
 			Overview:       entry.Overview,
 			QualityProfile: entry.QualityProfile.Name,
+			Monitored:      entry.Monitored,
 		}
 
 		if mv.ReleaseDate != "" {
