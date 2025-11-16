@@ -16,12 +16,11 @@ type Config struct {
 	Timezone             string
 	ScheduleDay          string
 	ScheduleTime         string
-	ShowPosters          bool
-	ShowDownloaded       bool
-	ShowQualityProfiles  bool
-	ShowSeriesOverview   bool
-	ShowEpisodeOverview  bool
-	ShowUnmonitored      bool
+	ShowPosters         bool
+	ShowDownloaded      bool
+	ShowSeriesOverview  bool
+	ShowEpisodeOverview bool
+	ShowUnmonitored     bool
 }
 
 // Minimal structs - only fields we actually need (reduces memory & JSON parsing time)
@@ -37,7 +36,6 @@ type Episode struct {
 	TvdbID         int
 	Overview       string
 	SeriesOverview string
-	QualityProfile string
 	Monitored      bool
 }
 
@@ -47,11 +45,10 @@ type Movie struct {
 	ReleaseDate    string
 	Downloaded     bool
 	PosterURL      string
-	IMDBID         string
-	TmdbID         int
-	Overview       string
-	QualityProfile string
-	Monitored      bool
+	IMDBID      string
+	TmdbID      int
+	Overview    string
+	Monitored   bool
 }
 
 // For Sonarr calendar response (nested series data)
@@ -64,13 +61,10 @@ type CalendarEpisode struct {
 	Series        struct {
 		Title          string `json:"title"`
 		TvdbId         int    `json:"tvdbId"`
-		ImdbId         string `json:"imdbId"`
-		Overview       string `json:"overview"`
-		Monitored      bool   `json:"monitored"`
-		QualityProfile struct {
-			Name string `json:"name"`
-		} `json:"qualityProfile"`
-		Images []struct {
+		ImdbId    string `json:"imdbId"`
+		Overview  string `json:"overview"`
+		Monitored bool   `json:"monitored"`
+		Images    []struct {
 			CoverType string `json:"coverType"`
 			Url       string `json:"url"`       // Local URL if available
 			RemoteUrl string `json:"remoteUrl"` // Fallback remote URL
@@ -83,14 +77,11 @@ type CalendarMovie struct {
 	Title           string `json:"title"`
 	Year            int    `json:"year"`
 	PhysicalRelease string `json:"physicalRelease"` // Assuming you want physical release; adjust if needed (e.g., to "digitalRelease" or "inCinemas")
-	ImdbId          string `json:"imdbId"`
-	TmdbId          int    `json:"tmdbId"`
-	Overview        string `json:"overview"`
-	Monitored       bool   `json:"monitored"`
-	QualityProfile  struct {
-		Name string `json:"name"`
-	} `json:"qualityProfile"`
-	Images []struct {
+	ImdbId    string `json:"imdbId"`
+	TmdbId    int    `json:"tmdbId"`
+	Overview  string `json:"overview"`
+	Monitored bool   `json:"monitored"`
+	Images    []struct {
 		CoverType string `json:"coverType"`
 		Url       string `json:"url"`       // Local URL if available
 		RemoteUrl string `json:"remoteUrl"` // Fallback remote URL
@@ -98,13 +89,12 @@ type CalendarMovie struct {
 }
 
 type SeriesGroup struct {
-	SeriesTitle    string
-	PosterURL      string
-	Episodes       []Episode
-	IMDBID         string
-	TvdbID         int
-	Overview       string
-	QualityProfile string
+	SeriesTitle string
+	PosterURL   string
+	Episodes    []Episode
+	IMDBID      string
+	TvdbID      int
+	Overview    string
 }
 
 type NewsletterData struct {
@@ -133,7 +123,6 @@ type WebConfig struct {
 	ScheduleTime        string `json:"schedule_time"`
 	ShowPosters         string `json:"show_posters"`
 	ShowDownloaded      string `json:"show_downloaded"`
-	ShowQualityProfiles string `json:"show_quality_profiles"`
 	ShowSeriesOverview  string `json:"show_series_overview"`
 	ShowEpisodeOverview string `json:"show_episode_overview"`
 	ShowUnmonitored     string `json:"show_unmonitored"`

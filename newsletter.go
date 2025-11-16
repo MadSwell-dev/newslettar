@@ -128,7 +128,7 @@ func runNewsletter() {
 	}
 
 	log.Println("📝 Generating newsletter HTML...")
-	html, err := generateNewsletterHTML(data, cfg.ShowPosters, cfg.ShowDownloaded, cfg.ShowQualityProfiles, cfg.ShowSeriesOverview, cfg.ShowEpisodeOverview)
+	html, err := generateNewsletterHTML(data, cfg.ShowPosters, cfg.ShowDownloaded, cfg.ShowSeriesOverview, cfg.ShowEpisodeOverview)
 	if err != nil {
 		log.Fatalf("❌ Failed to generate HTML: %v", err)
 	}
@@ -151,19 +151,17 @@ func runNewsletter() {
 }
 
 // Generate newsletter HTML using precompiled template
-func generateNewsletterHTML(data NewsletterData, showPosters, showDownloaded, showQualityProfiles, showSeriesOverview, showEpisodeOverview bool) (string, error) {
+func generateNewsletterHTML(data NewsletterData, showPosters, showDownloaded, showSeriesOverview, showEpisodeOverview bool) (string, error) {
 	templateData := struct {
 		NewsletterData
 		ShowPosters         bool
 		ShowDownloaded      bool
-		ShowQualityProfiles bool
 		ShowSeriesOverview  bool
 		ShowEpisodeOverview bool
 	}{
 		NewsletterData:      data,
 		ShowPosters:         showPosters,
 		ShowDownloaded:      showDownloaded,
-		ShowQualityProfiles: showQualityProfiles,
 		ShowSeriesOverview:  showSeriesOverview,
 		ShowEpisodeOverview: showEpisodeOverview,
 	}

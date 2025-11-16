@@ -58,7 +58,6 @@ func loadConfig() *Config {
 		ScheduleTime:        getEnvFromFile(envMap, "SCHEDULE_TIME", "09:00"),
 		ShowPosters:         getEnvFromFile(envMap, "SHOW_POSTERS", "true") != "false",
 		ShowDownloaded:      getEnvFromFile(envMap, "SHOW_DOWNLOADED", "true") != "false",
-		ShowQualityProfiles: getEnvFromFile(envMap, "SHOW_QUALITY_PROFILES", "false") != "false",
 		ShowSeriesOverview:  getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", "false") != "false",
 		ShowEpisodeOverview: getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", "false") != "false",
 		ShowUnmonitored:     getEnvFromFile(envMap, "SHOW_UNMONITORED", "false") != "false",
