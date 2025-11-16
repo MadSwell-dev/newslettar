@@ -1,10 +1,10 @@
 # Multi-stage build for Newslettar
-FROM golang:1.23.5-bookworm as builder
+FROM golang:1.23.5-bookworm AS builder
 
 WORKDIR /build
 
-# Copy all source files
-COPY *.go ./
+# Copy all source files explicitly (glob expansion doesn't work reliably)
+COPY main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go ./
 COPY go.mod go.sum ./
 COPY templates/ templates/
 
