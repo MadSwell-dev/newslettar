@@ -105,11 +105,17 @@ if [ $CLONE_EXIT -ne 0 ]; then
 else
     # Clone claims success - verify files exist
     echo -e "${BLUE}  Checking clone contents...${NC}"
-    echo -e "${BLUE}  DEBUG: Listing $TEMP_CLONE:${NC}"
-    ls -la "$TEMP_CLONE/" 2>&1 | head -15
     
-    if ! ls "$TEMP_CLONE"/*.go >/dev/null 2>&1; then
-        echo -e "${RED}Git clone succeeded but .go files are missing! Falling back to direct file downloads...${NC}"
+    # Count .go files
+    GO_COUNT=$(find "$TEMP_CLONE" -maxdepth 1 -name "*.go" 2>/dev/null | wc -l)
+    echo -e "${BLUE}  Found $GO_COUNT .go files${NC}"
+    ls "$TEMP_CLONE"/*.go 2>&1 | head -5
+    
+    if [ "$GO_COUNT" -lt 5 ]; then
+        echo -e "${RED}Git clone succeeded but .go files are missing!${NC}"
+        echo -e "${RED}Contents of $TEMP_CLONE:${NC}"
+        ls -la "$TEMP_CLONE/" 2>&1
+        echo -e "${RED}Falling back to direct file downloads...${NC}"
         rm -rf "$TEMP_CLONE"
     else
         # Files exist, proceed with copy
@@ -120,38 +126,33 @@ fi
 # Check if we have a successful clone directory with files
 if [ -d "$TEMP_CLONE" ] && [ -f "$TEMP_CLONE/main.go" ]; then
     echo -e "${BLUE}  Copying files from clone...${NC}"
-    echo -e "${BLUE}  DEBUG: Source dir contents:${NC}"
-    ls -la "$TEMP_CLONE/" | head -15
     
     # Copy all Go files explicitly
-    cp "$TEMP_CLONE"/main.go "$INSTALL_DIR/" || echo "Failed to copy main.go"
-    cp "$TEMP_CLONE"/types.go "$INSTALL_DIR/" || echo "Failed to copy types.go"
-    cp "$TEMP_CLONE"/config.go "$INSTALL_DIR/" || echo "Failed to copy config.go"
-    cp "$TEMP_CLONE"/api.go "$INSTALL_DIR/" || echo "Failed to copy api.go"
-    cp "$TEMP_CLONE"/newsletter.go "$INSTALL_DIR/" || echo "Failed to copy newsletter.go"
-    cp "$TEMP_CLONE"/handlers.go "$INSTALL_DIR/" || echo "Failed to copy handlers.go"
-    cp "$TEMP_CLONE"/server.go "$INSTALL_DIR/" || echo "Failed to copy server.go"
-    cp "$TEMP_CLONE"/utils.go "$INSTALL_DIR/" || echo "Failed to copy utils.go"
-    cp "$TEMP_CLONE"/ui.go "$INSTALL_DIR/" || echo "Failed to copy ui.go"
-    cp "$TEMP_CLONE"/go.mod "$INSTALL_DIR/" || echo "Failed to copy go.mod"
-    cp "$TEMP_CLONE"/go.sum "$INSTALL_DIR/" || echo "Failed to copy go.sum"
-    cp "$TEMP_CLONE"/version.json "$INSTALL_DIR/" || echo "Failed to copy version.json"
+    echo -e "${BLUE}    Copying .go files...${NC}"
+    cp -v "$TEMP_CLONE"/main.go "$INSTALL_DIR/" 2>&1 | grep -E "main\.go|error|cannot" || true
+    cp -v "$TEMP_CLONE"/types.go "$INSTALL_DIR/" 2>&1 | grep -E "types\.go|error|cannot" || true
+    cp -v "$TEMP_CLONE"/config.go "$INSTALL_DIR/" 2>&1 | grep -E "config\.go|error|cannot" || true
+    cp -v "$TEMP_CLONE"/api.go "$INSTALL_DIR/" 2>&1 | grep -E "api\.go|error|cannot" || true
+    cp -v "$TEMP_CLONE"/newsletter.go "$INSTALL_DIR/" 2>&1 | grep -E "newsletter\.go|error|cannot" || true
+    cp -v "$TEMP_CLONE"/handlers.go "$INSTALL_DIR/" 2>&1 | grep -E "handlers\.go|error|cannot" || true
+    cp -v "$TEMP_CLONE"/server.go "$INSTALL_DIR/" 2>&1 | grep -E "server\.go|error|cannot" || true
+    cp -v "$TEMP_CLONE"/utils.go "$INSTALL_DIR/" 2>&1 | grep -E "utils\.go|error|cannot" || true
+    cp -v "$TEMP_CLONE"/ui.go "$INSTALL_DIR/" 2>&1 | grep -E "ui\.go|error|cannot" || true
+    cp -v "$TEMP_CLONE"/go.mod "$INSTALL_DIR/" 2>&1 | grep -E "go\.mod|error|cannot" || true
+    cp -v "$TEMP_CLONE"/go.sum "$INSTALL_DIR/" 2>&1 | grep -E "go\.sum|error|cannot" || true
+    cp -v "$TEMP_CLONE"/version.json "$INSTALL_DIR/" 2>&1 | grep -E "version\.json|error|cannot" || true
     
     # Copy templates directory
     mkdir -p "$INSTALL_DIR/templates"
     if [ -d "$TEMP_CLONE/templates" ]; then
-        cp -r "$TEMP_CLONE/templates"/* "$INSTALL_DIR/templates/" || echo "Failed to copy templates"
+        cp -r "$TEMP_CLONE/templates"/* "$INSTALL_DIR/templates/" || echo "Warning: Failed to copy templates"
     fi
     
     # Copy git info if available
     cp -r "$TEMP_CLONE"/.git "$INSTALL_DIR/" 2>/dev/null || true
     cp "$TEMP_CLONE"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
     
-    echo -e "${BLUE}  DEBUG: Destination dir contents:${NC}"
-    ls -la "$INSTALL_DIR/" | head -15
-    
     rm -rf "$TEMP_CLONE"
-    echo -e "${BLUE}  Clone copy complete${NC}"
 fi
 
 # If clone didn't work, fall back to wget
