@@ -67,6 +67,7 @@ func groupEpisodesBySeries(episodes []Episode) []SeriesGroup {
 				Episodes:    []Episode{},
 				IMDBID:      ep.IMDBID,
 				TvdbID:      ep.TvdbID,
+				Overview:    ep.SeriesOverview,
 			}
 			seriesMap[ep.SeriesTitle] = group
 		}

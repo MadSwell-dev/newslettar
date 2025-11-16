@@ -155,7 +155,7 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 		DownloadedMovies:       downloadedMovies,
 	}
 
-	html, err := generateNewsletterHTML(data, cfg.ShowPosters, cfg.ShowDownloaded)
+	html, err := generateNewsletterHTML(data, cfg.ShowPosters, cfg.ShowDownloaded, cfg.ShowQualityProfiles, cfg.ShowSeriesOverview, cfg.ShowEpisodeOverview)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -231,6 +231,15 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.ShowDownloaded != "" {
 			envMap["SHOW_DOWNLOADED"] = webCfg.ShowDownloaded
 		}
+		if webCfg.ShowQualityProfiles != "" {
+			envMap["SHOW_QUALITY_PROFILES"] = webCfg.ShowQualityProfiles
+		}
+		if webCfg.ShowSeriesOverview != "" {
+			envMap["SHOW_SERIES_OVERVIEW"] = webCfg.ShowSeriesOverview
+		}
+		if webCfg.ShowEpisodeOverview != "" {
+			envMap["SHOW_EPISODE_OVERVIEW"] = webCfg.ShowEpisodeOverview
+		}
 
 		var envContent strings.Builder
 		for key, value := range envMap {
@@ -266,11 +275,14 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		"from_email":      getEnvFromFile(envMap, "FROM_EMAIL", ""),
 		"from_name":       getEnvFromFile(envMap, "FROM_NAME", "Newslettar"),
 		"to_emails":       getEnvFromFile(envMap, "TO_EMAILS", ""),
-		"timezone":        getEnvFromFile(envMap, "TIMEZONE", "UTC"),
-		"schedule_day":    getEnvFromFile(envMap, "SCHEDULE_DAY", "Sun"),
-		"schedule_time":   getEnvFromFile(envMap, "SCHEDULE_TIME", "09:00"),
-		"show_posters":    getEnvFromFile(envMap, "SHOW_POSTERS", "true"),
-		"show_downloaded": getEnvFromFile(envMap, "SHOW_DOWNLOADED", "true"),
+		"timezone":              getEnvFromFile(envMap, "TIMEZONE", "UTC"),
+		"schedule_day":          getEnvFromFile(envMap, "SCHEDULE_DAY", "Sun"),
+		"schedule_time":         getEnvFromFile(envMap, "SCHEDULE_TIME", "09:00"),
+		"show_posters":          getEnvFromFile(envMap, "SHOW_POSTERS", "true"),
+		"show_downloaded":       getEnvFromFile(envMap, "SHOW_DOWNLOADED", "true"),
+		"show_quality_profiles": getEnvFromFile(envMap, "SHOW_QUALITY_PROFILES", "false"),
+		"show_series_overview":  getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", "false"),
+		"show_episode_overview": getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", "false"),
 	})
 }
 
