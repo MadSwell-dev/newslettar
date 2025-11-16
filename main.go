@@ -14,7 +14,7 @@ import (
 //go:embed templates/*.html
 var templateFS embed.FS
 
-const version = "1.2.1"
+const version = "1.3.0"
 
 // Track server start time for uptime monitoring
 var startTime = time.Now()
