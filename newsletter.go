@@ -90,6 +90,17 @@ func runNewsletter() {
 	fetchDuration := time.Since(startFetch)
 	log.Printf("⚡ All data fetched in %v (parallel)", fetchDuration)
 
+	// Filter unmonitored items if the setting is disabled
+	if !cfg.ShowUnmonitored {
+		log.Println("📋 Filtering out unmonitored items...")
+		upcomingEpisodes = filterMonitoredEpisodes(upcomingEpisodes)
+		downloadedEpisodes = filterMonitoredEpisodes(downloadedEpisodes)
+		upcomingMovies = filterMonitoredMovies(upcomingMovies)
+		downloadedMovies = filterMonitoredMovies(downloadedMovies)
+		log.Printf("✓ After filtering: %d upcoming episodes, %d downloaded episodes, %d upcoming movies, %d downloaded movies",
+			len(upcomingEpisodes), len(downloadedEpisodes), len(upcomingMovies), len(downloadedMovies))
+	}
+
 	// Check if we have any content to send
 	hasContent := len(upcomingEpisodes) > 0 || len(upcomingMovies) > 0 ||
 		(cfg.ShowDownloaded && (len(downloadedEpisodes) > 0 || len(downloadedMovies) > 0))
@@ -243,4 +254,25 @@ func getNextScheduledRun(day, timeStr string, loc *time.Location) string {
 	}
 
 	return nextRun.Format("Monday, January 2, 2006 at 3:04 PM MST")
+}
+
+// Filter functions to exclude unmonitored items
+func filterMonitoredEpisodes(episodes []Episode) []Episode {
+	filtered := []Episode{}
+	for _, ep := range episodes {
+		if ep.Monitored {
+			filtered = append(filtered, ep)
+		}
+	}
+	return filtered
+}
+
+func filterMonitoredMovies(movies []Movie) []Movie {
+	filtered := []Movie{}
+	for _, mv := range movies {
+		if mv.Monitored {
+			filtered = append(filtered, mv)
+		}
+	}
+	return filtered
 }

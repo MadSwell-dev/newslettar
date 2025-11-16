@@ -21,6 +21,7 @@ type Config struct {
 	ShowQualityProfiles  bool
 	ShowSeriesOverview   bool
 	ShowEpisodeOverview  bool
+	ShowUnmonitored      bool
 }
 
 // Minimal structs - only fields we actually need (reduces memory & JSON parsing time)
@@ -37,6 +38,7 @@ type Episode struct {
 	Overview       string
 	SeriesOverview string
 	QualityProfile string
+	Monitored      bool
 }
 
 type Movie struct {
@@ -49,6 +51,7 @@ type Movie struct {
 	TmdbID         int
 	Overview       string
 	QualityProfile string
+	Monitored      bool
 }
 
 // For Sonarr calendar response (nested series data)
@@ -63,6 +66,7 @@ type CalendarEpisode struct {
 		TvdbId         int    `json:"tvdbId"`
 		ImdbId         string `json:"imdbId"`
 		Overview       string `json:"overview"`
+		Monitored      bool   `json:"monitored"`
 		QualityProfile struct {
 			Name string `json:"name"`
 		} `json:"qualityProfile"`
@@ -82,6 +86,7 @@ type CalendarMovie struct {
 	ImdbId          string `json:"imdbId"`
 	TmdbId          int    `json:"tmdbId"`
 	Overview        string `json:"overview"`
+	Monitored       bool   `json:"monitored"`
 	QualityProfile  struct {
 		Name string `json:"name"`
 	} `json:"qualityProfile"`
@@ -130,4 +135,5 @@ type WebConfig struct {
 	ShowQualityProfiles string `json:"show_quality_profiles"`
 	ShowSeriesOverview  string `json:"show_series_overview"`
 	ShowEpisodeOverview string `json:"show_episode_overview"`
+	ShowUnmonitored     string `json:"show_unmonitored"`
 }

@@ -546,7 +546,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 <div>
                     <strong>Show Downloaded Section</strong>
                     <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
-                        Include "Downloaded This Week" section
+                        Include "Downloaded Last Week" section
                     </p>
                 </div>
                 <label class="toggle-switch">
@@ -590,6 +590,19 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 </div>
                 <label class="toggle-switch">
                     <input type="checkbox" id="show-episode-overview" onchange="saveTemplateSettings()" aria-label="Toggle episode descriptions">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="template-option">
+                <div>
+                    <strong>Include Unmonitored Items</strong>
+                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
+                        Include unmonitored series and movies from Sonarr/Radarr. When disabled, only shows monitored items that will be downloaded automatically.
+                    </p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="show-unmonitored" onchange="saveTemplateSettings()" aria-label="Toggle unmonitored items">
                     <span class="toggle-slider"></span>
                 </label>
             </div>
@@ -813,7 +826,8 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 document.getElementById('show-quality-profiles').checked = data.show_quality_profiles !== 'false';
                 document.getElementById('show-series-overview').checked = data.show_series_overview !== 'false';
                 document.getElementById('show-episode-overview').checked = data.show_episode_overview !== 'false';
-                
+                document.getElementById('show-unmonitored').checked = data.show_unmonitored !== 'false';
+
                 document.getElementById('current-timezone').textContent = data.timezone || 'UTC';
                 
                 await updateTimezoneInfo();
@@ -973,6 +987,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             const showQualityProfiles = document.getElementById('show-quality-profiles').checked;
             const showSeriesOverview = document.getElementById('show-series-overview').checked;
             const showEpisodeOverview = document.getElementById('show-episode-overview').checked;
+            const showUnmonitored = document.getElementById('show-unmonitored').checked;
 
             try {
                 await fetch('/api/config', {
@@ -983,7 +998,8 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                         show_downloaded: showDownloaded ? 'true' : 'false',
                         show_quality_profiles: showQualityProfiles ? 'true' : 'false',
                         show_series_overview: showSeriesOverview ? 'true' : 'false',
-                        show_episode_overview: showEpisodeOverview ? 'true' : 'false'
+                        show_episode_overview: showEpisodeOverview ? 'true' : 'false',
+                        show_unmonitored: showUnmonitored ? 'true' : 'false'
                     })
                 });
 
@@ -1037,20 +1053,51 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         }
 
         async function performUpdate() {
-            if (!confirm('Update Newslettar? The page will reload in 20 seconds.')) return;
+            if (!confirm('Update Newslettar? The page will reload automatically when the update completes.')) return;
 
             const button = document.getElementById('update-btn');
             button.classList.add('loading');
             button.disabled = true;
 
-            showNotification('Starting update... Page will reload in 20 seconds', 'success');
-            
+            showNotification('Starting update... Please wait...', 'success');
+
             try {
                 await fetch('/api/update', { method: 'POST' });
 
-                setTimeout(() => {
-                    location.reload();
-                }, 20000);
+                // Poll server to check when it's back up
+                let attempts = 0;
+                const maxAttempts = 60; // 60 attempts * 2 seconds = 2 minutes max
+
+                const pollServer = async () => {
+                    attempts++;
+
+                    if (attempts > maxAttempts) {
+                        showNotification('Update may have failed. Please refresh manually.', 'error');
+                        button.classList.remove('loading');
+                        button.disabled = false;
+                        return;
+                    }
+
+                    try {
+                        // Try to fetch the version endpoint to see if server is back
+                        const response = await fetch('/api/version');
+                        if (response.ok) {
+                            // Server is back, reload the page
+                            showNotification('Update complete! Reloading...', 'success');
+                            setTimeout(() => location.reload(), 500);
+                        } else {
+                            // Server returned an error, keep polling
+                            setTimeout(pollServer, 2000);
+                        }
+                    } catch (error) {
+                        // Server not ready yet, keep polling
+                        setTimeout(pollServer, 2000);
+                    }
+                };
+
+                // Start polling after 5 seconds (give the update process time to start)
+                setTimeout(pollServer, 5000);
+
             } catch (error) {
                 showNotification('Update failed: ' + error.message, 'error');
                 button.classList.remove('loading');

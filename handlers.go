@@ -138,6 +138,14 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 
 	wg.Wait()
 
+	// Filter unmonitored items if the setting is disabled
+	if !cfg.ShowUnmonitored {
+		upcomingEpisodes = filterMonitoredEpisodes(upcomingEpisodes)
+		downloadedEpisodes = filterMonitoredEpisodes(downloadedEpisodes)
+		upcomingMovies = filterMonitoredMovies(upcomingMovies)
+		downloadedMovies = filterMonitoredMovies(downloadedMovies)
+	}
+
 	// Sort movies chronologically
 	sort.Slice(upcomingMovies, func(i, j int) bool {
 		return upcomingMovies[i].ReleaseDate < upcomingMovies[j].ReleaseDate
@@ -240,6 +248,9 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.ShowEpisodeOverview != "" {
 			envMap["SHOW_EPISODE_OVERVIEW"] = webCfg.ShowEpisodeOverview
 		}
+		if webCfg.ShowUnmonitored != "" {
+			envMap["SHOW_UNMONITORED"] = webCfg.ShowUnmonitored
+		}
 
 		var envContent strings.Builder
 		for key, value := range envMap {
@@ -283,6 +294,7 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		"show_quality_profiles": getEnvFromFile(envMap, "SHOW_QUALITY_PROFILES", "false"),
 		"show_series_overview":  getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", "false"),
 		"show_episode_overview": getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", "false"),
+		"show_unmonitored":      getEnvFromFile(envMap, "SHOW_UNMONITORED", "false"),
 	})
 }
 
