@@ -1,11 +1,9 @@
 {
-  "version": "1.4.13",
+  "version": "1.4.14",
   "released": "2025-11-16",
   "changelog": [
-    "Feature: Added unmonitored indicator (○) for Sonarr/Radarr releases",
-    "Enhancement: Orange circle appears next to unmonitored items",
-    "Enhancement: Hover tooltip shows 'Not monitored - won't be downloaded'",
-    "Enhancement: Helps identify items that will release but not auto-download",
-    "Enhancement: Applied to all Sonarr/Radarr sections (not Trakt)"
+    "Fix: Removed useless title attributes from unmonitored indicators",
+    "Fix: Title tooltips don't work in email clients, so removed them",
+    "Enhancement: Cleaner HTML markup for email compatibility"
   ]
 }
