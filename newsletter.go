@@ -265,7 +265,8 @@ func generateNewsletterHTML(data NewsletterData, cfg *Config) (string, error) {
 		ShowDownloaded             bool
 		ShowSeriesOverview         bool
 		ShowEpisodeOverview        bool
-		ShowRatings                bool
+		ShowSeriesRatings          bool
+		ShowEpisodeRatings         bool
 		DarkMode                   bool
 		ShowTraktAnticipatedSeries bool
 		ShowTraktWatchedSeries     bool
@@ -277,7 +278,8 @@ func generateNewsletterHTML(data NewsletterData, cfg *Config) (string, error) {
 		ShowDownloaded:             cfg.ShowDownloaded,
 		ShowSeriesOverview:         cfg.ShowSeriesOverview,
 		ShowEpisodeOverview:        cfg.ShowEpisodeOverview,
-		ShowRatings:                cfg.ShowRatings,
+		ShowSeriesRatings:          cfg.ShowSeriesRatings,
+		ShowEpisodeRatings:         cfg.ShowEpisodeRatings,
 		DarkMode:                   cfg.DarkMode,
 		ShowTraktAnticipatedSeries: cfg.ShowTraktAnticipatedSeries,
 		ShowTraktWatchedSeries:     cfg.ShowTraktWatchedSeries,

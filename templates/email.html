@@ -112,7 +112,7 @@
                                 {{else}}
                                     {{.SeriesTitle}}
                                 {{end}}
-                                <span style="{{if $.DarkMode}}color: #8899aa;{{else}}color: #666;{{end}} font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}})</span>
+                                <span style="{{if $.DarkMode}}color: #8899aa;{{else}}color: #666;{{end}} font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}}){{if and $.ShowSeriesRatings .Episodes}}{{if gt (index .Episodes 0).Rating 0.0}} • ⭐ {{printf "%.1f" (index .Episodes 0).Rating}}/10{{end}}{{end}}</span>
                             </div>
                             {{if $.ShowSeriesOverview}}
                                 {{if .Overview}}
@@ -126,7 +126,7 @@
                         <div class="episode-item">
                             <span class="episode-number">S{{printf "%02d" .SeasonNum}}E{{printf "%02d" .EpisodeNum}}</span>
                             <span class="episode-title">{{if .Title}}{{.Title}}{{else}}TBA{{end}}{{if not .Monitored}} <span style="color: #ff9800; font-size: 0.85em;">○</span>{{end}}</span>
-                            {{if .AirDate}}<span class="episode-date">{{formatDateWithDay .AirDate}}{{if and $.ShowRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>{{end}}
+                            {{if .AirDate}}<span class="episode-date">{{formatDateWithDay .AirDate}}{{if and $.ShowEpisodeRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>{{end}}
                             {{if $.ShowEpisodeOverview}}
                                 {{if .Overview}}
                                     <span class="episode-overview">{{.Overview}}</span>
@@ -161,7 +161,7 @@
                             {{end}}
                             {{if not .Monitored}} <span style="color: #ff9800; font-size: 0.85em;">○</span>{{end}}
                         </div>
-                        <div class="movie-year">({{.Year}}){{if .ReleaseDate}} • {{formatDateWithDay .ReleaseDate}}{{end}}{{if and $.ShowRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</div>
+                        <div class="movie-year">({{.Year}}){{if .ReleaseDate}} • {{formatDateWithDay .ReleaseDate}}{{end}}{{if and $.ShowSeriesRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</div>
                         {{if $.ShowSeriesOverview}}
                             {{if .Overview}}
                                 <div class="series-overview">{{.Overview}}</div>
@@ -197,7 +197,7 @@
                                 {{else}}
                                     {{.SeriesTitle}}
                                 {{end}}
-                                <span style="{{if $.DarkMode}}color: #8899aa;{{else}}color: #666;{{end}} font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}})</span>
+                                <span style="{{if $.DarkMode}}color: #8899aa;{{else}}color: #666;{{end}} font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}}){{if and $.ShowSeriesRatings .Episodes}}{{if gt (index .Episodes 0).Rating 0.0}} • ⭐ {{printf "%.1f" (index .Episodes 0).Rating}}/10{{end}}{{end}}</span>
                             </div>
                             {{if $.ShowSeriesOverview}}
                                 {{if .Overview}}
@@ -210,7 +210,7 @@
                         {{range .Episodes}}
                         <div class="episode-item">
                             <span class="episode-number">S{{printf "%02d" .SeasonNum}}E{{printf "%02d" .EpisodeNum}}</span>
-                            <span class="episode-title">{{if .Title}}{{.Title}}{{else}}Episode {{.EpisodeNum}}{{end}}{{if and $.ShowRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
+                            <span class="episode-title">{{if .Title}}{{.Title}}{{else}}Episode {{.EpisodeNum}}{{end}}{{if and $.ShowEpisodeRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</span>
                             {{if $.ShowEpisodeOverview}}
                                 {{if .Overview}}
                                     <span class="episode-overview">{{.Overview}}</span>
@@ -244,7 +244,7 @@
                                 {{.Title}}
                             {{end}}
                         </div>
-                        <div class="movie-year">({{.Year}}){{if and $.ShowRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</div>
+                        <div class="movie-year">({{.Year}}){{if and $.ShowSeriesRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</div>
                         {{if $.ShowSeriesOverview}}
                             {{if .Overview}}
                                 <div class="series-overview">{{.Overview}}</div>

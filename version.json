@@ -1,11 +1,11 @@
 {
-  "version": "1.4.14",
+  "version": "1.4.15",
   "released": "2025-11-16",
   "changelog": [
-    "Fix: CRITICAL - Fixed config deletion bug when toggling settings",
-    "Fix: Settings no longer get wiped when changing ratings/dark mode toggles",
-    "Fix: Updated version constant in main.go to match actual version",
-    "Fix: Removed unmonitored indicator from Downloaded section (not relevant there)",
-    "Enhancement: Unmonitored indicator only shown in Upcoming sections"
+    "Feature: Split ratings into two separate toggles - series and episode ratings",
+    "Feature: Series ratings now displayed in series headers",
+    "Feature: Episode ratings shown on individual episodes",
+    "Feature: Movie ratings use series ratings toggle for consistency",
+    "Enhancement: More granular control over rating display in newsletters"
   ]
 }
