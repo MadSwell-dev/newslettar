@@ -323,9 +323,6 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.TraktClientID != "" {
 			envMap["TRAKT_CLIENT_ID"] = webCfg.TraktClientID
 		}
-		if webCfg.TraktAPIKey != "" {
-			envMap["TRAKT_API_KEY"] = webCfg.TraktAPIKey
-		}
 		if webCfg.SMTPHost != "" {
 			envMap["SMTP_HOST"] = webCfg.SMTPHost
 		}
@@ -416,7 +413,6 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		"radarr_url":                    getEnvFromFile(envMap, "RADARR_URL", ""),
 		"radarr_api_key":                getEnvFromFile(envMap, "RADARR_API_KEY", ""),
 		"trakt_client_id":               getEnvFromFile(envMap, "TRAKT_CLIENT_ID", ""),
-		"trakt_api_key":                 getEnvFromFile(envMap, "TRAKT_API_KEY", ""),
 		"smtp_host":                     cfg.SMTPHost,
 		"smtp_port":                     cfg.SMTPPort,
 		"smtp_user":                     cfg.SMTPUser,

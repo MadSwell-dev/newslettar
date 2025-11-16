@@ -40,7 +40,7 @@ type traktMovieResponse struct {
 
 // fetchTraktAnticipatedSeries fetches the most anticipated series of the coming week from Trakt
 func fetchTraktAnticipatedSeries(ctx context.Context, cfg *Config) ([]TraktShow, error) {
-	if cfg.TraktClientID == "" || cfg.TraktAPIKey == "" {
+	if cfg.TraktClientID == "" {
 		return nil, nil
 	}
 
@@ -64,7 +64,7 @@ func fetchTraktAnticipatedSeries(ctx context.Context, cfg *Config) ([]TraktShow,
 
 // fetchTraktWatchedSeries fetches the most watched series of the last week from Trakt
 func fetchTraktWatchedSeries(ctx context.Context, cfg *Config) ([]TraktShow, error) {
-	if cfg.TraktClientID == "" || cfg.TraktAPIKey == "" {
+	if cfg.TraktClientID == "" {
 		return nil, nil
 	}
 
@@ -88,7 +88,7 @@ func fetchTraktWatchedSeries(ctx context.Context, cfg *Config) ([]TraktShow, err
 
 // fetchTraktAnticipatedMovies fetches the most anticipated movies of the coming week from Trakt
 func fetchTraktAnticipatedMovies(ctx context.Context, cfg *Config) ([]TraktMovie, error) {
-	if cfg.TraktClientID == "" || cfg.TraktAPIKey == "" {
+	if cfg.TraktClientID == "" {
 		return nil, nil
 	}
 
@@ -112,7 +112,7 @@ func fetchTraktAnticipatedMovies(ctx context.Context, cfg *Config) ([]TraktMovie
 
 // fetchTraktWatchedMovies fetches the most watched movies of the last week from Trakt
 func fetchTraktWatchedMovies(ctx context.Context, cfg *Config) ([]TraktMovie, error) {
-	if cfg.TraktClientID == "" || cfg.TraktAPIKey == "" {
+	if cfg.TraktClientID == "" {
 		return nil, nil
 	}
 

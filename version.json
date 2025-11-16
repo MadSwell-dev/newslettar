@@ -1,11 +1,10 @@
 {
-  "version": "1.4.1",
+  "version": "1.4.2",
   "released": "2025-11-16",
   "changelog": [
-    "Fix: Added missing UI fields for Trakt configuration (Client ID and API Key)",
-    "Fix: Added missing UI toggles for Dark Mode in Email Template tab",
-    "Fix: Added missing UI toggles for Trakt features (4 trending sections)",
-    "Enhancement: Added helpful info banners explaining Trakt integration",
-    "Enhancement: JavaScript now properly loads and saves all new configuration fields"
+    "Fix: Simplified Trakt configuration - only Client ID is needed (removed unnecessary API Key field)",
+    "Enhancement: Updated UI to clarify that Client Secret is not required for trending content",
+    "Enhancement: Removed redundant validation checks for non-existent API Key field",
+    "Documentation: Added note explaining Client ID vs Client Secret usage"
   ]
 }

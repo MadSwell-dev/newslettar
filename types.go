@@ -57,7 +57,6 @@ type Config struct {
 	RadarrURL                  string
 	RadarrAPIKey               string
 	TraktClientID              string
-	TraktAPIKey                string
 	SMTPHost                   string
 	SMTPPort                   string
 	SMTPUser                   string
@@ -196,7 +195,6 @@ type WebConfig struct {
 	RadarrURL                  string `json:"radarr_url"`
 	RadarrAPIKey               string `json:"radarr_api_key"`
 	TraktClientID              string `json:"trakt_client_id"`
-	TraktAPIKey                string `json:"trakt_api_key"`
 	SMTPHost                   string `json:"smtp_host"`
 	SMTPPort                   string `json:"smtp_port"`
 	SMTPUser                   string `json:"smtp_user"`
