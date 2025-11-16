@@ -82,11 +82,14 @@ func loadConfig() *Config {
 		ShowEpisodeOverview: getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", DefaultShowEpisodeOverview) != "false",
 		ShowUnmonitored:     getEnvFromFile(envMap, "SHOW_UNMONITORED", DefaultShowUnmonitored) != "false",
 		// Performance tuning - parse as integers with defaults
-		APIPageSize:    getEnvIntFromFile(envMap, "API_PAGE_SIZE", DefaultAPIPageSize),
-		MaxRetries:     getEnvIntFromFile(envMap, "MAX_RETRIES", DefaultMaxRetries),
-		PreviewRetries: getEnvIntFromFile(envMap, "PREVIEW_RETRIES", DefaultPreviewRetries),
-		APITimeout:     getEnvIntFromFile(envMap, "API_TIMEOUT", int(DefaultAPITimeout/time.Second)),
-		WebUIPort:      getEnvFromFile(envMap, "WEBUI_PORT", DefaultWebUIPort),
+		APIPageSize:     getEnvIntFromFile(envMap, "API_PAGE_SIZE", DefaultAPIPageSize),
+		MaxRetries:      getEnvIntFromFile(envMap, "MAX_RETRIES", DefaultMaxRetries),
+		PreviewRetries:  getEnvIntFromFile(envMap, "PREVIEW_RETRIES", DefaultPreviewRetries),
+		APITimeout:      getEnvIntFromFile(envMap, "API_TIMEOUT", int(DefaultAPITimeout/time.Second)),
+		WebUIPort:       getEnvFromFile(envMap, "WEBUI_PORT", DefaultWebUIPort),
+		EmailBatchSize:  getEnvIntFromFile(envMap, "EMAIL_BATCH_SIZE", DefaultEmailBatchSize),
+		EmailBatchDelay: getEnvIntFromFile(envMap, "EMAIL_BATCH_DELAY", int(DefaultEmailBatchDelay/time.Second)),
+		LogLevel:        getEnvFromFile(envMap, "LOG_LEVEL", DefaultLogLevel),
 	}
 }
 

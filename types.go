@@ -1,5 +1,55 @@
 package main
 
+import (
+	"sync"
+	"time"
+)
+
+// Cache structures for API responses
+type CacheEntry struct {
+	Data      interface{}
+	ExpiresAt time.Time
+}
+
+type APICache struct {
+	mu    sync.RWMutex
+	cache map[string]CacheEntry
+}
+
+func NewAPICache() *APICache {
+	return &APICache{
+		cache: make(map[string]CacheEntry),
+	}
+}
+
+func (c *APICache) Get(key string) (interface{}, bool) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	entry, exists := c.cache[key]
+	if !exists || time.Now().After(entry.ExpiresAt) {
+		return nil, false
+	}
+	return entry.Data, true
+}
+
+func (c *APICache) Set(key string, data interface{}, ttl time.Duration) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.cache[key] = CacheEntry{
+		Data:      data,
+		ExpiresAt: time.Now().Add(ttl),
+	}
+}
+
+func (c *APICache) Clear() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.cache = make(map[string]CacheEntry)
+}
+
 // Config structures
 type Config struct {
 	SonarrURL            string
@@ -27,6 +77,9 @@ type Config struct {
 	PreviewRetries   int
 	APITimeout       int // in seconds
 	WebUIPort        string
+	EmailBatchSize   int    // Number of recipients per batch
+	EmailBatchDelay  int    // Delay between batches in seconds
+	LogLevel         string // debug, info, warn, error
 }
 
 // Minimal structs - only fields we actually need (reduces memory & JSON parsing time)

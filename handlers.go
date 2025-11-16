@@ -21,6 +21,7 @@ import (
 // Register all HTTP handlers
 func registerHandlers() {
 	http.HandleFunc("/", withGzip(uiHandler))
+	http.HandleFunc("/health", healthHandler)
 	http.HandleFunc("/api/config", configHandler)
 	http.HandleFunc("/api/test-sonarr", testSonarrHandler)
 	http.HandleFunc("/api/test-radarr", testRadarrHandler)
@@ -70,6 +71,72 @@ func uiHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprint(w, html)
+}
+
+// Health check endpoint for monitoring and load balancers
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	cfg := getConfig()
+
+	// Check if basic configuration is present
+	healthy := true
+	checks := make(map[string]string)
+
+	// Check Sonarr configuration
+	if cfg.SonarrURL != "" && cfg.SonarrAPIKey != "" {
+		checks["sonarr"] = "configured"
+	} else if cfg.SonarrURL == "" && cfg.SonarrAPIKey == "" {
+		checks["sonarr"] = "not_configured"
+	} else {
+		checks["sonarr"] = "misconfigured"
+		healthy = false
+	}
+
+	// Check Radarr configuration
+	if cfg.RadarrURL != "" && cfg.RadarrAPIKey != "" {
+		checks["radarr"] = "configured"
+	} else if cfg.RadarrURL == "" && cfg.RadarrAPIKey == "" {
+		checks["radarr"] = "not_configured"
+	} else {
+		checks["radarr"] = "misconfigured"
+		healthy = false
+	}
+
+	// Check if at least one service is configured
+	if checks["sonarr"] == "not_configured" && checks["radarr"] == "not_configured" {
+		checks["services"] = "none_configured"
+		healthy = false
+	} else {
+		checks["services"] = "ok"
+	}
+
+	// Check email configuration
+	if cfg.FromEmail != "" && len(cfg.ToEmails) > 0 && cfg.SMTPUser != "" && cfg.SMTPPass != "" {
+		checks["email"] = "configured"
+	} else if cfg.FromEmail == "" && len(cfg.ToEmails) == 0 {
+		checks["email"] = "not_configured"
+		healthy = false
+	} else {
+		checks["email"] = "misconfigured"
+		healthy = false
+	}
+
+	status := "healthy"
+	statusCode := http.StatusOK
+	if !healthy {
+		status = "unhealthy"
+		statusCode = http.StatusServiceUnavailable
+	}
+
+	response := map[string]interface{}{
+		"status":  status,
+		"version": version,
+		"checks":  checks,
+		"uptime":  time.Since(startTime).String(),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(response)
 }
 
 func timezoneInfoHandler(w http.ResponseWriter, r *http.Request) {
