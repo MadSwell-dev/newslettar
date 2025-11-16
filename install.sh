@@ -39,6 +39,15 @@ INSTALL_DIR="/opt/newslettar"
 REPO_URL="https://raw.githubusercontent.com/agencefanfare/newslettar/main"
 GITHUB_REPO="https://github.com/agencefanfare/newslettar"
 
+# Check if installation already exists and offer to clean it
+if [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/main.go" ]; then
+    echo -e "${YELLOW}⚠ Existing installation found at $INSTALL_DIR${NC}"
+    echo -e "${YELLOW}Removing old installation to start fresh...${NC}"
+    rm -rf "$INSTALL_DIR"
+    echo -e "${GREEN}✓ Old installation removed${NC}"
+    echo ""
+fi
+
 echo -e "${YELLOW}[1/8] Updating system packages...${NC}"
 apt-get update -qq
 apt-get install -y wget curl ca-certificates git >/dev/null 2>&1
@@ -78,6 +87,9 @@ echo -e "${YELLOW}[4/8] Downloading Newslettar...${NC}"
 
 # Clone the latest version from GitHub (automatically gets all files)
 echo -e "${BLUE}  Cloning from GitHub (this may take a moment)...${NC}"
+
+# Clean up any leftover temp directories from failed attempts
+rm -rf /tmp/temp_clone temp_clone 2>/dev/null || true
 
 # Clone into a temporary directory first, then move contents
 TEMP_DIR=$(mktemp -d)
