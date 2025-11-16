@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  newslettar:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: newslettar
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      # Mount .env file for configuration
+      - ./data/.env:/opt/newslettar/.env
+      # Optional: persist logs
+      - ./data/logs:/opt/newslettar/logs
+    environment:
+      # Override these via .env file or here
+      - TIMEZONE=UTC
+      - WEBUI_PORT=8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - newslettar-net
+
+networks:
+  newslettar-net:
+    driver: bridge
