@@ -168,6 +168,8 @@ type TraktShow struct {
 	ImageURL    string
 	Overview    string
 	ReleaseDate string
+	Network     string
+	IMDBID      string
 }
 
 type TraktMovie struct {
@@ -176,6 +178,7 @@ type TraktMovie struct {
 	ImageURL    string
 	Overview    string
 	ReleaseDate string
+	IMDBID      string
 }
 
 type NewsletterData struct {

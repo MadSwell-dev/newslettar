@@ -16,6 +16,7 @@ type traktShowResponse struct {
 		Title      string `json:"title"`
 		Year       int    `json:"year"`
 		FirstAired string `json:"first_aired"`
+		Network    string `json:"network"`
 		IDs        struct {
 			Slug string `json:"slug"`
 			TVDB int    `json:"tvdb"`
@@ -206,6 +207,8 @@ func fetchTraktShows(ctx context.Context, cfg *Config, url string, filterToNextW
 			Year:        resp.Show.Year,
 			Overview:    resp.Show.Overview,
 			ReleaseDate: resp.Show.FirstAired,
+			Network:     resp.Show.Network,
+			IMDBID:      resp.Show.IDs.IMDB,
 		}
 
 		// Images are not available from Trakt API directly
@@ -289,6 +292,7 @@ func fetchTraktMovies(ctx context.Context, cfg *Config, url string, filterToNext
 			Year:        resp.Movie.Year,
 			Overview:    resp.Movie.Overview,
 			ReleaseDate: resp.Movie.Released,
+			IMDBID:      resp.Movie.IDs.IMDB,
 		}
 
 		// Images are not available from Trakt API directly

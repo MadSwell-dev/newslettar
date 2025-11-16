@@ -269,8 +269,8 @@
             <div class="trakt-item">
                 <div class="movie-poster-placeholder">📺</div>
                 <div class="movie-content">
-                    <div class="movie-title">{{.Title}}</div>
-                    <div class="movie-year">({{.Year}}){{if .ReleaseDate}} • Premieres {{formatDateWithDay .ReleaseDate}}{{end}}</div>
+                    <div class="movie-title">{{.Title}}{{if .IMDBID}} <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: #f5c518; text-decoration: none; font-size: 0.9em;">⭐</a>{{end}}</div>
+                    <div class="movie-year">({{.Year}}){{if .Network}} • {{.Network}}{{end}}{{if .ReleaseDate}} • Premieres {{formatDateWithDay .ReleaseDate}}{{end}}</div>
                     {{if .Overview}}
                         <div class="series-overview">{{.Overview}}</div>
                     {{end}}
@@ -287,8 +287,8 @@
             <div class="trakt-item">
                 <div class="movie-poster-placeholder">📺</div>
                 <div class="movie-content">
-                    <div class="movie-title">{{.Title}}</div>
-                    <div class="movie-year">({{.Year}})</div>
+                    <div class="movie-title">{{.Title}}{{if .IMDBID}} <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: #f5c518; text-decoration: none; font-size: 0.9em;">⭐</a>{{end}}</div>
+                    <div class="movie-year">({{.Year}}){{if .Network}} • {{.Network}}{{end}}</div>
                     {{if .Overview}}
                         <div class="series-overview">{{.Overview}}</div>
                     {{end}}
@@ -305,7 +305,7 @@
             <div class="trakt-item">
                 <div class="movie-poster-placeholder">🎬</div>
                 <div class="movie-content">
-                    <div class="movie-title">{{.Title}}</div>
+                    <div class="movie-title">{{.Title}}{{if .IMDBID}} <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: #f5c518; text-decoration: none; font-size: 0.9em;">⭐</a>{{end}}</div>
                     <div class="movie-year">({{.Year}}){{if .ReleaseDate}} • Releases {{formatDateWithDay .ReleaseDate}}{{end}}</div>
                     {{if .Overview}}
                         <div class="series-overview">{{.Overview}}</div>
@@ -323,7 +323,7 @@
             <div class="trakt-item">
                 <div class="movie-poster-placeholder">🎬</div>
                 <div class="movie-content">
-                    <div class="movie-title">{{.Title}}</div>
+                    <div class="movie-title">{{.Title}}{{if .IMDBID}} <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank" style="color: #f5c518; text-decoration: none; font-size: 0.9em;">⭐</a>{{end}}</div>
                     <div class="movie-year">({{.Year}})</div>
                     {{if .Overview}}
                         <div class="series-overview">{{.Overview}}</div>
