@@ -114,6 +114,10 @@ if [ $? -ne 0 ] || [ ! -f "$TEMP_CLONE/main.go" ]; then
         exit 1
     }
 else
+    # Debug: show what's actually in the temp directory
+    echo -e "${BLUE}  DEBUG: Contents of $TEMP_CLONE:${NC}"
+    ls -la "$TEMP_CLONE/" | head -20
+    
     # Use find to reliably copy all files
     find "$TEMP_CLONE" -maxdepth 1 -type f -name "*.go" -exec cp {} "$INSTALL_DIR/" \;
     find "$TEMP_CLONE" -maxdepth 1 -type f -name "go.mod" -exec cp {} "$INSTALL_DIR/" \;
@@ -121,6 +125,11 @@ else
     find "$TEMP_CLONE" -maxdepth 1 -type f -name "version.json" -exec cp {} "$INSTALL_DIR/" \;
     mkdir -p "$INSTALL_DIR/templates"
     find "$TEMP_CLONE/templates" -type f -exec cp {} "$INSTALL_DIR/templates/" \;
+    
+    # Debug: show what was copied
+    echo -e "${BLUE}  DEBUG: Contents of $INSTALL_DIR after copy:${NC}"
+    ls -la "$INSTALL_DIR/" | head -20
+    
     cp -r "$TEMP_CLONE"/.git "$INSTALL_DIR/" 2>/dev/null || true
     cp "$TEMP_CLONE"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
     rm -rf "$TEMP_CLONE"
