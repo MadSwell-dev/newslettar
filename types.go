@@ -98,12 +98,13 @@ type CalendarMovie struct {
 }
 
 type SeriesGroup struct {
-	SeriesTitle string
-	PosterURL   string
-	Episodes    []Episode
-	IMDBID      string
-	TvdbID      int
-	Overview    string
+	SeriesTitle    string
+	PosterURL      string
+	Episodes       []Episode
+	IMDBID         string
+	TvdbID         int
+	Overview       string
+	QualityProfile string
 }
 
 type NewsletterData struct {

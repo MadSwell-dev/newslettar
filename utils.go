@@ -62,12 +62,13 @@ func groupEpisodesBySeries(episodes []Episode) []SeriesGroup {
 		group, exists := seriesMap[ep.SeriesTitle]
 		if !exists {
 			group = &SeriesGroup{
-				SeriesTitle: ep.SeriesTitle,
-				PosterURL:   ep.PosterURL,
-				Episodes:    []Episode{},
-				IMDBID:      ep.IMDBID,
-				TvdbID:      ep.TvdbID,
-				Overview:    ep.SeriesOverview,
+				SeriesTitle:    ep.SeriesTitle,
+				PosterURL:      ep.PosterURL,
+				Episodes:       []Episode{},
+				IMDBID:         ep.IMDBID,
+				TvdbID:         ep.TvdbID,
+				Overview:       ep.SeriesOverview,
+				QualityProfile: ep.QualityProfile,
 			}
 			seriesMap[ep.SeriesTitle] = group
 		}
