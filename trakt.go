@@ -43,6 +43,120 @@ type traktMovieResponse struct {
 	} `json:"movie"`
 }
 
+// isShowInSonarr checks if a show exists in Sonarr library by IMDB or TVDB ID
+func isShowInSonarr(ctx context.Context, cfg *Config, imdbID string, tvdbID int) bool {
+	if cfg.SonarrURL == "" || cfg.SonarrAPIKey == "" {
+		return false
+	}
+
+	url := fmt.Sprintf("%s/api/v3/series", cfg.SonarrURL)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return false
+	}
+
+	req.Header.Set("X-Api-Key", cfg.SonarrAPIKey)
+	client := &http.Client{
+		Timeout: time.Duration(cfg.APITimeout) * time.Second,
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return false
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return false
+	}
+
+	var series []struct {
+		ImdbID    string `json:"imdbId"`
+		TvdbID    int    `json:"tvdbId"`
+		Monitored bool   `json:"monitored"`
+	}
+
+	if err := json.Unmarshal(body, &series); err != nil {
+		return false
+	}
+
+	// Check if any monitored series matches IMDB or TVDB ID
+	for _, s := range series {
+		if s.Monitored {
+			if imdbID != "" && s.ImdbID == imdbID {
+				return true
+			}
+			if tvdbID > 0 && s.TvdbID == tvdbID {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// isMovieInRadarr checks if a movie exists in Radarr library by IMDB or TMDB ID
+func isMovieInRadarr(ctx context.Context, cfg *Config, imdbID string, tmdbID int) bool {
+	if cfg.RadarrURL == "" || cfg.RadarrAPIKey == "" {
+		return false
+	}
+
+	url := fmt.Sprintf("%s/api/v3/movie", cfg.RadarrURL)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return false
+	}
+
+	req.Header.Set("X-Api-Key", cfg.RadarrAPIKey)
+	client := &http.Client{
+		Timeout: time.Duration(cfg.APITimeout) * time.Second,
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return false
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return false
+	}
+
+	var movies []struct {
+		ImdbID    string `json:"imdbId"`
+		TmdbID    int    `json:"tmdbId"`
+		Monitored bool   `json:"monitored"`
+	}
+
+	if err := json.Unmarshal(body, &movies); err != nil {
+		return false
+	}
+
+	// Check if any monitored movie matches IMDB or TMDB ID
+	for _, m := range movies {
+		if m.Monitored {
+			if imdbID != "" && m.ImdbID == imdbID {
+				return true
+			}
+			if tmdbID > 0 && m.TmdbID == tmdbID {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 // fetchTraktAnticipatedSeries fetches the most anticipated series of the coming week from Trakt
 func fetchTraktAnticipatedSeries(ctx context.Context, cfg *Config) ([]TraktShow, error) {
 	if cfg.TraktClientID == "" {
@@ -212,6 +326,7 @@ func fetchTraktShows(ctx context.Context, cfg *Config, url string, filterToNextW
 			Network:     resp.Show.Network,
 			IMDBID:      resp.Show.IDs.IMDB,
 			Rating:      resp.Show.Rating,
+			InLibrary:   isShowInSonarr(ctx, cfg, resp.Show.IDs.IMDB, resp.Show.IDs.TVDB),
 		}
 
 		// Images are not available from Trakt API directly
@@ -297,6 +412,7 @@ func fetchTraktMovies(ctx context.Context, cfg *Config, url string, filterToNext
 			ReleaseDate: resp.Movie.Released,
 			IMDBID:      resp.Movie.IDs.IMDB,
 			Rating:      resp.Movie.Rating,
+			InLibrary:   isMovieInRadarr(ctx, cfg, resp.Movie.IDs.IMDB, resp.Movie.IDs.TMDB),
 		}
 
 		// Images are not available from Trakt API directly

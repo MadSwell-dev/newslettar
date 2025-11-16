@@ -1,11 +1,9 @@
 {
-  "version": "1.4.8",
+  "version": "1.4.9",
   "released": "2025-11-16",
   "changelog": [
-    "Fix: Properly separate title line from description (no more cramped layout)",
-    "Enhancement: Removed 'on Trakt' from section title - now just '🔥 Trending'",
-    "Enhancement: Added explicit display:block to ensure proper line breaks",
-    "Enhancement: Improved line height and spacing for better readability",
-    "Enhancement: Slightly larger title font for better visual hierarchy"
+    "Feature: Added checkmark indicator (✓) for Trakt items already in your Sonarr/Radarr library",
+    "Enhancement: Cross-references Trakt trending content with your monitored series and movies",
+    "Enhancement: Green checkmark appears next to titles already in your collection"
   ]
 }
