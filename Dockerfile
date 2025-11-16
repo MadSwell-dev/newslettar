@@ -13,7 +13,7 @@ RUN go mod tidy && \
     CGO_ENABLED=0 GOOS=linux go build \
     -ldflags="-s -w" \
     -trimpath \
-    -o newslettar main.go
+    -o newslettar .
 
 # Final stage - minimal runtime image
 FROM debian:bookworm-slim
