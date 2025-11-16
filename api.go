@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,6 +10,19 @@ import (
 	"net/http"
 	"time"
 )
+
+// Global API cache instance (5-minute TTL for preview generation)
+var apiCache = NewAPICache()
+
+// Cache TTL for API responses (makes previews instant if called within 5 minutes)
+const cacheTTL = 5 * time.Minute
+
+// Generate cache key from endpoint and parameters
+func getCacheKey(endpoint string, params ...interface{}) string {
+	key := fmt.Sprintf("%s:%v", endpoint, params)
+	hash := sha256.Sum256([]byte(key))
+	return fmt.Sprintf("%x", hash[:16]) // Use first 16 bytes of hash
+}
 
 // Generic retry wrapper - reduces code duplication from 67 lines to 20 lines
 func retryWithBackoff[T any](operation func() (T, error), operationName string, maxRetries int) (T, error) {
@@ -59,6 +73,13 @@ func fetchRadarrCalendarWithRetry(ctx context.Context, cfg *Config, start, end t
 func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Episode, error) {
 	if cfg.SonarrURL == "" || cfg.SonarrAPIKey == "" {
 		return nil, fmt.Errorf("Sonarr not configured")
+	}
+
+	// Check cache first
+	cacheKey := getCacheKey("sonarr_history", cfg.SonarrURL, since.Unix())
+	if cached, found := apiCache.Get(cacheKey); found {
+		log.Printf("📦 Using cached Sonarr history")
+		return cached.([]Episode), nil
 	}
 
 	url := fmt.Sprintf("%s/api/v3/history?pageSize=%d&sortKey=date&sortDirection=descending&includeEpisode=true&includeSeries=true", cfg.SonarrURL, cfg.APIPageSize)
@@ -148,10 +169,20 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 		})
 	}
 
+	// Store in cache (reuse the cacheKey variable from above)
+	apiCache.Set(cacheKey, episodes, cacheTTL)
+
 	return episodes, nil
 }
 
 func fetchSonarrCalendar(ctx context.Context, cfg *Config, start, end time.Time) ([]Episode, error) {
+	// Check cache first
+	cacheKey := getCacheKey("sonarr_calendar", cfg.SonarrURL, start.Unix(), end.Unix())
+	if cached, found := apiCache.Get(cacheKey); found {
+		log.Printf("📦 Using cached Sonarr calendar")
+		return cached.([]Episode), nil
+	}
+
 	url := fmt.Sprintf("%s/api/v3/calendar?unmonitored=true&includeSeries=true&includeEpisodeImages=true&start=%s&end=%s",
 		cfg.SonarrURL, start.Format("2006-01-02"), end.Format("2006-01-02"))
 
@@ -218,12 +249,22 @@ func fetchSonarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 		episodes = append(episodes, ep)
 	}
 
+	// Store in cache (reuse the cacheKey variable from above)
+	apiCache.Set(cacheKey, episodes, cacheTTL)
+
 	return episodes, nil
 }
 
 func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Movie, error) {
 	if cfg.RadarrURL == "" || cfg.RadarrAPIKey == "" {
 		return nil, fmt.Errorf("Radarr not configured")
+	}
+
+	// Check cache first
+	cacheKey := getCacheKey("radarr_history", cfg.RadarrURL, since.Unix())
+	if cached, found := apiCache.Get(cacheKey); found {
+		log.Printf("📦 Using cached Radarr history")
+		return cached.([]Movie), nil
 	}
 
 	url := fmt.Sprintf("%s/api/v3/history?pageSize=%d&sortKey=date&sortDirection=descending&includeMovie=true", cfg.RadarrURL, cfg.APIPageSize)
@@ -304,10 +345,20 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 		})
 	}
 
+	// Store in cache (reuse the cacheKey variable from above)
+	apiCache.Set(cacheKey, movies, cacheTTL)
+
 	return movies, nil
 }
 
 func fetchRadarrCalendar(ctx context.Context, cfg *Config, start, end time.Time) ([]Movie, error) {
+	// Check cache first
+	cacheKey := getCacheKey("radarr_calendar", cfg.RadarrURL, start.Unix(), end.Unix())
+	if cached, found := apiCache.Get(cacheKey); found {
+		log.Printf("📦 Using cached Radarr calendar")
+		return cached.([]Movie), nil
+	}
+
 	url := fmt.Sprintf("%s/api/v3/calendar?unmonitored=true&includeMovie=true&start=%s&end=%s",
 		cfg.RadarrURL, start.Format("2006-01-02"), end.Format("2006-01-02"))
 
@@ -370,6 +421,9 @@ func fetchRadarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 
 		movies = append(movies, mv)
 	}
+
+	// Store in cache (reuse the cacheKey variable from above)
+	apiCache.Set(cacheKey, movies, cacheTTL)
 
 	return movies, nil
 }

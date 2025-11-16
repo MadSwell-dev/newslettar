@@ -28,11 +28,14 @@ const (
 	DefaultMaxIdleConns     = 10
 	DefaultMaxIdleConnsPerHost = 5
 	DefaultIdleConnTimeout  = 90 * time.Second
+	DefaultEmailBatchSize   = 10
+	DefaultEmailBatchDelay  = 1 * time.Second
 )
 
 // Log configuration
 const (
 	DefaultMaxLogLines = 500
+	DefaultLogLevel    = "info" // debug, info, warn, error
 )
 
 // Server configuration

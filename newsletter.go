@@ -90,6 +90,32 @@ func runNewsletter() {
 	fetchDuration := time.Since(startFetch)
 	log.Printf("⚡ All data fetched in %v (parallel)", fetchDuration)
 
+	// Check for partial failures and provide graceful degradation
+	failedServices := []string{}
+	workingServices := []string{}
+
+	if errSonarrHistory != nil || errSonarrCalendar != nil {
+		failedServices = append(failedServices, "Sonarr")
+	} else {
+		workingServices = append(workingServices, "Sonarr")
+	}
+
+	if errRadarrHistory != nil || errRadarrCalendar != nil {
+		failedServices = append(failedServices, "Radarr")
+	} else {
+		workingServices = append(workingServices, "Radarr")
+	}
+
+	// Log graceful degradation status
+	if len(failedServices) > 0 && len(workingServices) > 0 {
+		log.Printf("⚠️  Graceful degradation: %s failed, continuing with %s only",
+			strings.Join(failedServices, ", "),
+			strings.Join(workingServices, ", "))
+	} else if len(failedServices) > 0 && len(workingServices) == 0 {
+		log.Printf("❌ All services failed - cannot generate newsletter")
+		return
+	}
+
 	// Filter unmonitored items if the setting is disabled
 	if !cfg.ShowUnmonitored {
 		log.Println("📋 Filtering out unmonitored items...")
@@ -174,12 +200,48 @@ func generateNewsletterHTML(data NewsletterData, showPosters, showDownloaded, sh
 	return buf.String(), nil
 }
 
-// Send email
+// Send email (with batch support for large recipient lists)
 func sendEmail(cfg *Config, subject, htmlBody string) error {
 	if cfg.FromEmail == "" || len(cfg.ToEmails) == 0 {
 		return fmt.Errorf("email configuration incomplete")
 	}
 
+	// If recipients fit in one batch, send normally
+	if len(cfg.ToEmails) <= cfg.EmailBatchSize {
+		return sendEmailBatch(cfg, subject, htmlBody, cfg.ToEmails)
+	}
+
+	// Send in batches to avoid SMTP rate limits
+	log.Printf("📨 Sending to %d recipients in batches of %d...", len(cfg.ToEmails), cfg.EmailBatchSize)
+
+	for i := 0; i < len(cfg.ToEmails); i += cfg.EmailBatchSize {
+		end := i + cfg.EmailBatchSize
+		if end > len(cfg.ToEmails) {
+			end = len(cfg.ToEmails)
+		}
+		batch := cfg.ToEmails[i:end]
+
+		log.Printf("📧 Sending batch %d/%d (%d recipients)...",
+			(i/cfg.EmailBatchSize)+1,
+			(len(cfg.ToEmails)+cfg.EmailBatchSize-1)/cfg.EmailBatchSize,
+			len(batch))
+
+		if err := sendEmailBatch(cfg, subject, htmlBody, batch); err != nil {
+			return fmt.Errorf("batch %d failed: %w", (i/cfg.EmailBatchSize)+1, err)
+		}
+
+		// Add delay between batches (except for the last batch)
+		if end < len(cfg.ToEmails) {
+			time.Sleep(time.Duration(cfg.EmailBatchDelay) * time.Second)
+		}
+	}
+
+	log.Printf("✅ Successfully sent to all %d recipients", len(cfg.ToEmails))
+	return nil
+}
+
+// Send email to a single batch of recipients
+func sendEmailBatch(cfg *Config, subject, htmlBody string, recipients []string) error {
 	from := cfg.FromEmail
 	if cfg.FromName != "" {
 		from = fmt.Sprintf("%s <%s>", cfg.FromName, cfg.FromEmail)
@@ -187,7 +249,7 @@ func sendEmail(cfg *Config, subject, htmlBody string) error {
 
 	headers := make(map[string]string)
 	headers["From"] = from
-	headers["To"] = strings.Join(cfg.ToEmails, ", ")
+	headers["To"] = strings.Join(recipients, ", ")
 	headers["Subject"] = subject
 	headers["MIME-Version"] = "1.0"
 	headers["Content-Type"] = "text/html; charset=UTF-8"
@@ -201,7 +263,7 @@ func sendEmail(cfg *Config, subject, htmlBody string) error {
 	auth := smtp.PlainAuth("", cfg.SMTPUser, cfg.SMTPPass, cfg.SMTPHost)
 	addr := fmt.Sprintf("%s:%s", cfg.SMTPHost, cfg.SMTPPort)
 
-	return smtp.SendMail(addr, auth, cfg.FromEmail, cfg.ToEmails, []byte(message))
+	return smtp.SendMail(addr, auth, cfg.FromEmail, recipients, []byte(message))
 }
 
 // Precompile template with custom functions
