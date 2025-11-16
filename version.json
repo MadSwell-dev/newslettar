@@ -1,12 +1,11 @@
 {
-  "version": "1.4.3",
+  "version": "1.4.4",
   "released": "2025-11-16",
   "changelog": [
-    "Fix: Trakt results now limited to top 5 items per section (was 10)",
-    "Fix: Anticipated content filtered to show only releases in the next 7 days",
-    "Fix: Configuration fields can now be properly cleared by deleting and saving",
-    "Enhancement: Added release dates to anticipated series and movies",
-    "Enhancement: Removed Trakt poster images (not available from API, show placeholders instead)",
-    "Enhancement: Updated section headers to clarify 'Next Week' for anticipated content"
+    "Fix: Date format now shows only date without time component",
+    "Enhancement: Added IMDB links to all Trakt items (clickable star icon)",
+    "Enhancement: Added network/streaming service information for TV series (e.g., Netflix, HBO, Disney+)",
+    "Enhancement: Improved config deletion debugging with detailed logging",
+    "Fix: Release dates now parse both RFC3339 and simple date formats correctly"
   ]
 }

@@ -331,8 +331,10 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		if webCfg.TraktClientID != "" {
 			envMap["TRAKT_CLIENT_ID"] = webCfg.TraktClientID
+			log.Printf("Setting TRAKT_CLIENT_ID to: %s", webCfg.TraktClientID)
 		} else {
 			delete(envMap, "TRAKT_CLIENT_ID")
+			log.Println("Deleting TRAKT_CLIENT_ID from configuration")
 		}
 		if webCfg.SMTPHost != "" {
 			envMap["SMTP_HOST"] = webCfg.SMTPHost

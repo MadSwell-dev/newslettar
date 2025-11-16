@@ -156,9 +156,14 @@ func formatDateWithDay(dateStr string) string {
 		return "Date TBA"
 	}
 
-	t, err := time.Parse("2006-01-02", dateStr)
+	// Try RFC3339 first (ISO8601 with time: "2025-11-19T08:00:00.000Z")
+	t, err := time.Parse(time.RFC3339, dateStr)
 	if err != nil {
-		return dateStr
+		// Try simple date format (YYYY-MM-DD)
+		t, err = time.Parse("2006-01-02", dateStr)
+		if err != nil {
+			return dateStr
+		}
 	}
 
 	return t.Format("Monday, January 2, 2006")
