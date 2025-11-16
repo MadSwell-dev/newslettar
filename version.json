@@ -2,8 +2,10 @@
   "version": "1.4.14",
   "released": "2025-11-16",
   "changelog": [
-    "Fix: Removed useless title attributes from unmonitored indicators",
-    "Fix: Title tooltips don't work in email clients, so removed them",
-    "Enhancement: Cleaner HTML markup for email compatibility"
+    "Fix: CRITICAL - Fixed config deletion bug when toggling settings",
+    "Fix: Settings no longer get wiped when changing ratings/dark mode toggles",
+    "Fix: Updated version constant in main.go to match actual version",
+    "Fix: Removed unmonitored indicator from Downloaded section (not relevant there)",
+    "Enhancement: Unmonitored indicator only shown in Upcoming sections"
   ]
 }
