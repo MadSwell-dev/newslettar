@@ -1,7 +1,12 @@
 {
-  "version": "1.0.22",
-  "released": "2025-01-27",
+  "version": "1.1.0",
+  "released": "2025-11-16",
   "changelog": [
-    "Revert back"
+    "Major refactoring: Split monolithic main.go into 9 focused modules",
+    "New file structure: types.go, config.go, api.go, newsletter.go, handlers.go, server.go, utils.go, ui.go",
+    "Improved maintainability and code organization",
+    "Updated all GitHub URLs to agencefanfare/newslettar repository",
+    "Internal scheduler fully functional without systemd requirements",
+    "All files kept in project root for simplicity"
   ]
 }

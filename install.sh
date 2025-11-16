@@ -2,7 +2,7 @@
 
 # Newslettar Installer v1.0.19 (Optimized)
 # Run this INSIDE your Debian LXC container
-# curl -sSL https://raw.githubusercontent.com/agencefanfare/lerefuge/main/newslettar/install.sh | bash
+# curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install.sh | bash
 
 set -e
 
@@ -36,8 +36,8 @@ echo -e "${BLUE}Detected Debian version: ${DEBIAN_VERSION}${NC}"
 echo ""
 
 INSTALL_DIR="/opt/newslettar"
-REPO_URL="https://raw.githubusercontent.com/agencefanfare/lerefuge/main/newslettar"
-GITHUB_REPO="https://github.com/agencefanfare/lerefuge"
+REPO_URL="https://raw.githubusercontent.com/agencefanfare/newslettar/main"
+GITHUB_REPO="https://github.com/agencefanfare/newslettar"
 
 echo -e "${YELLOW}[1/8] Updating system packages...${NC}"
 apt-get update -qq
@@ -221,9 +221,9 @@ case "$1" in
         echo -e "${YELLOW}Updating Newslettar...${NC}"
         cd /opt/newslettar
         cp .env .env.backup
-        wget -q -O main.go https://raw.githubusercontent.com/agencefanfare/lerefuge/main/newslettar/main.go
-        wget -q -O go.mod https://raw.githubusercontent.com/agencefanfare/lerefuge/main/newslettar/go.mod
-        wget -q -O templates/email.html https://raw.githubusercontent.com/agencefanfare/lerefuge/main/newslettar/templates/email.html
+        wget -q -O main.go https://raw.githubusercontent.com/agencefanfare/newslettar/main/main.go
+        wget -q -O go.mod https://raw.githubusercontent.com/agencefanfare/newslettar/main/go.mod
+        wget -q -O templates/email.html https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html
         /usr/local/go/bin/go mod tidy
         /usr/local/go/bin/go build -ldflags="-s -w" -trimpath -o newslettar main.go
         mv .env.backup .env
