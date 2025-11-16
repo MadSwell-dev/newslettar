@@ -70,11 +70,8 @@
                                 {{end}}
                                 <span style="color: #8899aa; font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}})</span>
                                 {{if $.ShowQualityProfiles}}
-                                    {{range .Episodes}}
-                                        {{if .QualityProfile}}
-                                            <span class="quality-badge">{{.QualityProfile}}</span>
-                                            {{break}}
-                                        {{end}}
+                                    {{if .QualityProfile}}
+                                        <span class="quality-badge">{{.QualityProfile}}</span>
                                     {{end}}
                                 {{end}}
                             </div>
@@ -167,11 +164,8 @@
                                 {{end}}
                                 <span style="color: #8899aa; font-size: 0.8em; font-weight: normal;">({{len .Episodes}} episode{{if gt (len .Episodes) 1}}s{{end}})</span>
                                 {{if $.ShowQualityProfiles}}
-                                    {{range .Episodes}}
-                                        {{if .QualityProfile}}
-                                            <span class="quality-badge">{{.QualityProfile}}</span>
-                                            {{break}}
-                                        {{end}}
+                                    {{if .QualityProfile}}
+                                        <span class="quality-badge">{{.QualityProfile}}</span>
                                     {{end}}
                                 {{end}}
                             </div>
