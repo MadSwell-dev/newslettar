@@ -43,16 +43,22 @@ type traktMovieResponse struct {
 	} `json:"movie"`
 }
 
-// isShowInSonarr checks if a show exists in Sonarr library by IMDB or TVDB ID
-func isShowInSonarr(ctx context.Context, cfg *Config, imdbID string, tvdbID int) bool {
+// getSonarrLibrary fetches and caches the Sonarr library (optimized: only IDs)
+func getSonarrLibrary(ctx context.Context, cfg *Config) map[string]bool {
 	if cfg.SonarrURL == "" || cfg.SonarrAPIKey == "" {
-		return false
+		return make(map[string]bool)
+	}
+
+	// Check cache first
+	cacheKey := getCacheKey("sonarr_library", cfg.SonarrAPIKey, 0)
+	if cached, found := apiCache.Get(cacheKey); found {
+		return cached.(map[string]bool)
 	}
 
 	url := fmt.Sprintf("%s/api/v3/series", cfg.SonarrURL)
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return false
+		return make(map[string]bool)
 	}
 
 	req.Header.Set("X-Api-Key", cfg.SonarrAPIKey)
@@ -62,17 +68,17 @@ func isShowInSonarr(ctx context.Context, cfg *Config, imdbID string, tvdbID int)
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return make(map[string]bool)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return false
+		return make(map[string]bool)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return false
+		return make(map[string]bool)
 	}
 
 	var series []struct {
@@ -82,34 +88,44 @@ func isShowInSonarr(ctx context.Context, cfg *Config, imdbID string, tvdbID int)
 	}
 
 	if err := json.Unmarshal(body, &series); err != nil {
-		return false
+		return make(map[string]bool)
 	}
 
-	// Check if any monitored series matches IMDB or TVDB ID
+	// Build lookup map for O(1) access
+	library := make(map[string]bool)
 	for _, s := range series {
 		if s.Monitored {
-			if imdbID != "" && s.ImdbID == imdbID {
-				return true
+			if s.ImdbID != "" {
+				library["imdb:"+s.ImdbID] = true
 			}
-			if tvdbID > 0 && s.TvdbID == tvdbID {
-				return true
+			if s.TvdbID > 0 {
+				library[fmt.Sprintf("tvdb:%d", s.TvdbID)] = true
 			}
 		}
 	}
 
-	return false
+	// Cache for 5 minutes
+	apiCache.Set(cacheKey, library, cacheTTL)
+	log.Printf("📚 Cached %d monitored series from Sonarr", len(library))
+	return library
 }
 
-// isMovieInRadarr checks if a movie exists in Radarr library by IMDB or TMDB ID
-func isMovieInRadarr(ctx context.Context, cfg *Config, imdbID string, tmdbID int) bool {
+// getRadarrLibrary fetches and caches the Radarr library (optimized: only IDs)
+func getRadarrLibrary(ctx context.Context, cfg *Config) map[string]bool {
 	if cfg.RadarrURL == "" || cfg.RadarrAPIKey == "" {
-		return false
+		return make(map[string]bool)
+	}
+
+	// Check cache first
+	cacheKey := getCacheKey("radarr_library", cfg.RadarrAPIKey, 0)
+	if cached, found := apiCache.Get(cacheKey); found {
+		return cached.(map[string]bool)
 	}
 
 	url := fmt.Sprintf("%s/api/v3/movie", cfg.RadarrURL)
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return false
+		return make(map[string]bool)
 	}
 
 	req.Header.Set("X-Api-Key", cfg.RadarrAPIKey)
@@ -119,17 +135,17 @@ func isMovieInRadarr(ctx context.Context, cfg *Config, imdbID string, tmdbID int
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return make(map[string]bool)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return false
+		return make(map[string]bool)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return false
+		return make(map[string]bool)
 	}
 
 	var movies []struct {
@@ -139,21 +155,47 @@ func isMovieInRadarr(ctx context.Context, cfg *Config, imdbID string, tmdbID int
 	}
 
 	if err := json.Unmarshal(body, &movies); err != nil {
-		return false
+		return make(map[string]bool)
 	}
 
-	// Check if any monitored movie matches IMDB or TMDB ID
+	// Build lookup map for O(1) access
+	library := make(map[string]bool)
 	for _, m := range movies {
 		if m.Monitored {
-			if imdbID != "" && m.ImdbID == imdbID {
-				return true
+			if m.ImdbID != "" {
+				library["imdb:"+m.ImdbID] = true
 			}
-			if tmdbID > 0 && m.TmdbID == tmdbID {
-				return true
+			if m.TmdbID > 0 {
+				library[fmt.Sprintf("tmdb:%d", m.TmdbID)] = true
 			}
 		}
 	}
 
+	// Cache for 5 minutes
+	apiCache.Set(cacheKey, library, cacheTTL)
+	log.Printf("📚 Cached %d monitored movies from Radarr", len(library))
+	return library
+}
+
+// isShowInLibrary checks if a show exists in the cached library
+func isShowInLibrary(library map[string]bool, imdbID string, tvdbID int) bool {
+	if imdbID != "" && library["imdb:"+imdbID] {
+		return true
+	}
+	if tvdbID > 0 && library[fmt.Sprintf("tvdb:%d", tvdbID)] {
+		return true
+	}
+	return false
+}
+
+// isMovieInLibrary checks if a movie exists in the cached library
+func isMovieInLibrary(library map[string]bool, imdbID string, tmdbID int) bool {
+	if imdbID != "" && library["imdb:"+imdbID] {
+		return true
+	}
+	if tmdbID > 0 && library[fmt.Sprintf("tmdb:%d", tmdbID)] {
+		return true
+	}
 	return false
 }
 
@@ -255,6 +297,9 @@ func fetchTraktWatchedMovies(ctx context.Context, cfg *Config) ([]TraktMovie, er
 
 // fetchTraktShows is a helper function to fetch shows from Trakt API
 func fetchTraktShows(ctx context.Context, cfg *Config, url string, filterToNextWeek bool) ([]TraktShow, error) {
+	// Fetch Sonarr library once (cached for 5 minutes)
+	sonarrLibrary := getSonarrLibrary(ctx, cfg)
+
 	// Add extended parameter to get full details
 	if len(url) > 0 && url[len(url)-1] != '?' {
 		url += "?extended=full"
@@ -326,7 +371,7 @@ func fetchTraktShows(ctx context.Context, cfg *Config, url string, filterToNextW
 			Network:     resp.Show.Network,
 			IMDBID:      resp.Show.IDs.IMDB,
 			Rating:      resp.Show.Rating,
-			InLibrary:   isShowInSonarr(ctx, cfg, resp.Show.IDs.IMDB, resp.Show.IDs.TVDB),
+			InLibrary:   isShowInLibrary(sonarrLibrary, resp.Show.IDs.IMDB, resp.Show.IDs.TVDB),
 		}
 
 		// Images are not available from Trakt API directly
@@ -342,6 +387,9 @@ func fetchTraktShows(ctx context.Context, cfg *Config, url string, filterToNextW
 
 // fetchTraktMovies is a helper function to fetch movies from Trakt API
 func fetchTraktMovies(ctx context.Context, cfg *Config, url string, filterToNextWeek bool) ([]TraktMovie, error) {
+	// Fetch Radarr library once (cached for 5 minutes)
+	radarrLibrary := getRadarrLibrary(ctx, cfg)
+
 	// Add extended parameter to get full details
 	if len(url) > 0 && url[len(url)-1] != '?' {
 		url += "?extended=full"
@@ -412,7 +460,7 @@ func fetchTraktMovies(ctx context.Context, cfg *Config, url string, filterToNext
 			ReleaseDate: resp.Movie.Released,
 			IMDBID:      resp.Movie.IDs.IMDB,
 			Rating:      resp.Movie.Rating,
-			InLibrary:   isMovieInRadarr(ctx, cfg, resp.Movie.IDs.IMDB, resp.Movie.IDs.TMDB),
+			InLibrary:   isMovieInLibrary(radarrLibrary, resp.Movie.IDs.IMDB, resp.Movie.IDs.TMDB),
 		}
 
 		// Images are not available from Trakt API directly

@@ -1,9 +1,9 @@
 {
-  "version": "1.4.9",
+  "version": "1.4.11",
   "released": "2025-11-16",
   "changelog": [
-    "Feature: Added checkmark indicator (✓) for Trakt items already in your Sonarr/Radarr library",
-    "Enhancement: Cross-references Trakt trending content with your monitored series and movies",
-    "Enhancement: Green checkmark appears next to titles already in your collection"
+    "Fix: Corrected Trakt section layout to display title/metadata on top with description underneath",
+    "Fix: Changed .trakt-item from flexbox to block layout for proper vertical stacking",
+    "Enhancement: Full-width layout for better readability of Trakt trending items"
   ]
 }
