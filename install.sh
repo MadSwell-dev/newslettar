@@ -114,9 +114,22 @@ if [ $? -ne 0 ]; then
     }
 else
     # Copy all files from temp directory to INSTALL_DIR
-    cp -r "$TEMP_DIR"/* "$INSTALL_DIR/" 2>/dev/null || true
+    echo -e "${BLUE}  Copying files to installation directory...${NC}"
+    cp -r "$TEMP_DIR"/* "$INSTALL_DIR/" || {
+        echo -e "${RED}Failed to copy files from $TEMP_DIR${NC}"
+        ls -la "$TEMP_DIR"
+        exit 1
+    }
     cp -r "$TEMP_DIR"/.git "$INSTALL_DIR/" 2>/dev/null || true
     cp "$TEMP_DIR"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
+    
+    # Verify files were copied
+    if [ ! -f "$INSTALL_DIR/main.go" ]; then
+        echo -e "${RED}ERROR: main.go not found in $INSTALL_DIR after copy${NC}"
+        echo -e "${RED}Files in $INSTALL_DIR:${NC}"
+        ls -la "$INSTALL_DIR"
+        exit 1
+    fi
 fi
 
 # Clean up temp directory
