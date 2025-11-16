@@ -1,9 +1,10 @@
 {
-  "version": "1.4.9",
+  "version": "1.4.10",
   "released": "2025-11-16",
   "changelog": [
-    "Feature: Added checkmark indicator (✓) for Trakt items already in your Sonarr/Radarr library",
-    "Enhancement: Cross-references Trakt trending content with your monitored series and movies",
-    "Enhancement: Green checkmark appears next to titles already in your collection"
+    "Performance: Optimized library checking - now fetches Sonarr/Radarr library once instead of per-item",
+    "Performance: Reduced API calls from 20 to 2 maximum (1 Sonarr + 1 Radarr) for Trakt cross-referencing",
+    "Performance: Implemented O(1) hash map lookups instead of repeated linear searches",
+    "Enhancement: Added 5-minute caching for library data to further reduce load"
   ]
 }
