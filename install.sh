@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Newslettar Installer v1.0.19 (Optimized)
+# Newslettar Installer v1.1.0 (Refactored & Optimized)
 # Run this INSIDE your Debian LXC container
 # curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install.sh | bash
 
@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║    Newslettar Installer v1.0.19        ║${NC}"
-echo -e "${GREEN}║    Optimized • Internal Scheduler      ║${NC}"
+echo -e "${GREEN}║    Newslettar Installer v1.1.0         ║${NC}"
+echo -e "${GREEN}║    Refactored • Internal Scheduler     ║${NC}"
 echo -e "${GREEN}║    For Debian LXC Container            ║${NC}"
 echo -e "${GREEN}╚════════════════════════════════════════╝${NC}"
 echo ""
@@ -41,7 +41,7 @@ GITHUB_REPO="https://github.com/agencefanfare/newslettar"
 
 echo -e "${YELLOW}[1/8] Updating system packages...${NC}"
 apt-get update -qq
-apt-get install -y wget curl ca-certificates >/dev/null 2>&1
+apt-get install -y wget curl ca-certificates git >/dev/null 2>&1
 echo -e "${GREEN}✓ System updated${NC}"
 
 echo -e "${YELLOW}[2/8] Installing Go...${NC}"
@@ -72,34 +72,28 @@ fi
 
 echo -e "${YELLOW}[3/8] Creating installation directory...${NC}"
 mkdir -p $INSTALL_DIR
-mkdir -p $INSTALL_DIR/templates
+mkdir -p $INSTALL_DIR
 cd $INSTALL_DIR
 echo -e "${GREEN}✓ Directory created: $INSTALL_DIR${NC}"
 
 echo -e "${YELLOW}[4/8] Downloading Newslettar...${NC}"
-echo -e "${BLUE}  Downloading main.go...${NC}"
-wget -q -O main.go "$REPO_URL/main.go" || {
-    echo -e "${RED}Failed to download main.go${NC}"
-    exit 1
-}
 
-echo -e "${BLUE}  Downloading go.mod...${NC}"
-wget -q -O go.mod "$REPO_URL/go.mod" || {
-    echo -e "${RED}Failed to download go.mod${NC}"
-    exit 1
-}
-
-echo -e "${BLUE}  Downloading email template...${NC}"
-wget -q -O templates/email.html "$REPO_URL/templates/email.html" || {
-    echo -e "${RED}Failed to download email template${NC}"
-    exit 1
-}
-
-echo -e "${BLUE}  Downloading version info...${NC}"
-wget -q -O version.json "$REPO_URL/version.json" || {
-    echo -e "${RED}Failed to download version.json${NC}"
-    exit 1
-}
+# Clone the latest version from GitHub (automatically gets all files)
+if [ -d "$INSTALL_DIR/.git" ]; then
+    echo -e "${BLUE}  Updating from GitHub...${NC}"
+    git fetch origin main -q
+    git reset --hard origin/main -q
+else
+    echo -e "${BLUE}  Cloning from GitHub...${NC}"
+    git clone --depth 1 --branch main "https://github.com/agencefanfare/newslettar.git" temp_clone 2>/dev/null
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to clone repository${NC}"
+        exit 1
+    fi
+    mv temp_clone/* . 2>/dev/null
+    mv temp_clone/.git . 2>/dev/null
+    rmdir temp_clone 2>/dev/null
+fi
 
 echo -e "${GREEN}✓ Application downloaded${NC}"
 
@@ -221,12 +215,25 @@ case "$1" in
         echo -e "${YELLOW}Updating Newslettar...${NC}"
         cd /opt/newslettar
         cp .env .env.backup
-        wget -q -O main.go https://raw.githubusercontent.com/agencefanfare/newslettar/main/main.go
-        wget -q -O go.mod https://raw.githubusercontent.com/agencefanfare/newslettar/main/go.mod
-        wget -q -O templates/email.html https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html
+        
+        # Update from GitHub (all files)
+        git fetch origin main -q
+        git reset --hard origin/main -q
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Failed to update from GitHub${NC}"
+            mv .env.backup .env
+            exit 1
+        fi
+        
         /usr/local/go/bin/go mod tidy
         /usr/local/go/bin/go build -ldflags="-s -w" -trimpath -o newslettar main.go
-        mv .env.backup .env
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Build failed!${NC}"
+            mv .env.backup .env
+            exit 1
+        fi
+        
+        rm -f .env.backup
         systemctl restart newslettar.service
         echo -e "${GREEN}✓ Updated successfully!${NC}"
         ;;
@@ -287,7 +294,8 @@ echo -e "${BLUE}┌─ Web UI Access ──────────────�
 echo -e "${BLUE}│${NC} ${GREEN}http://${IP}:8080${NC}"
 echo -e "${BLUE}└──────────────────────────────────────┘${NC}"
 echo ""
-echo -e "${YELLOW}🎯 What's New in v1.0.19:${NC}"
+echo -e "${YELLOW}🎯 What's New in v1.1.0:${NC}"
+echo "  • 🏗️ Code Refactored - Split into 9 focused modules"
 echo "  • 🌍 Timezone Support - Schedule in your local time"
 echo "  • ⏰ Internal Scheduler - No systemd timer needed"
 echo "  • 🚀 6x Faster - Parallel API calls"
