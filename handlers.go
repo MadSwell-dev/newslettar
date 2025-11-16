@@ -180,8 +180,25 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 	var wg sync.WaitGroup
 	var downloadedEpisodes, upcomingEpisodes []Episode
 	var downloadedMovies, upcomingMovies []Movie
+	var traktAnticipatedSeries, traktWatchedSeries []TraktShow
+	var traktAnticipatedMovies, traktWatchedMovies []TraktMovie
 
-	wg.Add(4)
+	// Count API calls (4 for Sonarr/Radarr + up to 4 for Trakt if enabled)
+	apiCalls := 4
+	if cfg.ShowTraktAnticipatedSeries {
+		apiCalls++
+	}
+	if cfg.ShowTraktWatchedSeries {
+		apiCalls++
+	}
+	if cfg.ShowTraktAnticipatedMovies {
+		apiCalls++
+	}
+	if cfg.ShowTraktWatchedMovies {
+		apiCalls++
+	}
+
+	wg.Add(apiCalls)
 
 	go func() {
 		defer wg.Done()
@@ -202,6 +219,35 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 		defer wg.Done()
 		upcomingMovies, _ = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.PreviewRetries)
 	}()
+
+	// Fetch Trakt data if enabled
+	if cfg.ShowTraktAnticipatedSeries {
+		go func() {
+			defer wg.Done()
+			traktAnticipatedSeries, _ = fetchTraktAnticipatedSeries(ctx, cfg)
+		}()
+	}
+
+	if cfg.ShowTraktWatchedSeries {
+		go func() {
+			defer wg.Done()
+			traktWatchedSeries, _ = fetchTraktWatchedSeries(ctx, cfg)
+		}()
+	}
+
+	if cfg.ShowTraktAnticipatedMovies {
+		go func() {
+			defer wg.Done()
+			traktAnticipatedMovies, _ = fetchTraktAnticipatedMovies(ctx, cfg)
+		}()
+	}
+
+	if cfg.ShowTraktWatchedMovies {
+		go func() {
+			defer wg.Done()
+			traktWatchedMovies, _ = fetchTraktWatchedMovies(ctx, cfg)
+		}()
+	}
 
 	wg.Wait()
 
@@ -228,9 +274,13 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 		UpcomingMovies:         upcomingMovies,
 		DownloadedSeriesGroups: groupEpisodesBySeries(downloadedEpisodes),
 		DownloadedMovies:       downloadedMovies,
+		TraktAnticipatedSeries: traktAnticipatedSeries,
+		TraktWatchedSeries:     traktWatchedSeries,
+		TraktAnticipatedMovies: traktAnticipatedMovies,
+		TraktWatchedMovies:     traktWatchedMovies,
 	}
 
-	html, err := generateNewsletterHTML(data, cfg.ShowPosters, cfg.ShowDownloaded, cfg.ShowSeriesOverview, cfg.ShowEpisodeOverview)
+	html, err := generateNewsletterHTML(data, cfg)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -269,6 +319,12 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		if webCfg.RadarrAPIKey != "" {
 			envMap["RADARR_API_KEY"] = webCfg.RadarrAPIKey
+		}
+		if webCfg.TraktClientID != "" {
+			envMap["TRAKT_CLIENT_ID"] = webCfg.TraktClientID
+		}
+		if webCfg.TraktAPIKey != "" {
+			envMap["TRAKT_API_KEY"] = webCfg.TraktAPIKey
 		}
 		if webCfg.SMTPHost != "" {
 			envMap["SMTP_HOST"] = webCfg.SMTPHost
@@ -315,6 +371,21 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.ShowUnmonitored != "" {
 			envMap["SHOW_UNMONITORED"] = webCfg.ShowUnmonitored
 		}
+		if webCfg.DarkMode != "" {
+			envMap["DARK_MODE"] = webCfg.DarkMode
+		}
+		if webCfg.ShowTraktAnticipatedSeries != "" {
+			envMap["SHOW_TRAKT_ANTICIPATED_SERIES"] = webCfg.ShowTraktAnticipatedSeries
+		}
+		if webCfg.ShowTraktWatchedSeries != "" {
+			envMap["SHOW_TRAKT_WATCHED_SERIES"] = webCfg.ShowTraktWatchedSeries
+		}
+		if webCfg.ShowTraktAnticipatedMovies != "" {
+			envMap["SHOW_TRAKT_ANTICIPATED_MOVIES"] = webCfg.ShowTraktAnticipatedMovies
+		}
+		if webCfg.ShowTraktWatchedMovies != "" {
+			envMap["SHOW_TRAKT_WATCHED_MOVIES"] = webCfg.ShowTraktWatchedMovies
+		}
 
 		var envContent strings.Builder
 		for key, value := range envMap {
@@ -340,25 +411,32 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 	cfg := getConfig()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"sonarr_url":      getEnvFromFile(envMap, "SONARR_URL", ""),
-		"sonarr_api_key":  getEnvFromFile(envMap, "SONARR_API_KEY", ""),
-		"radarr_url":      getEnvFromFile(envMap, "RADARR_URL", ""),
-		"radarr_api_key":  getEnvFromFile(envMap, "RADARR_API_KEY", ""),
-		"smtp_host":       cfg.SMTPHost,
-		"smtp_port":       cfg.SMTPPort,
-		"smtp_user":       cfg.SMTPUser,
-		"smtp_pass":       cfg.SMTPPass,
-		"from_email":      getEnvFromFile(envMap, "FROM_EMAIL", ""),
-		"from_name":       getEnvFromFile(envMap, "FROM_NAME", DefaultFromName),
-		"to_emails":       getEnvFromFile(envMap, "TO_EMAILS", ""),
-		"timezone":              getEnvFromFile(envMap, "TIMEZONE", DefaultTimezone),
-		"schedule_day":          getEnvFromFile(envMap, "SCHEDULE_DAY", DefaultScheduleDay),
-		"schedule_time":         getEnvFromFile(envMap, "SCHEDULE_TIME", DefaultScheduleTime),
-		"show_posters":          getEnvFromFile(envMap, "SHOW_POSTERS", DefaultShowPosters),
-		"show_downloaded":       getEnvFromFile(envMap, "SHOW_DOWNLOADED", DefaultShowDownloaded),
-		"show_series_overview":  getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", DefaultShowSeriesOverview),
-		"show_episode_overview": getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", DefaultShowEpisodeOverview),
-		"show_unmonitored":      getEnvFromFile(envMap, "SHOW_UNMONITORED", DefaultShowUnmonitored),
+		"sonarr_url":                    getEnvFromFile(envMap, "SONARR_URL", ""),
+		"sonarr_api_key":                getEnvFromFile(envMap, "SONARR_API_KEY", ""),
+		"radarr_url":                    getEnvFromFile(envMap, "RADARR_URL", ""),
+		"radarr_api_key":                getEnvFromFile(envMap, "RADARR_API_KEY", ""),
+		"trakt_client_id":               getEnvFromFile(envMap, "TRAKT_CLIENT_ID", ""),
+		"trakt_api_key":                 getEnvFromFile(envMap, "TRAKT_API_KEY", ""),
+		"smtp_host":                     cfg.SMTPHost,
+		"smtp_port":                     cfg.SMTPPort,
+		"smtp_user":                     cfg.SMTPUser,
+		"smtp_pass":                     cfg.SMTPPass,
+		"from_email":                    getEnvFromFile(envMap, "FROM_EMAIL", ""),
+		"from_name":                     getEnvFromFile(envMap, "FROM_NAME", DefaultFromName),
+		"to_emails":                     getEnvFromFile(envMap, "TO_EMAILS", ""),
+		"timezone":                      getEnvFromFile(envMap, "TIMEZONE", DefaultTimezone),
+		"schedule_day":                  getEnvFromFile(envMap, "SCHEDULE_DAY", DefaultScheduleDay),
+		"schedule_time":                 getEnvFromFile(envMap, "SCHEDULE_TIME", DefaultScheduleTime),
+		"show_posters":                  getEnvFromFile(envMap, "SHOW_POSTERS", DefaultShowPosters),
+		"show_downloaded":               getEnvFromFile(envMap, "SHOW_DOWNLOADED", DefaultShowDownloaded),
+		"show_series_overview":          getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", DefaultShowSeriesOverview),
+		"show_episode_overview":         getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", DefaultShowEpisodeOverview),
+		"show_unmonitored":              getEnvFromFile(envMap, "SHOW_UNMONITORED", DefaultShowUnmonitored),
+		"dark_mode":                     getEnvFromFile(envMap, "DARK_MODE", DefaultDarkMode),
+		"show_trakt_anticipated_series": getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_SERIES", DefaultShowTraktAnticipatedSeries),
+		"show_trakt_watched_series":     getEnvFromFile(envMap, "SHOW_TRAKT_WATCHED_SERIES", DefaultShowTraktWatchedSeries),
+		"show_trakt_anticipated_movies": getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_MOVIES", DefaultShowTraktAnticipatedMovies),
+		"show_trakt_watched_movies":     getEnvFromFile(envMap, "SHOW_TRAKT_WATCHED_MOVIES", DefaultShowTraktWatchedMovies),
 	})
 }
 

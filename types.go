@@ -52,34 +52,41 @@ func (c *APICache) Clear() {
 
 // Config structures
 type Config struct {
-	SonarrURL            string
-	SonarrAPIKey         string
-	RadarrURL            string
-	RadarrAPIKey         string
-	SMTPHost             string
-	SMTPPort             string
-	SMTPUser             string
-	SMTPPass             string
-	FromEmail            string
-	FromName             string
-	ToEmails             []string
-	Timezone             string
-	ScheduleDay          string
-	ScheduleTime         string
-	ShowPosters         bool
-	ShowDownloaded      bool
-	ShowSeriesOverview  bool
-	ShowEpisodeOverview bool
-	ShowUnmonitored     bool
+	SonarrURL                  string
+	SonarrAPIKey               string
+	RadarrURL                  string
+	RadarrAPIKey               string
+	TraktClientID              string
+	TraktAPIKey                string
+	SMTPHost                   string
+	SMTPPort                   string
+	SMTPUser                   string
+	SMTPPass                   string
+	FromEmail                  string
+	FromName                   string
+	ToEmails                   []string
+	Timezone                   string
+	ScheduleDay                string
+	ScheduleTime               string
+	ShowPosters                bool
+	ShowDownloaded             bool
+	ShowSeriesOverview         bool
+	ShowEpisodeOverview        bool
+	ShowUnmonitored            bool
+	DarkMode                   bool
+	ShowTraktAnticipatedSeries bool
+	ShowTraktWatchedSeries     bool
+	ShowTraktAnticipatedMovies bool
+	ShowTraktWatchedMovies     bool
 	// Performance tuning
-	APIPageSize      int
-	MaxRetries       int
-	PreviewRetries   int
-	APITimeout       int // in seconds
-	WebUIPort        string
-	EmailBatchSize   int    // Number of recipients per batch
-	EmailBatchDelay  int    // Delay between batches in seconds
-	LogLevel         string // debug, info, warn, error
+	APIPageSize     int
+	MaxRetries      int
+	PreviewRetries  int
+	APITimeout      int // in seconds
+	WebUIPort       string
+	EmailBatchSize  int    // Number of recipients per batch
+	EmailBatchDelay int    // Delay between batches in seconds
+	LogLevel        string // debug, info, warn, error
 }
 
 // Minimal structs - only fields we actually need (reduces memory & JSON parsing time)
@@ -99,11 +106,11 @@ type Episode struct {
 }
 
 type Movie struct {
-	Title          string
-	Year           int
-	ReleaseDate    string
-	Downloaded     bool
-	PosterURL      string
+	Title       string
+	Year        int
+	ReleaseDate string
+	Downloaded  bool
+	PosterURL   string
 	IMDBID      string
 	TmdbID      int
 	Overview    string
@@ -118,8 +125,8 @@ type CalendarEpisode struct {
 	AirDate       string `json:"airDate"`
 	Overview      string `json:"overview"`
 	Series        struct {
-		Title          string `json:"title"`
-		TvdbId         int    `json:"tvdbId"`
+		Title     string `json:"title"`
+		TvdbId    int    `json:"tvdbId"`
 		ImdbId    string `json:"imdbId"`
 		Overview  string `json:"overview"`
 		Monitored bool   `json:"monitored"`
@@ -136,11 +143,11 @@ type CalendarMovie struct {
 	Title           string `json:"title"`
 	Year            int    `json:"year"`
 	PhysicalRelease string `json:"physicalRelease"` // Assuming you want physical release; adjust if needed (e.g., to "digitalRelease" or "inCinemas")
-	ImdbId    string `json:"imdbId"`
-	TmdbId    int    `json:"tmdbId"`
-	Overview  string `json:"overview"`
-	Monitored bool   `json:"monitored"`
-	Images    []struct {
+	ImdbId          string `json:"imdbId"`
+	TmdbId          int    `json:"tmdbId"`
+	Overview        string `json:"overview"`
+	Monitored       bool   `json:"monitored"`
+	Images          []struct {
 		CoverType string `json:"coverType"`
 		Url       string `json:"url"`       // Local URL if available
 		RemoteUrl string `json:"remoteUrl"` // Fallback remote URL
@@ -156,6 +163,20 @@ type SeriesGroup struct {
 	Overview    string
 }
 
+type TraktShow struct {
+	Title    string
+	Year     int
+	ImageURL string
+	Overview string
+}
+
+type TraktMovie struct {
+	Title    string
+	Year     int
+	ImageURL string
+	Overview string
+}
+
 type NewsletterData struct {
 	WeekStart              string
 	WeekEnd                string
@@ -163,26 +184,37 @@ type NewsletterData struct {
 	UpcomingMovies         []Movie
 	DownloadedSeriesGroups []SeriesGroup
 	DownloadedMovies       []Movie
+	TraktAnticipatedSeries []TraktShow
+	TraktWatchedSeries     []TraktShow
+	TraktAnticipatedMovies []TraktMovie
+	TraktWatchedMovies     []TraktMovie
 }
 
 type WebConfig struct {
-	SonarrURL           string `json:"sonarr_url"`
-	SonarrAPIKey        string `json:"sonarr_api_key"`
-	RadarrURL           string `json:"radarr_url"`
-	RadarrAPIKey        string `json:"radarr_api_key"`
-	SMTPHost            string `json:"smtp_host"`
-	SMTPPort            string `json:"smtp_port"`
-	SMTPUser            string `json:"smtp_user"`
-	SMTPPass            string `json:"smtp_pass"`
-	FromEmail           string `json:"from_email"`
-	FromName            string `json:"from_name"`
-	ToEmails            string `json:"to_emails"`
-	Timezone            string `json:"timezone"`
-	ScheduleDay         string `json:"schedule_day"`
-	ScheduleTime        string `json:"schedule_time"`
-	ShowPosters         string `json:"show_posters"`
-	ShowDownloaded      string `json:"show_downloaded"`
-	ShowSeriesOverview  string `json:"show_series_overview"`
-	ShowEpisodeOverview string `json:"show_episode_overview"`
-	ShowUnmonitored     string `json:"show_unmonitored"`
+	SonarrURL                  string `json:"sonarr_url"`
+	SonarrAPIKey               string `json:"sonarr_api_key"`
+	RadarrURL                  string `json:"radarr_url"`
+	RadarrAPIKey               string `json:"radarr_api_key"`
+	TraktClientID              string `json:"trakt_client_id"`
+	TraktAPIKey                string `json:"trakt_api_key"`
+	SMTPHost                   string `json:"smtp_host"`
+	SMTPPort                   string `json:"smtp_port"`
+	SMTPUser                   string `json:"smtp_user"`
+	SMTPPass                   string `json:"smtp_pass"`
+	FromEmail                  string `json:"from_email"`
+	FromName                   string `json:"from_name"`
+	ToEmails                   string `json:"to_emails"`
+	Timezone                   string `json:"timezone"`
+	ScheduleDay                string `json:"schedule_day"`
+	ScheduleTime               string `json:"schedule_time"`
+	ShowPosters                string `json:"show_posters"`
+	ShowDownloaded             string `json:"show_downloaded"`
+	ShowSeriesOverview         string `json:"show_series_overview"`
+	ShowEpisodeOverview        string `json:"show_episode_overview"`
+	ShowUnmonitored            string `json:"show_unmonitored"`
+	DarkMode                   string `json:"dark_mode"`
+	ShowTraktAnticipatedSeries string `json:"show_trakt_anticipated_series"`
+	ShowTraktWatchedSeries     string `json:"show_trakt_watched_series"`
+	ShowTraktAnticipatedMovies string `json:"show_trakt_anticipated_movies"`
+	ShowTraktWatchedMovies     string `json:"show_trakt_watched_movies"`
 }
