@@ -1,12 +1,12 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "released": "2025-11-16",
   "changelog": [
-    "Major refactoring: Split monolithic main.go into 9 focused modules",
-    "New file structure: types.go, config.go, api.go, newsletter.go, handlers.go, server.go, utils.go, ui.go",
-    "Improved maintainability and code organization",
-    "Updated all GitHub URLs to agencefanfare/newslettar repository",
-    "Internal scheduler fully functional without systemd requirements",
-    "All files kept in project root for simplicity"
+    "Install script now uses 'git clone' for automatic file discovery (future-proof)",
+    "Update button handler uses git fetch + git reset instead of wget (consistent approach)",
+    "No more hardcoded file lists in installer or update commands",
+    "Faster updates: single git operation vs multiple wget calls",
+    "All installation methods now self-healing: always gets latest repository state",
+    "Previous: Split monolithic main.go into 9 focused modules for better maintainability"
   ]
 }

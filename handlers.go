@@ -489,12 +489,9 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			cd /opt/newslettar
 			echo "Backing up .env..."
 			cp .env .env.backup
-			echo "Downloading main.go..."
-			wget -O main.go https://raw.githubusercontent.com/agencefanfare/newslettar/main/main.go
-			echo "Downloading go.mod..."
-			wget -O go.mod https://raw.githubusercontent.com/agencefanfare/newslettar/main/go.mod
-			echo "Downloading version.json..."
-			wget -O version.json https://raw.githubusercontent.com/agencefanfare/newslettar/main/version.json
+			echo "Updating from GitHub..."
+			git fetch origin main -q
+			git reset --hard origin/main -q
 			echo "Building with optimization flags..."
 			/usr/local/go/bin/go build -ldflags="-s -w" -trimpath -o newslettar main.go
 			echo "Restoring .env..."
