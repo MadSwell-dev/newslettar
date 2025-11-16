@@ -63,13 +63,24 @@ echo ""
 # Step 4: Download or clone repository
 echo -e "${YELLOW}Step 4: Getting source code...${NC}"
 echo -e "${BLUE}Method: Git clone${NC}"
-git clone --depth 1 --branch main "https://github.com/agencefanfare/newslettar.git" . 2>&1
-if [ $? -eq 0 ]; then
+
+# Create temp directory for clone
+TEMP_CLONE=$(mktemp -d)
+git clone --depth 1 --branch main "https://github.com/agencefanfare/newslettar.git" "$TEMP_CLONE" 2>&1
+
+if [ $? -eq 0 ] && [ -f "$TEMP_CLONE/main.go" ]; then
+    # Copy files from temp to install directory
+    cp -r "$TEMP_CLONE"/* "$INSTALL_DIR/" 2>/dev/null
+    cp -r "$TEMP_CLONE"/.git "$INSTALL_DIR/" 2>/dev/null || true
+    cp "$TEMP_CLONE"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
+    rm -rf "$TEMP_CLONE"
     echo -e "${GREEN}✓ Source code downloaded${NC}"
 else
     echo -e "${YELLOW}Git clone failed, trying wget fallback...${NC}"
+    rm -rf "$TEMP_CLONE"
     mkdir -p templates
     for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod go.sum version.json; do
+        echo -e "${BLUE}  Downloading ${file}...${NC}"
         wget -q -O "$file" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/${file}" || echo -e "${RED}Failed: $file${NC}"
     done
     wget -q -O templates/email.html "https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html" || echo -e "${RED}Failed: email.html${NC}"
