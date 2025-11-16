@@ -120,19 +120,37 @@ fi
 # Check if we have a successful clone directory with files
 if [ -d "$TEMP_CLONE" ] && [ -f "$TEMP_CLONE/main.go" ]; then
     echo -e "${BLUE}  Copying files from clone...${NC}"
+    echo -e "${BLUE}  DEBUG: Source dir contents:${NC}"
+    ls -la "$TEMP_CLONE/" | head -15
     
-    # Use find to reliably copy all files
-    find "$TEMP_CLONE" -maxdepth 1 -type f -name "*.go" -exec cp {} "$INSTALL_DIR/" \;
-    find "$TEMP_CLONE" -maxdepth 1 -type f -name "go.mod" -exec cp {} "$INSTALL_DIR/" \;
-    find "$TEMP_CLONE" -maxdepth 1 -type f -name "go.sum" -exec cp {} "$INSTALL_DIR/" \;
-    find "$TEMP_CLONE" -maxdepth 1 -type f -name "version.json" -exec cp {} "$INSTALL_DIR/" \;
+    # Copy all Go files explicitly
+    cp "$TEMP_CLONE"/main.go "$INSTALL_DIR/" || echo "Failed to copy main.go"
+    cp "$TEMP_CLONE"/types.go "$INSTALL_DIR/" || echo "Failed to copy types.go"
+    cp "$TEMP_CLONE"/config.go "$INSTALL_DIR/" || echo "Failed to copy config.go"
+    cp "$TEMP_CLONE"/api.go "$INSTALL_DIR/" || echo "Failed to copy api.go"
+    cp "$TEMP_CLONE"/newsletter.go "$INSTALL_DIR/" || echo "Failed to copy newsletter.go"
+    cp "$TEMP_CLONE"/handlers.go "$INSTALL_DIR/" || echo "Failed to copy handlers.go"
+    cp "$TEMP_CLONE"/server.go "$INSTALL_DIR/" || echo "Failed to copy server.go"
+    cp "$TEMP_CLONE"/utils.go "$INSTALL_DIR/" || echo "Failed to copy utils.go"
+    cp "$TEMP_CLONE"/ui.go "$INSTALL_DIR/" || echo "Failed to copy ui.go"
+    cp "$TEMP_CLONE"/go.mod "$INSTALL_DIR/" || echo "Failed to copy go.mod"
+    cp "$TEMP_CLONE"/go.sum "$INSTALL_DIR/" || echo "Failed to copy go.sum"
+    cp "$TEMP_CLONE"/version.json "$INSTALL_DIR/" || echo "Failed to copy version.json"
+    
+    # Copy templates directory
     mkdir -p "$INSTALL_DIR/templates"
-    find "$TEMP_CLONE/templates" -type f -exec cp {} "$INSTALL_DIR/templates/" \;
+    if [ -d "$TEMP_CLONE/templates" ]; then
+        cp -r "$TEMP_CLONE/templates"/* "$INSTALL_DIR/templates/" || echo "Failed to copy templates"
+    fi
     
+    # Copy git info if available
     cp -r "$TEMP_CLONE"/.git "$INSTALL_DIR/" 2>/dev/null || true
     cp "$TEMP_CLONE"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
-    rm -rf "$TEMP_CLONE"
     
+    echo -e "${BLUE}  DEBUG: Destination dir contents:${NC}"
+    ls -la "$INSTALL_DIR/" | head -15
+    
+    rm -rf "$TEMP_CLONE"
     echo -e "${BLUE}  Clone copy complete${NC}"
 fi
 
