@@ -1,13 +1,12 @@
 {
-  "version": "1.1.5",
+  "version": "1.1.6",
   "released": "2025-11-16",
   "changelog": [
-    "Fixed quality profile toggle to properly display quality badges in emails",
-    "Added monitored/unmonitored toggle - Filter items based on monitoring status in Sonarr/Radarr",
-    "Improved update button with smart polling - Detects when update completes instead of fixed 20s wait",
-    "Changed 'Downloaded This Week' to 'Downloaded Last Week' for better accuracy",
-    "Quality profiles now properly stored in SeriesGroup for reliable display",
-    "Update process polls server every 2 seconds with 2-minute timeout",
-    "Monitored toggle allows showing only items that will be auto-downloaded"
+    "Removed quality profile feature completely - Feature was not working reliably",
+    "Added favicon to web UI - TV emoji on purple background",
+    "Removed version number from browser page title - Cleaner tab appearance",
+    "Improved update button with smart polling instead of fixed 20s wait",
+    "Added monitored/unmonitored toggle for Sonarr/Radarr filtering",
+    "Changed 'Downloaded This Week' to 'Downloaded Last Week' for accuracy"
   ]
 }

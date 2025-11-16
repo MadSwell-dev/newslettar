@@ -25,7 +25,6 @@
         .episode-date { color: #8899aa; font-size: 0.9em; display: block; margin-top: 3px;}
         .episode-overview { color: #a0b0c0; font-size: 0.85em; display: block; margin-top: 5px; font-style: italic; }
         .series-overview { color: #a0b0c0; font-size: 0.9em; margin-top: 8px; font-style: italic; line-height: 1.4; }
-        .quality-badge { background-color: #38ef7d; color: #0f1419; padding: 2px 8px; border-radius: 10px; font-size: 0.75em; margin-left: 8px; font-weight: 600; }
         .movie-item { display: flex; padding: 15px; margin: 12px 0; background-color: #252f3f; border-left: 3px solid #38ef7d; border-radius: 8px; align-items: flex-start; }
         .movie-poster { width: 80px; height: 120px; object-fit: cover; border-radius: 6px; margin-right: 15px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
         .movie-poster-placeholder { width: 80px; height: 120px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 6px; margin-right: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 36px; color: white; }
@@ -120,11 +119,6 @@
                             {{else}}
                                 {{.Title}}
                             {{end}}
-                            {{if $.ShowQualityProfiles}}
-                                {{if .QualityProfile}}
-                                    <span class="quality-badge">{{.QualityProfile}}</span>
-                                {{end}}
-                            {{end}}
                         </div>
                         <div class="movie-year">({{.Year}}){{if .ReleaseDate}} • {{formatDateWithDay .ReleaseDate}}{{end}}</div>
                         {{if $.ShowSeriesOverview}}
@@ -212,11 +206,6 @@
                                 <a href="https://www.imdb.com/title/{{.IMDBID}}/" target="_blank">{{.Title}}</a>
                             {{else}}
                                 {{.Title}}
-                            {{end}}
-                            {{if $.ShowQualityProfiles}}
-                                {{if .QualityProfile}}
-                                    <span class="quality-badge">{{.QualityProfile}}</span>
-                                {{end}}
                             {{end}}
                         </div>
                         <div class="movie-year">({{.Year}})</div>

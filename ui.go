@@ -7,7 +7,8 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Newslettar v` + version + `</title>
+    <title>Newslettar</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white'>📺</text></svg>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -557,19 +558,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
             <div class="template-option">
                 <div>
-                    <strong>Show Quality Profiles</strong>
-                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
-                        Display quality profile (e.g., HD-1080p) for shows and movies
-                    </p>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="show-quality-profiles" onchange="saveTemplateSettings()" aria-label="Toggle quality profiles">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <div class="template-option">
-                <div>
                     <strong>Show Series Descriptions</strong>
                     <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
                         Display short description for each TV series
@@ -823,7 +811,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 
                 document.getElementById('show-posters').checked = data.show_posters !== 'false';
                 document.getElementById('show-downloaded').checked = data.show_downloaded !== 'false';
-                document.getElementById('show-quality-profiles').checked = data.show_quality_profiles !== 'false';
                 document.getElementById('show-series-overview').checked = data.show_series_overview !== 'false';
                 document.getElementById('show-episode-overview').checked = data.show_episode_overview !== 'false';
                 document.getElementById('show-unmonitored').checked = data.show_unmonitored !== 'false';
@@ -984,7 +971,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         async function saveTemplateSettings() {
             const showPosters = document.getElementById('show-posters').checked;
             const showDownloaded = document.getElementById('show-downloaded').checked;
-            const showQualityProfiles = document.getElementById('show-quality-profiles').checked;
             const showSeriesOverview = document.getElementById('show-series-overview').checked;
             const showEpisodeOverview = document.getElementById('show-episode-overview').checked;
             const showUnmonitored = document.getElementById('show-unmonitored').checked;
@@ -996,7 +982,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                     body: JSON.stringify({
                         show_posters: showPosters ? 'true' : 'false',
                         show_downloaded: showDownloaded ? 'true' : 'false',
-                        show_quality_profiles: showQualityProfiles ? 'true' : 'false',
                         show_series_overview: showSeriesOverview ? 'true' : 'false',
                         show_episode_overview: showEpisodeOverview ? 'true' : 'false',
                         show_unmonitored: showUnmonitored ? 'true' : 'false'

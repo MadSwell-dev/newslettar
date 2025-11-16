@@ -108,15 +108,12 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 			Date      time.Time `json:"date"`
 			EventType string    `json:"eventType"`
 			Series    struct {
-				Title          string `json:"title"`
-				TvdbID         int    `json:"tvdbId"`
-				ImdbID         string `json:"imdbId"`
-				Overview       string `json:"overview"`
-				Monitored      bool   `json:"monitored"`
-				QualityProfile struct {
-					Name string `json:"name"`
-				} `json:"qualityProfile"`
-				Images []struct {
+				Title     string `json:"title"`
+				TvdbID    int    `json:"tvdbId"`
+				ImdbID    string `json:"imdbId"`
+				Overview  string `json:"overview"`
+				Monitored bool   `json:"monitored"`
+				Images    []struct {
 					CoverType string `json:"coverType"`
 					RemoteURL string `json:"remoteUrl"`
 				} `json:"images"`
@@ -167,7 +164,6 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 			TvdbID:         record.Series.TvdbID,
 			Overview:       record.Episode.Overview,
 			SeriesOverview: record.Series.Overview,
-			QualityProfile: record.Series.QualityProfile.Name,
 			Monitored:      record.Series.Monitored,
 		})
 	}
@@ -228,7 +224,6 @@ func fetchSonarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 			TvdbID:         entry.Series.TvdbId,
 			Overview:       entry.Overview,
 			SeriesOverview: entry.Series.Overview,
-			QualityProfile: entry.Series.QualityProfile.Name,
 			Monitored:      entry.Series.Monitored,
 		}
 
@@ -271,17 +266,14 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 			Date      time.Time `json:"date"`
 			EventType string    `json:"eventType"`
 			Movie     struct {
-				Title          string `json:"title"`
-				Year           int    `json:"year"`
-				TmdbID         int    `json:"tmdbId"`
-				ImdbID         string `json:"imdbId"`
-				InCinemas      string `json:"inCinemas"`
-				Overview       string `json:"overview"`
-				Monitored      bool   `json:"monitored"`
-				QualityProfile struct {
-					Name string `json:"name"`
-				} `json:"qualityProfile"`
-				Images []struct {
+				Title     string `json:"title"`
+				Year      int    `json:"year"`
+				TmdbID    int    `json:"tmdbId"`
+				ImdbID    string `json:"imdbId"`
+				InCinemas string `json:"inCinemas"`
+				Overview  string `json:"overview"`
+				Monitored bool   `json:"monitored"`
+				Images    []struct {
 					CoverType string `json:"coverType"`
 					RemoteURL string `json:"remoteUrl"`
 				} `json:"images"`
@@ -314,16 +306,15 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 		}
 
 		movies = append(movies, Movie{
-			Title:          record.Movie.Title,
-			Year:           record.Movie.Year,
-			ReleaseDate:    record.Movie.InCinemas,
-			Downloaded:     true,
-			PosterURL:      posterURL,
-			IMDBID:         record.Movie.ImdbID,
-			TmdbID:         record.Movie.TmdbID,
-			Overview:       record.Movie.Overview,
-			QualityProfile: record.Movie.QualityProfile.Name,
-			Monitored:      record.Movie.Monitored,
+			Title:       record.Movie.Title,
+			Year:        record.Movie.Year,
+			ReleaseDate: record.Movie.InCinemas,
+			Downloaded:  true,
+			PosterURL:   posterURL,
+			IMDBID:      record.Movie.ImdbID,
+			TmdbID:      record.Movie.TmdbID,
+			Overview:    record.Movie.Overview,
+			Monitored:   record.Movie.Monitored,
 		})
 	}
 
@@ -373,15 +364,14 @@ func fetchRadarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 		}
 
 		mv := Movie{
-			Title:          entry.Title,
-			Year:           entry.Year,
-			ReleaseDate:    entry.PhysicalRelease,
-			PosterURL:      posterURL,
-			IMDBID:         entry.ImdbId,
-			TmdbID:         entry.TmdbId,
-			Overview:       entry.Overview,
-			QualityProfile: entry.QualityProfile.Name,
-			Monitored:      entry.Monitored,
+			Title:       entry.Title,
+			Year:        entry.Year,
+			ReleaseDate: entry.PhysicalRelease,
+			PosterURL:   posterURL,
+			IMDBID:      entry.ImdbId,
+			TmdbID:      entry.TmdbId,
+			Overview:    entry.Overview,
+			Monitored:   entry.Monitored,
 		}
 
 		if mv.ReleaseDate != "" {
