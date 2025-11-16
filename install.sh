@@ -128,6 +128,20 @@ fi
 
 echo -e "${GREEN}✓ Application downloaded${NC}"
 
+# Verify all critical files were copied
+MISSING=""
+for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod version.json; do
+    if [ ! -f "$INSTALL_DIR/$file" ]; then
+        MISSING="$MISSING\n  - $file"
+    fi
+done
+
+if [ -n "$MISSING" ]; then
+    echo -e "${RED}ERROR: Missing files after download:$MISSING${NC}"
+    echo -e "${RED}Installation failed. Please try again.${NC}"
+    exit 1
+fi
+
 echo -e "${YELLOW}[5/8] Installing dependencies...${NC}"
 cd "$INSTALL_DIR"
 /usr/local/go/bin/go mod tidy
