@@ -20,7 +20,9 @@ import (
 
 // Register all HTTP handlers
 func registerHandlers() {
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
+	// Serve embedded assets (images, etc.)
+	assetsHandler := http.FileServer(http.FS(assetsFS))
+	http.Handle("/assets/", assetsHandler)
 	http.HandleFunc("/", withGzip(uiHandler))
 	http.HandleFunc("/health", healthHandler)
 	http.HandleFunc("/api/config", configHandler)

@@ -58,24 +58,28 @@ fi
 
 # Build Docker image
 echo -e "${YELLOW}[3/4] Building Docker image...${NC}"
-echo -e "${BLUE}  Verifying source files exist:${NC}"
+echo -e "${BLUE}  Verifying source structure exists:${NC}"
 
-# Check if all critical files exist
-MISSING_FILES=""
-for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod go.sum; do
-    if [ ! -f "$file" ]; then
-        MISSING_FILES="$MISSING_FILES $file"
-    else
-        echo -e "${BLUE}    ✓ $file${NC}"
-    fi
-done
-
-if [ -n "$MISSING_FILES" ]; then
-    echo -e "${RED}ERROR: Missing files:$MISSING_FILES${NC}"
+# Check if critical directories and files exist
+if [ ! -d "cmd/newslettar" ]; then
+    echo -e "${RED}ERROR: cmd/newslettar directory not found${NC}"
     echo "Make sure you're in the newslettar repository directory and have run 'git pull'"
     exit 1
 fi
 
+if [ ! -f "go.mod" ] || [ ! -f "go.sum" ]; then
+    echo -e "${RED}ERROR: go.mod or go.sum not found${NC}"
+    exit 1
+fi
+
+if [ ! -f "cmd/newslettar/main.go" ]; then
+    echo -e "${RED}ERROR: cmd/newslettar/main.go not found${NC}"
+    exit 1
+fi
+
+echo -e "${BLUE}    ✓ cmd/newslettar/ directory${NC}"
+echo -e "${BLUE}    ✓ go.mod and go.sum${NC}"
+echo -e "${BLUE}    ✓ Source files${NC}"
 echo -e "${BLUE}  All source files found - building Docker image...${NC}"
 docker build -t newslettar:latest .
 echo -e "${GREEN}✓ Docker image built${NC}"
