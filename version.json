@@ -1,14 +1,11 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "released": "2025-11-17",
   "changelog": [
-    "Added comprehensive Dashboard tab as the main view",
-    "Dashboard displays system stats (uptime, memory, version, port)",
-    "Dashboard shows newsletter statistics (emails sent, last sent, next run)",
-    "Dashboard includes real-time service status indicators for Sonarr/Radarr/Email/Trakt",
-    "Dashboard displays recent logs with auto-refresh",
-    "Added quick action buttons to Dashboard (Preview, Send Now, Configuration)",
-    "Dashboard auto-updates every 10 seconds when active",
-    "Backend now tracks total emails sent and last sent timestamp"
+    "Fixed configuration button active state when navigating from dashboard tab",
+    "Fixed episode ordering to sort by season and episode number within each series",
+    "Added periodic timezone display refresh in configuration tab (updates every 60 seconds)",
+    "Moved 'Edit Email Strings' section to top of Email Template tab for better UX",
+    "Fixed date format consistency between 'Last Sent' and 'Next Scheduled' in dashboard"
   ]
 }
