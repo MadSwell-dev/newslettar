@@ -252,12 +252,10 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 
 	wg.Wait()
 
-	// Filter unmonitored items if the setting is disabled
+	// Filter unmonitored items from next week releases only (last week already downloaded)
 	if !cfg.ShowUnmonitored {
 		upcomingEpisodes = filterMonitoredEpisodes(upcomingEpisodes)
-		downloadedEpisodes = filterMonitoredEpisodes(downloadedEpisodes)
 		upcomingMovies = filterMonitoredMovies(upcomingMovies)
-		downloadedMovies = filterMonitoredMovies(downloadedMovies)
 	}
 
 	// Sort movies chronologically
