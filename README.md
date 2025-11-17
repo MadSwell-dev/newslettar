@@ -176,7 +176,6 @@ SCHEDULE_TIME=09:00
 # Template Settings
 SHOW_POSTERS=true                    # Show poster images in emails
 SHOW_DOWNLOADED=true                 # Include already downloaded content
-SHOW_QUALITY_PROFILES=false          # Show quality profile information
 SHOW_UNMONITORED=false               # Include unmonitored content
 SHOW_SERIES_OVERVIEW=false           # Show series descriptions
 SHOW_EPISODE_OVERVIEW=false          # Show episode summaries
