@@ -570,6 +570,8 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 
 // Generic API test handler - eliminates 74 lines of duplication
 func testAPIHandler(w http.ResponseWriter, r *http.Request, serviceName string) {
+	const maskedPlaceholder = "••••••••"
+
 	var req struct {
 		URL    string `json:"url"`
 		APIKey string `json:"api_key"`
@@ -577,6 +579,16 @@ func testAPIHandler(w http.ResponseWriter, r *http.Request, serviceName string) 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	// If API key is masked, load the real one from .env
+	if req.APIKey == maskedPlaceholder {
+		envMap := readEnvFile()
+		if serviceName == "Sonarr" {
+			req.APIKey = getEnvFromFile(envMap, "SONARR_API_KEY", "")
+		} else if serviceName == "Radarr" {
+			req.APIKey = getEnvFromFile(envMap, "RADARR_API_KEY", "")
+		}
 	}
 
 	success := false
@@ -616,12 +628,20 @@ func testRadarrHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func testTraktHandler(w http.ResponseWriter, r *http.Request) {
+	const maskedPlaceholder = "••••••••"
+
 	var req struct {
 		ClientID string `json:"client_id"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	// If Client ID is masked, load the real one from .env
+	if req.ClientID == maskedPlaceholder {
+		envMap := readEnvFile()
+		req.ClientID = getEnvFromFile(envMap, "TRAKT_CLIENT_ID", "")
 	}
 
 	success := false
@@ -662,6 +682,8 @@ func testTraktHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func testEmailHandler(w http.ResponseWriter, r *http.Request) {
+	const maskedPlaceholder = "••••••••"
+
 	var req struct {
 		SMTP string `json:"smtp"`
 		Port string `json:"port"`
@@ -671,6 +693,12 @@ func testEmailHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	// If password is masked, load the real one from .env
+	if req.Pass == maskedPlaceholder {
+		envMap := readEnvFile()
+		req.Pass = getEnvFromFile(envMap, "SMTP_PASS", "")
 	}
 
 	success := false
