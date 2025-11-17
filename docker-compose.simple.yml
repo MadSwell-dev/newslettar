@@ -1,8 +1,15 @@
-# Simplified Docker Compose for Newslettar
-# Download this file and run: docker-compose -f docker-compose.simple.yml up -d
+# =============================================================================
+# Newslettar - Simplified Docker Compose
+# =============================================================================
+# Perfect for: Proxmox Docker containers, any Docker host
+#
+# QUICK START:
+#   1. Download: wget https://raw.githubusercontent.com/agencefanfare/newslettar/main/docker-compose.simple.yml
+#   2. Edit this file: nano docker-compose.simple.yml (edit environment variables below)
+#   3. Run: docker-compose -f docker-compose.simple.yml up -d
+#   4. Access: http://localhost:8080
 #
 # No .env file needed - all configuration is inline below.
-# Edit the environment variables section with your settings.
 
 version: '3.8'
 

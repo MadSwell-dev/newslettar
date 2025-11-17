@@ -23,72 +23,59 @@ Newslettar automatically generates beautiful, scheduled email newsletters summar
 
 ## 🚀 Quick Start
 
-### Method 1: Docker (Recommended - No Git Clone Required!)
+Choose your platform:
 
-Download a single file and run:
+### 🐳 **Proxmox Docker Container** or **Any Docker Host**
 
 ```bash
-# Download docker-compose file
 wget https://raw.githubusercontent.com/agencefanfare/newslettar/main/docker-compose.simple.yml
-
-# Edit the environment variables with your settings
-nano docker-compose.simple.yml
-
-# Start (builds automatically from GitHub)
+nano docker-compose.simple.yml  # Edit your Sonarr/Radarr/Email settings
 docker-compose -f docker-compose.simple.yml up -d
-
-# Access web UI
-open http://localhost:8080
 ```
+Access: **http://localhost:8080**
 
-### Method 2: Pre-built Binary (Fastest - Linux/Proxmox/LXC)
+---
 
-One command installs everything:
+### 📦 **Proxmox LXC (Debian 12)** or **Any Linux Server**
 
 ```bash
-# Downloads pre-compiled binary from GitHub Releases (~13MB, no Go compiler needed)
 curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install-binary.sh | sudo bash
 ```
+Access: **http://your-server-ip:8080**
 
-Then configure via web UI at `http://your-server-ip:8080`
+---
 
-### Method 3: Debian Package (For Package Managers)
-
-```bash
-# Download the latest .deb package
-wget https://github.com/agencefanfare/newslettar/releases/latest/download/newslettar_*_amd64.deb
-
-# Install
-sudo dpkg -i newslettar_*_amd64.deb
-
-# Configure via web UI at http://your-server-ip:8080
-# Or edit config: newslettar-ctl edit
-```
+**That's it!** Configure everything through the web interface.
 
 ## 📋 Requirements
 
-### For Docker (Method 1)
-- Docker and docker-compose installed
-- ~100MB disk space (for image and data)
-- Port 8080 available (configurable)
+### Docker Installation
+- Docker + docker-compose
+- ~100MB disk space
+- Port 8080 available
 
-### For Pre-built Binary (Method 2 - Recommended for Proxmox/LXC)
-- Debian 11+, Ubuntu 20.04+, or similar Linux distribution
-- systemd (for service management)
-- ~50MB disk space
-- **No Go compiler needed!**
-
-### For Debian Package (Method 3)
+### Linux/LXC Installation
 - Debian 11+ or Ubuntu 20.04+
-- dpkg package manager
 - ~50MB disk space
+- systemd
 
-### General Requirements (All Methods)
-- Access to Sonarr and/or Radarr instances
-- SMTP server for sending emails (Gmail, Mailgun, SendGrid, etc.)
-- (Optional) Trakt.tv API key for trending content
+### Both Need
+- Sonarr and/or Radarr URL + API key
+- SMTP email settings (Gmail, Mailgun, etc.)
+- (Optional) Trakt.tv Client ID
 
 ## 📖 Detailed Installation Guide
+
+### 🖥️ Proxmox Users - Which Method?
+
+| Your Setup | Use This Method |
+|------------|----------------|
+| Proxmox with Docker installed | `docker-compose.simple.yml` (Docker method below) |
+| Proxmox LXC container (Debian 12) | `install-binary.sh` (Linux method below) |
+
+Both work perfectly on Proxmox!
+
+---
 
 ### Docker: Standalone Compose File (Simplest)
 
@@ -564,6 +551,26 @@ Contributions are welcome! Here's how you can help:
 - Update documentation
 - Keep commits atomic and well-described
 - Ensure `make test` passes before submitting PR
+
+### Creating Releases (For Maintainers)
+
+To enable the pre-built binary installer, create a GitHub release:
+
+```bash
+# Update version in version.json first, then:
+git add version.json
+git commit -m "chore: bump version to v0.8.0"
+git push
+
+# Create and push tag
+git tag v0.8.0
+git push origin v0.8.0
+```
+
+The GitHub Actions workflow will automatically:
+- Build binaries for amd64, arm64, and armv6
+- Attach them to the release
+- Enable `install-binary.sh` to work
 
 ## 📄 License
 

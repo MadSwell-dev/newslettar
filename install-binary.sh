@@ -1,8 +1,15 @@
 #!/bin/bash
 
+# =============================================================================
 # Newslettar Binary Installer v2.0.0
-# Simplified installer that downloads pre-built binaries from GitHub Releases
-# Run with: curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install-binary.sh | bash
+# =============================================================================
+# Perfect for: Proxmox LXC containers, Debian/Ubuntu servers
+# Downloads pre-built binary (~13MB) instead of compiling from source
+#
+# INSTALLATION:
+#   curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install-binary.sh | sudo bash
+#
+# After install, configure via web UI at: http://your-server-ip:8080
 
 set -e
 
@@ -60,9 +67,14 @@ LATEST_VERSION=$(curl -s "https://api.github.com/repos/${GITHUB_REPO}/releases/l
 
 if [ -z "$LATEST_VERSION" ]; then
     echo -e "${RED}Could not fetch latest release version${NC}"
-    echo -e "${YELLOW}This might mean no releases exist yet.${NC}"
-    echo -e "${YELLOW}Please use the source installation method:${NC}"
-    echo -e "${BLUE}curl -sSL https://raw.githubusercontent.com/${GITHUB_REPO}/main/install.sh | bash${NC}"
+    echo -e "${YELLOW}No releases with binaries found yet.${NC}"
+    echo ""
+    echo -e "${YELLOW}To use this installer, create a release first:${NC}"
+    echo -e "${BLUE}  git tag v0.8.0${NC}"
+    echo -e "${BLUE}  git push origin v0.8.0${NC}"
+    echo ""
+    echo -e "${YELLOW}Or use the source installation method:${NC}"
+    echo -e "${BLUE}  curl -sSL https://raw.githubusercontent.com/${GITHUB_REPO}/main/install.sh | sudo bash${NC}"
     exit 1
 fi
 

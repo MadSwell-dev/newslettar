@@ -1,15 +1,14 @@
 {
-  "version": "0.7.0",
+  "version": "0.8.0",
   "released": "2025-11-17",
   "changelog": [
-    "SECURITY: Fixed .env file permissions (0644 → 0600) to prevent credential exposure",
-    "SECURITY: Removed credential logging that exposed API keys in logs",
-    "SECURITY: Masked sensitive fields (API keys, passwords) in API responses",
-    "SECURITY: Strengthened SMTP TLS configuration (require TLS 1.2+, strong ciphers)",
-    "PERFORMANCE: Optimized HTTP client usage in Trakt API (eliminated 4 redundant client creations)",
-    "PERFORMANCE: Replaced io.ReadAll with streaming JSON decoder for better memory efficiency",
-    "PERFORMANCE: Added periodic cache cleanup to prevent unbounded memory growth",
-    "STRUCTURE: Reorganized project with cmd/ directory structure following Go best practices",
-    "STRUCTURE: Moved documentation to docs/ folder for better organization"
+    "INSTALL: Simplified Docker installation - single file, no git clone required",
+    "INSTALL: Pre-built binary installer for Linux/Proxmox LXC (13MB vs 400MB)",
+    "INSTALL: Environment variable support for Docker deployments (no .env file needed)",
+    "INSTALL: GitHub Actions workflow for automatic multi-arch binary releases",
+    "CONFIG: Support environment variables as fallback to .env file",
+    "DOCKER: New docker-compose.simple.yml for one-file deployment",
+    "DOCKER: Simplified Dockerfile (removed embedded .env generation)",
+    "DOCS: Reorganized installation guide by platform (Docker/Proxmox/LXC)"
   ]
 }
