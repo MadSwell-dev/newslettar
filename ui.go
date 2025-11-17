@@ -720,7 +720,23 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
         <div id="template-tab" class="tab-content" role="tabpanel">
             <h3 style="margin-bottom: 20px;">Email Template Options</h3>
-            
+
+            <h3 style="margin-bottom: 20px;">Customize Email Text</h3>
+
+            <div class="info-banner" style="margin-bottom: 20px;">
+                <p style="font-size: 0.9em;">
+                    ℹ️ Customize all static text in your newsletter, including headings, messages, and the footer. Perfect for translating your newsletter to other languages or personalizing the content.
+                </p>
+            </div>
+
+            <button class="btn" onclick="openEditStringsModal()" aria-label="Edit email strings">
+                <span>✏️ Edit Email Strings</span>
+            </button>
+
+            <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
+
+            <h3 style="margin-bottom: 15px;">Display Options</h3>
+
             <div class="template-option">
                 <div>
                     <strong>Show Movie/Series Posters</strong>
@@ -908,20 +924,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             <p style="margin-top: 20px; color: #8899aa; font-size: 0.9em;">
                 ℹ️ Changes are saved automatically when you toggle switches.
             </p>
-
-            <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
-
-            <h3 style="margin-bottom: 20px;">Customize Email Text</h3>
-
-            <div class="info-banner" style="margin-bottom: 20px;">
-                <p style="font-size: 0.9em;">
-                    ℹ️ Customize all static text in your newsletter, including headings, messages, and the footer. Perfect for translating your newsletter to other languages or personalizing the content.
-                </p>
-            </div>
-
-            <button class="btn" onclick="openEditStringsModal()" aria-label="Edit email strings">
-                <span>✏️ Edit Email Strings</span>
-            </button>
 
             <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
 
@@ -1114,6 +1116,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         });
 
         let dashboardInterval;
+        let timezoneInterval;
 
         function showTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => {
@@ -1122,19 +1125,33 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             });
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
 
-            event.target.classList.add('active');
-            event.target.setAttribute('aria-selected', 'true');
+            // Find and activate the correct tab button by matching the tab name
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => {
+                const onclick = t.getAttribute('onclick');
+                if (onclick && onclick.includes("'" + tabName + "'")) {
+                    t.classList.add('active');
+                    t.setAttribute('aria-selected', 'true');
+                }
+            });
             document.getElementById(tabName + '-tab').classList.add('active');
 
-            // Clear dashboard interval
+            // Clear intervals
             if (dashboardInterval) {
                 clearInterval(dashboardInterval);
+            }
+            if (timezoneInterval) {
+                clearInterval(timezoneInterval);
             }
 
             // Handle tab-specific actions
             if (tabName === 'dashboard') {
                 loadDashboard();
                 dashboardInterval = setInterval(loadDashboard, 10000); // Update every 10 seconds
+            } else if (tabName === 'config') {
+                // Refresh timezone info every 60 seconds when config tab is active
+                updateTimezoneInfo();
+                timezoneInterval = setInterval(updateTimezoneInfo, 60000); // Update every 60 seconds
             }
         }
 

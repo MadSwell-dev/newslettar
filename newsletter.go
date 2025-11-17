@@ -420,7 +420,7 @@ func getNextScheduledRun(day, timeStr string, loc *time.Location) string {
 		}
 	}
 
-	return nextRun.Format("Jan 2, 2006 3:04 PM MST")
+	return nextRun.Format("2006-01-02 15:04:05 MST")
 }
 
 // Monitorable is a constraint for types that have a Monitored field

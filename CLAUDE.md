@@ -1,6 +1,6 @@
 # CLAUDE.md - AI Assistant Guide for Newslettar
 
-> **Last Updated:** 2025-11-17 (v1.6.0)
+> **Last Updated:** 2025-11-17 (v0.6.1)
 > **Purpose:** Comprehensive guide for AI assistants working on the Newslettar codebase
 
 ---

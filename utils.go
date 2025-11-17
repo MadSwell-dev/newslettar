@@ -145,6 +145,13 @@ func groupEpisodesBySeries(episodes []Episode) []SeriesGroup {
 
 	groups := make([]SeriesGroup, 0, len(seriesMap))
 	for _, group := range seriesMap {
+		// Sort episodes within each series by season and episode number
+		sort.Slice(group.Episodes, func(i, j int) bool {
+			if group.Episodes[i].SeasonNum != group.Episodes[j].SeasonNum {
+				return group.Episodes[i].SeasonNum < group.Episodes[j].SeasonNum
+			}
+			return group.Episodes[i].EpisodeNum < group.Episodes[j].EpisodeNum
+		})
 		groups = append(groups, *group)
 	}
 
