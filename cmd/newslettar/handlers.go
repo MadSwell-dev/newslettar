@@ -344,21 +344,25 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		const maskedPlaceholder = "••••••••"
 
 		// Update configuration fields
-		// Only update fields if they are provided (not empty) and not masked placeholders
-		// Don't delete fields that aren't sent in the request
+		// For sensitive fields (API keys, passwords): update if not masked, allowing empty values to clear them
+		// For other fields: only update if provided (not empty)
+		// Masked placeholder (••••••••) indicates the field wasn't changed by the user
 		if webCfg.SonarrURL != "" {
 			envMap["SONARR_URL"] = webCfg.SonarrURL
 		}
-		if webCfg.SonarrAPIKey != "" && webCfg.SonarrAPIKey != maskedPlaceholder {
+		// Allow clearing API keys - update if not masked (even if empty)
+		if webCfg.SonarrAPIKey != maskedPlaceholder {
 			envMap["SONARR_API_KEY"] = webCfg.SonarrAPIKey
 		}
 		if webCfg.RadarrURL != "" {
 			envMap["RADARR_URL"] = webCfg.RadarrURL
 		}
-		if webCfg.RadarrAPIKey != "" && webCfg.RadarrAPIKey != maskedPlaceholder {
+		// Allow clearing API keys - update if not masked (even if empty)
+		if webCfg.RadarrAPIKey != maskedPlaceholder {
 			envMap["RADARR_API_KEY"] = webCfg.RadarrAPIKey
 		}
-		if webCfg.TraktClientID != "" && webCfg.TraktClientID != maskedPlaceholder {
+		// Allow clearing Trakt Client ID - update if not masked (even if empty)
+		if webCfg.TraktClientID != maskedPlaceholder {
 			envMap["TRAKT_CLIENT_ID"] = webCfg.TraktClientID
 		}
 		if webCfg.SMTPHost != "" {
@@ -370,7 +374,8 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.SMTPUser != "" {
 			envMap["SMTP_USER"] = webCfg.SMTPUser
 		}
-		if webCfg.SMTPPass != "" && webCfg.SMTPPass != maskedPlaceholder {
+		// Allow clearing password - update if not masked (even if empty)
+		if webCfg.SMTPPass != maskedPlaceholder {
 			envMap["SMTP_PASS"] = webCfg.SMTPPass
 		}
 		if webCfg.FromEmail != "" {
