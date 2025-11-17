@@ -118,6 +118,9 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 					CoverType string `json:"coverType"`
 					RemoteURL string `json:"remoteUrl"`
 				} `json:"images"`
+				Ratings struct {
+					Value float64 `json:"value"`
+				} `json:"ratings"`
 			} `json:"series"`
 			Episode struct {
 				SeasonNumber  int    `json:"seasonNumber"`
@@ -166,6 +169,7 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 			Overview:       record.Episode.Overview,
 			SeriesOverview: record.Series.Overview,
 			Monitored:      record.Series.Monitored,
+			Rating:         record.Series.Ratings.Value,
 		})
 	}
 
@@ -305,6 +309,14 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 					CoverType string `json:"coverType"`
 					RemoteURL string `json:"remoteUrl"`
 				} `json:"images"`
+				Ratings struct {
+					Imdb struct {
+						Value float64 `json:"value"`
+					} `json:"imdb"`
+					Tmdb struct {
+						Value float64 `json:"value"`
+					} `json:"tmdb"`
+				} `json:"ratings"`
 			} `json:"movie"`
 		} `json:"records"`
 	}
@@ -333,6 +345,11 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 			}
 		}
 
+		rating := record.Movie.Ratings.Imdb.Value
+		if rating == 0 {
+			rating = record.Movie.Ratings.Tmdb.Value
+		}
+
 		movies = append(movies, Movie{
 			Title:       record.Movie.Title,
 			Year:        record.Movie.Year,
@@ -343,6 +360,7 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 			TmdbID:      record.Movie.TmdbID,
 			Overview:    record.Movie.Overview,
 			Monitored:   record.Movie.Monitored,
+			Rating:      rating,
 		})
 	}
 
