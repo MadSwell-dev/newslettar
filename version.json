@@ -1,5 +1,5 @@
 {
-  "version": "1.6.1",
+  "version": "0.6.1",
   "released": "2025-11-17",
   "changelog": [
     "Fixed configuration button active state when navigating from dashboard tab",
