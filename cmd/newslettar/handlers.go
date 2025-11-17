@@ -115,11 +115,12 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check email configuration
-	if cfg.FromEmail != "" && len(cfg.ToEmails) > 0 && cfg.SMTPUser != "" && cfg.SMTPPass != "" {
+	// Email is configured if SMTP settings are present (recipients can be added later)
+	if cfg.SMTPHost != "" && cfg.SMTPPort != "" && cfg.SMTPUser != "" && cfg.SMTPPass != "" && cfg.FromEmail != "" {
 		checks["email"] = "configured"
-	} else if cfg.FromEmail == "" && len(cfg.ToEmails) == 0 {
+	} else if cfg.SMTPHost == "" && cfg.SMTPPort == "" && cfg.FromEmail == "" {
 		checks["email"] = "not_configured"
-		healthy = false
+		// Don't mark as unhealthy if email is simply not configured
 	} else {
 		checks["email"] = "misconfigured"
 		healthy = false
@@ -910,8 +911,11 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check Email configuration
-	if cfg.SMTPHost != "" && cfg.SMTPPort != "" && cfg.FromEmail != "" && len(cfg.ToEmails) > 0 {
+	// Show as configured if SMTP settings are present (recipients can be added later)
+	if cfg.SMTPHost != "" && cfg.SMTPPort != "" && cfg.SMTPUser != "" && cfg.SMTPPass != "" && cfg.FromEmail != "" {
 		serviceStatus["email"] = "configured"
+	} else if cfg.SMTPHost != "" || cfg.SMTPPort != "" || cfg.FromEmail != "" {
+		serviceStatus["email"] = "misconfigured" // Partially configured
 	} else {
 		serviceStatus["email"] = "not_configured"
 	}
