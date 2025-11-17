@@ -198,18 +198,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             from { transform: translateX(400px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-        .logs-container {
-            background: #0f1419;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            max-height: 500px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            border: 2px solid #2a3444;
-        }
-
         /* Dashboard Styles */
         .dashboard-grid {
             display: grid;
@@ -483,7 +471,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             <button class="tab active" role="tab" aria-selected="true" aria-controls="dashboard-tab" onclick="showTab('dashboard')">📊 Dashboard</button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="config-tab" onclick="showTab('config')">⚙️ Configuration</button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="template-tab" onclick="showTab('template')">📝 Email Template</button>
-            <button class="tab" role="tab" aria-selected="false" aria-controls="logs-tab" onclick="showTab('logs')">📋 Logs</button>
             <button class="tab" id="update-tab-button" role="tab" aria-selected="false" aria-controls="update-tab" onclick="showTab('update')" style="display: none;">🔄 Update</button>
         </div>
 
@@ -532,7 +519,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                         </div>
                         <div class="stat-row">
                             <span class="stat-label">Next Scheduled:</span>
-                            <span class="stat-value" id="dash-next-run">` + nextRun + `</span>
+                            <span class="stat-value" style="text-align: right; line-height: 1.4;" id="dash-next-run">` + nextRun + `</span>
                         </div>
                         <div class="stat-row">
                             <span class="stat-label">Timezone:</span>
@@ -948,14 +935,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             </p>
         </div>
 
-        <div id="logs-tab" class="tab-content" role="tabpanel">
-            <h3 style="margin-bottom: 15px;">📋 Newsletter Logs</h3>
-            <button class="btn btn-secondary" onclick="loadLogs()" style="margin-bottom: 15px;" aria-label="Refresh logs">
-                <span>🔄 Refresh Logs</span>
-            </button>
-            <div class="logs-container" id="logs" role="log" aria-live="polite"></div>
-        </div>
-
         <div id="update-tab" class="tab-content" role="tabpanel">
             <h3 style="margin-bottom: 20px;">🔄 Update Newslettar</h3>
             
@@ -991,8 +970,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
     </div>
 
     <script>
-        let logsInterval;
-
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
@@ -1013,10 +990,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             event.target.setAttribute('aria-selected', 'true');
             document.getElementById(tabName + '-tab').classList.add('active');
 
-            // Clear intervals
-            if (logsInterval) {
-                clearInterval(logsInterval);
-            }
+            // Clear dashboard interval
             if (dashboardInterval) {
                 clearInterval(dashboardInterval);
             }
@@ -1025,9 +999,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             if (tabName === 'dashboard') {
                 loadDashboard();
                 dashboardInterval = setInterval(loadDashboard, 10000); // Update every 10 seconds
-            } else if (tabName === 'logs') {
-                loadLogs();
-                logsInterval = setInterval(loadLogs, 5000);
             }
         }
 
@@ -1424,17 +1395,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             } finally {
                 button.classList.remove('loading');
                 button.disabled = false;
-            }
-        }
-
-        async function loadLogs() {
-            try {
-                const resp = await fetch('/api/logs');
-                const logs = await resp.text();
-                document.getElementById('logs').textContent = logs;
-                document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight;
-            } catch (error) {
-                console.error('Failed to load logs:', error);
             }
         }
 
