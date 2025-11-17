@@ -1584,8 +1584,14 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         document.getElementById('config-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            // Ensure the to_emails field is updated with current tags before submitting
+            updateEmailsField();
+
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
+
+            // Explicitly ensure to_emails is included even if empty
+            data.to_emails = emailTags.join(', ');
 
             const submitBtn = e.target.querySelector('button[type="submit"]');
             submitBtn.classList.add('loading');
