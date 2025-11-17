@@ -5,7 +5,8 @@ BINARY_NAME=newslettar
 VERSION=$(shell cat version.json | grep version | cut -d'"' -f4)
 BUILD_DIR=build
 DIST_DIR=dist
-GO_FILES=$(shell find . -name '*.go' -not -path './vendor/*')
+CMD_DIR=./cmd/newslettar
+GO_FILES=$(shell find $(CMD_DIR) -name '*.go')
 
 # Build flags
 LDFLAGS=-ldflags="-s -w -X main.version=$(VERSION)"
@@ -21,18 +22,18 @@ build: ## Build the binary
 	@echo "Building $(BINARY_NAME) v$(VERSION)..."
 	@mkdir -p $(BUILD_DIR)
 	go mod tidy
-	CGO_ENABLED=0 go build $(BUILDFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) .
+	CGO_ENABLED=0 go build $(BUILDFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) $(CMD_DIR)
 	@echo "✓ Built: $(BUILD_DIR)/$(BINARY_NAME)"
 
 build-all: ## Build for all platforms
 	@echo "Building for all platforms..."
 	@mkdir -p $(DIST_DIR)
-	GOOS=linux GOARCH=amd64 go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-linux-amd64 .
-	GOOS=linux GOARCH=arm64 go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-linux-arm64 .
-	GOOS=linux GOARCH=arm go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-linux-arm .
-	GOOS=darwin GOARCH=amd64 go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-darwin-amd64 .
-	GOOS=darwin GOARCH=arm64 go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-darwin-arm64 .
-	GOOS=windows GOARCH=amd64 go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-windows-amd64.exe .
+	GOOS=linux GOARCH=amd64 go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-linux-amd64 $(CMD_DIR)
+	GOOS=linux GOARCH=arm64 go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-linux-arm64 $(CMD_DIR)
+	GOOS=linux GOARCH=arm go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-linux-arm $(CMD_DIR)
+	GOOS=darwin GOARCH=amd64 go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-darwin-amd64 $(CMD_DIR)
+	GOOS=darwin GOARCH=arm64 go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-darwin-arm64 $(CMD_DIR)
+	GOOS=windows GOARCH=amd64 go build $(BUILDFLAGS) $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-windows-amd64.exe $(CMD_DIR)
 	@echo "✓ Built all platforms in $(DIST_DIR)/"
 
 clean: ## Clean build artifacts
@@ -42,7 +43,7 @@ clean: ## Clean build artifacts
 
 test: ## Run tests
 	@echo "Running tests..."
-	go test -v -race -coverprofile=coverage.out ./...
+	go test -v -race -coverprofile=coverage.out $(CMD_DIR)/...
 	@echo "✓ Tests complete"
 
 coverage: test ## Show test coverage
@@ -88,7 +89,7 @@ fmt: ## Format Go code
 lint: ## Run linters
 	@echo "Running linters..."
 	@which golangci-lint > /dev/null || (echo "golangci-lint not installed. Run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b \$$(go env GOPATH)/bin" && exit 1)
-	golangci-lint run ./...
+	golangci-lint run $(CMD_DIR)/...
 	@echo "✓ Linting complete"
 
 dev: ## Run in development mode with auto-reload (requires air)

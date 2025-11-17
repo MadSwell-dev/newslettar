@@ -3,18 +3,16 @@ FROM golang:1.23.5-bookworm AS builder
 
 WORKDIR /build
 
-# Copy all source files explicitly (glob expansion doesn't work reliably)
-COPY main.go types.go config.go constants.go api.go newsletter.go handlers.go server.go utils.go ui.go trakt.go ./
+# Copy source files (new structure with cmd/)
+COPY cmd/ cmd/
 COPY go.mod go.sum version.json ./
-COPY templates/ templates/
-COPY assets/ assets/
 
 # Build the application with optimizations
 RUN go mod tidy && \
     CGO_ENABLED=0 GOOS=linux go build \
     -ldflags="-s -w" \
     -trimpath \
-    -o newslettar .
+    -o newslettar ./cmd/newslettar
 
 # Final stage - minimal runtime image
 FROM debian:bookworm-slim
@@ -26,10 +24,8 @@ RUN apt-get update && \
 
 WORKDIR /opt/newslettar
 
-# Copy the compiled binary from builder
+# Copy the compiled binary from builder (templates/assets are embedded in binary)
 COPY --from=builder /build/newslettar .
-COPY --from=builder /build/templates/ templates/
-COPY --from=builder /build/assets/ assets/
 COPY --from=builder /build/version.json ./
 
 # Create default .env file
