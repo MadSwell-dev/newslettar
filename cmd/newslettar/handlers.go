@@ -436,24 +436,40 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 			envMap["TRAKT_WATCHED_MOVIES_LIMIT"] = webCfg.TraktWatchedMoviesLimit
 		}
 		// Email string customization
-		// Allow empty strings for these fields (user can intentionally clear them)
-		envMap["EMAIL_TITLE"] = webCfg.EmailTitle
-		envMap["EMAIL_INTRO"] = webCfg.EmailIntro
-		envMap["WEEK_RANGE_PREFIX"] = webCfg.WeekRangePrefix
-		envMap["COMING_THIS_WEEK_HEADING"] = webCfg.ComingThisWeekHeading
-		envMap["TV_SHOWS_HEADING"] = webCfg.TVShowsHeading
-		envMap["MOVIES_HEADING"] = webCfg.MoviesHeading
-		envMap["NO_SHOWS_MESSAGE"] = webCfg.NoShowsMessage
-		envMap["NO_MOVIES_MESSAGE"] = webCfg.NoMoviesMessage
-		envMap["DOWNLOADED_SECTION_HEADING"] = webCfg.DownloadedSectionHeading
-		envMap["NO_DOWNLOADED_SHOWS_MESSAGE"] = webCfg.NoDownloadedShowsMessage
-		envMap["NO_DOWNLOADED_MOVIES_MESSAGE"] = webCfg.NoDownloadedMoviesMessage
-		envMap["TRENDING_SECTION_HEADING"] = webCfg.TrendingSectionHeading
-		envMap["ANTICIPATED_SERIES_HEADING"] = webCfg.AnticipatedSeriesHeading
-		envMap["WATCHED_SERIES_HEADING"] = webCfg.WatchedSeriesHeading
-		envMap["ANTICIPATED_MOVIES_HEADING"] = webCfg.AnticipatedMoviesHeading
-		envMap["WATCHED_MOVIES_HEADING"] = webCfg.WatchedMoviesHeading
-		envMap["FOOTER_TEXT"] = webCfg.FooterText
+		// Only update if at least one custom string field is provided
+		// This prevents wiping them when saving from other tabs
+		// Check if any custom string field has a value (indicates template tab submission)
+		hasCustomStrings := webCfg.EmailTitle != "" || webCfg.EmailIntro != "" ||
+			webCfg.WeekRangePrefix != "" || webCfg.ComingThisWeekHeading != "" ||
+			webCfg.TVShowsHeading != "" || webCfg.MoviesHeading != "" ||
+			webCfg.NoShowsMessage != "" || webCfg.NoMoviesMessage != "" ||
+			webCfg.DownloadedSectionHeading != "" || webCfg.NoDownloadedShowsMessage != "" ||
+			webCfg.NoDownloadedMoviesMessage != "" || webCfg.TrendingSectionHeading != "" ||
+			webCfg.AnticipatedSeriesHeading != "" || webCfg.WatchedSeriesHeading != "" ||
+			webCfg.AnticipatedMoviesHeading != "" || webCfg.WatchedMoviesHeading != "" ||
+			webCfg.FooterText != ""
+
+		// Only update custom strings if they're being submitted (from template tab)
+		// Allow empty strings for intentional clearing when submitting from template tab
+		if hasCustomStrings {
+			envMap["EMAIL_TITLE"] = webCfg.EmailTitle
+			envMap["EMAIL_INTRO"] = webCfg.EmailIntro
+			envMap["WEEK_RANGE_PREFIX"] = webCfg.WeekRangePrefix
+			envMap["COMING_THIS_WEEK_HEADING"] = webCfg.ComingThisWeekHeading
+			envMap["TV_SHOWS_HEADING"] = webCfg.TVShowsHeading
+			envMap["MOVIES_HEADING"] = webCfg.MoviesHeading
+			envMap["NO_SHOWS_MESSAGE"] = webCfg.NoShowsMessage
+			envMap["NO_MOVIES_MESSAGE"] = webCfg.NoMoviesMessage
+			envMap["DOWNLOADED_SECTION_HEADING"] = webCfg.DownloadedSectionHeading
+			envMap["NO_DOWNLOADED_SHOWS_MESSAGE"] = webCfg.NoDownloadedShowsMessage
+			envMap["NO_DOWNLOADED_MOVIES_MESSAGE"] = webCfg.NoDownloadedMoviesMessage
+			envMap["TRENDING_SECTION_HEADING"] = webCfg.TrendingSectionHeading
+			envMap["ANTICIPATED_SERIES_HEADING"] = webCfg.AnticipatedSeriesHeading
+			envMap["WATCHED_SERIES_HEADING"] = webCfg.WatchedSeriesHeading
+			envMap["ANTICIPATED_MOVIES_HEADING"] = webCfg.AnticipatedMoviesHeading
+			envMap["WATCHED_MOVIES_HEADING"] = webCfg.WatchedMoviesHeading
+			envMap["FOOTER_TEXT"] = webCfg.FooterText
+		}
 
 		var envContent strings.Builder
 		for key, value := range envMap {
