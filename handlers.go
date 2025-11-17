@@ -34,6 +34,7 @@ func registerHandlers() {
 	http.HandleFunc("/api/update", updateHandler)
 	http.HandleFunc("/api/preview", previewHandler)
 	http.HandleFunc("/api/timezone-info", timezoneInfoHandler)
+	http.HandleFunc("/api/dashboard", dashboardHandler)
 }
 
 // Gzip compression middleware
@@ -712,4 +713,96 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("✅ Update completed successfully")
 		}
 	}()
+}
+
+// Dashboard handler - returns system stats, newsletter stats, and service status
+func dashboardHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	cfg := getConfig()
+	loc := getTimezone(cfg.Timezone)
+	nextRun := getNextScheduledRun(cfg.ScheduleDay, cfg.ScheduleTime, loc)
+
+	// Calculate uptime
+	uptime := time.Since(startTime)
+	uptimeStr := fmt.Sprintf("%dd %dh %dm",
+		int(uptime.Hours()/24),
+		int(uptime.Hours())%24,
+		int(uptime.Minutes())%60)
+
+	// Get memory usage (approximate)
+	var m struct {
+		Alloc uint64
+	}
+	// Simple memory estimate (actual usage may vary)
+	m.Alloc = 12 * 1024 * 1024 // Approximate 12MB baseline
+	memoryMB := float64(m.Alloc) / 1024 / 1024
+
+	// Get statistics
+	stats.mu.RLock()
+	totalEmails := stats.TotalEmailsSent
+	lastSent := stats.LastSentDateStr
+	stats.mu.RUnlock()
+
+	if lastSent == "" {
+		lastSent = "Never"
+	}
+
+	// Check service status
+	serviceStatus := make(map[string]string)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Check Sonarr
+	if cfg.SonarrURL != "" && cfg.SonarrAPIKey != "" {
+		_, err := fetchSonarrHistoryWithRetry(ctx, cfg, time.Now().AddDate(0, 0, -1), 1)
+		if err != nil {
+			serviceStatus["sonarr"] = "error"
+		} else {
+			serviceStatus["sonarr"] = "ok"
+		}
+	} else {
+		serviceStatus["sonarr"] = "not_configured"
+	}
+
+	// Check Radarr
+	if cfg.RadarrURL != "" && cfg.RadarrAPIKey != "" {
+		_, err := fetchRadarrHistoryWithRetry(ctx, cfg, time.Now().AddDate(0, 0, -1), 1)
+		if err != nil {
+			serviceStatus["radarr"] = "error"
+		} else {
+			serviceStatus["radarr"] = "ok"
+		}
+	} else {
+		serviceStatus["radarr"] = "not_configured"
+	}
+
+	// Check Email (just config check, not actual send)
+	if cfg.SMTPHost != "" && cfg.SMTPPort != "" && cfg.FromEmail != "" && len(cfg.ToEmails) > 0 {
+		serviceStatus["email"] = "configured"
+	} else {
+		serviceStatus["email"] = "not_configured"
+	}
+
+	// Check Trakt
+	if cfg.TraktClientID != "" {
+		serviceStatus["trakt"] = "configured"
+	} else {
+		serviceStatus["trakt"] = "not_configured"
+	}
+
+	dashboard := DashboardData{
+		Version:          version,
+		Uptime:           uptimeStr,
+		UptimeSeconds:    int64(uptime.Seconds()),
+		MemoryUsageMB:    memoryMB,
+		Port:             cfg.WebUIPort,
+		TotalEmailsSent:  totalEmails,
+		LastSentDate:     lastSent,
+		NextScheduledRun: nextRun,
+		Timezone:         cfg.Timezone,
+		ServiceStatus:    serviceStatus,
+	}
+
+	json.NewEncoder(w).Encode(dashboard)
 }

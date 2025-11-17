@@ -52,36 +52,36 @@ func (c *APICache) Clear() {
 
 // Config structures
 type Config struct {
-	SonarrURL                  string
-	SonarrAPIKey               string
-	RadarrURL                  string
-	RadarrAPIKey               string
-	TraktClientID              string
-	SMTPHost                   string
-	SMTPPort                   string
-	SMTPUser                   string
-	SMTPPass                   string
-	FromEmail                  string
-	FromName                   string
-	ToEmails                   []string
-	Timezone                   string
-	ScheduleDay                string
-	ScheduleTime               string
-	ShowPosters                bool
-	ShowDownloaded             bool
-	ShowSeriesOverview         bool
-	ShowEpisodeOverview        bool
-	ShowUnmonitored            bool
-	ShowSeriesRatings          bool
-	DarkMode                   bool
-	ShowTraktAnticipatedSeries      bool
-	ShowTraktWatchedSeries          bool
-	ShowTraktAnticipatedMovies      bool
-	ShowTraktWatchedMovies          bool
-	TraktAnticipatedSeriesLimit     int
-	TraktWatchedSeriesLimit         int
-	TraktAnticipatedMoviesLimit     int
-	TraktWatchedMoviesLimit         int
+	SonarrURL                   string
+	SonarrAPIKey                string
+	RadarrURL                   string
+	RadarrAPIKey                string
+	TraktClientID               string
+	SMTPHost                    string
+	SMTPPort                    string
+	SMTPUser                    string
+	SMTPPass                    string
+	FromEmail                   string
+	FromName                    string
+	ToEmails                    []string
+	Timezone                    string
+	ScheduleDay                 string
+	ScheduleTime                string
+	ShowPosters                 bool
+	ShowDownloaded              bool
+	ShowSeriesOverview          bool
+	ShowEpisodeOverview         bool
+	ShowUnmonitored             bool
+	ShowSeriesRatings           bool
+	DarkMode                    bool
+	ShowTraktAnticipatedSeries  bool
+	ShowTraktWatchedSeries      bool
+	ShowTraktAnticipatedMovies  bool
+	ShowTraktWatchedMovies      bool
+	TraktAnticipatedSeriesLimit int
+	TraktWatchedSeriesLimit     int
+	TraktAnticipatedMoviesLimit int
+	TraktWatchedMoviesLimit     int
 	// Performance tuning
 	APIPageSize     int
 	MaxRetries      int
@@ -218,34 +218,56 @@ type NewsletterData struct {
 }
 
 type WebConfig struct {
-	SonarrURL                  string `json:"sonarr_url"`
-	SonarrAPIKey               string `json:"sonarr_api_key"`
-	RadarrURL                  string `json:"radarr_url"`
-	RadarrAPIKey               string `json:"radarr_api_key"`
-	TraktClientID              string `json:"trakt_client_id"`
-	SMTPHost                   string `json:"smtp_host"`
-	SMTPPort                   string `json:"smtp_port"`
-	SMTPUser                   string `json:"smtp_user"`
-	SMTPPass                   string `json:"smtp_pass"`
-	FromEmail                  string `json:"from_email"`
-	FromName                   string `json:"from_name"`
-	ToEmails                   string `json:"to_emails"`
-	Timezone                   string `json:"timezone"`
-	ScheduleDay                string `json:"schedule_day"`
-	ScheduleTime               string `json:"schedule_time"`
-	ShowPosters                string `json:"show_posters"`
-	ShowDownloaded             string `json:"show_downloaded"`
-	ShowSeriesOverview         string `json:"show_series_overview"`
-	ShowEpisodeOverview        string `json:"show_episode_overview"`
-	ShowUnmonitored            string `json:"show_unmonitored"`
-	ShowSeriesRatings          string `json:"show_series_ratings"`
-	DarkMode                   string `json:"dark_mode"`
-	ShowTraktAnticipatedSeries      string `json:"show_trakt_anticipated_series"`
-	ShowTraktWatchedSeries          string `json:"show_trakt_watched_series"`
-	ShowTraktAnticipatedMovies      string `json:"show_trakt_anticipated_movies"`
-	ShowTraktWatchedMovies          string `json:"show_trakt_watched_movies"`
-	TraktAnticipatedSeriesLimit     string `json:"trakt_anticipated_series_limit"`
-	TraktWatchedSeriesLimit         string `json:"trakt_watched_series_limit"`
-	TraktAnticipatedMoviesLimit     string `json:"trakt_anticipated_movies_limit"`
-	TraktWatchedMoviesLimit         string `json:"trakt_watched_movies_limit"`
+	SonarrURL                   string `json:"sonarr_url"`
+	SonarrAPIKey                string `json:"sonarr_api_key"`
+	RadarrURL                   string `json:"radarr_url"`
+	RadarrAPIKey                string `json:"radarr_api_key"`
+	TraktClientID               string `json:"trakt_client_id"`
+	SMTPHost                    string `json:"smtp_host"`
+	SMTPPort                    string `json:"smtp_port"`
+	SMTPUser                    string `json:"smtp_user"`
+	SMTPPass                    string `json:"smtp_pass"`
+	FromEmail                   string `json:"from_email"`
+	FromName                    string `json:"from_name"`
+	ToEmails                    string `json:"to_emails"`
+	Timezone                    string `json:"timezone"`
+	ScheduleDay                 string `json:"schedule_day"`
+	ScheduleTime                string `json:"schedule_time"`
+	ShowPosters                 string `json:"show_posters"`
+	ShowDownloaded              string `json:"show_downloaded"`
+	ShowSeriesOverview          string `json:"show_series_overview"`
+	ShowEpisodeOverview         string `json:"show_episode_overview"`
+	ShowUnmonitored             string `json:"show_unmonitored"`
+	ShowSeriesRatings           string `json:"show_series_ratings"`
+	DarkMode                    string `json:"dark_mode"`
+	ShowTraktAnticipatedSeries  string `json:"show_trakt_anticipated_series"`
+	ShowTraktWatchedSeries      string `json:"show_trakt_watched_series"`
+	ShowTraktAnticipatedMovies  string `json:"show_trakt_anticipated_movies"`
+	ShowTraktWatchedMovies      string `json:"show_trakt_watched_movies"`
+	TraktAnticipatedSeriesLimit string `json:"trakt_anticipated_series_limit"`
+	TraktWatchedSeriesLimit     string `json:"trakt_watched_series_limit"`
+	TraktAnticipatedMoviesLimit string `json:"trakt_anticipated_movies_limit"`
+	TraktWatchedMoviesLimit     string `json:"trakt_watched_movies_limit"`
+}
+
+// Statistics for dashboard
+type Statistics struct {
+	mu              sync.RWMutex
+	TotalEmailsSent int       `json:"total_emails_sent"`
+	LastSentDate    time.Time `json:"last_sent_date"`
+	LastSentDateStr string    `json:"last_sent_date_str"`
+}
+
+// Dashboard data
+type DashboardData struct {
+	Version          string            `json:"version"`
+	Uptime           string            `json:"uptime"`
+	UptimeSeconds    int64             `json:"uptime_seconds"`
+	MemoryUsageMB    float64           `json:"memory_usage_mb"`
+	Port             string            `json:"port"`
+	TotalEmailsSent  int               `json:"total_emails_sent"`
+	LastSentDate     string            `json:"last_sent_date"`
+	NextScheduledRun string            `json:"next_scheduled_run"`
+	Timezone         string            `json:"timezone"`
+	ServiceStatus    map[string]string `json:"service_status"`
 }

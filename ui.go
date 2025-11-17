@@ -209,6 +209,84 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             white-space: pre-wrap;
             border: 2px solid #2a3444;
         }
+
+        /* Dashboard Styles */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .dashboard-card {
+            background: #252f3f;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #2a3444;
+        }
+        .dashboard-logs {
+            grid-column: 1 / -1;
+        }
+        .dashboard-card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dashboard-card-header h4 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.1em;
+        }
+        .dashboard-icon {
+            font-size: 1.5em;
+        }
+        .dashboard-card-content {
+            padding: 20px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #2a3444;
+        }
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        .stat-label {
+            color: #8899aa;
+            font-size: 0.95em;
+        }
+        .stat-value {
+            color: #e8e8e8;
+            font-weight: 500;
+        }
+        .stat-highlight {
+            color: #667eea;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        .status-indicator {
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+        .dashboard-logs-container {
+            background: #0f1419;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 2px solid #2a3444;
+            line-height: 1.4;
+        }
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
         .schedule-info {
             background: #252f3f;
             padding: 20px;
@@ -402,13 +480,119 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         </div>
 
         <div class="tabs" role="tablist">
-            <button class="tab active" role="tab" aria-selected="true" aria-controls="config-tab" onclick="showTab('config')">⚙️ Configuration</button>
+            <button class="tab active" role="tab" aria-selected="true" aria-controls="dashboard-tab" onclick="showTab('dashboard')">📊 Dashboard</button>
+            <button class="tab" role="tab" aria-selected="false" aria-controls="config-tab" onclick="showTab('config')">⚙️ Configuration</button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="template-tab" onclick="showTab('template')">📝 Email Template</button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="logs-tab" onclick="showTab('logs')">📋 Logs</button>
             <button class="tab" id="update-tab-button" role="tab" aria-selected="false" aria-controls="update-tab" onclick="showTab('update')" style="display: none;">🔄 Update</button>
         </div>
 
-        <div id="config-tab" class="tab-content active" role="tabpanel">
+        <div id="dashboard-tab" class="tab-content active" role="tabpanel">
+            <h3 style="margin-bottom: 20px; color: #667eea;">System Overview</h3>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <span class="dashboard-icon">🖥️</span>
+                        <h4>System Stats</h4>
+                    </div>
+                    <div class="dashboard-card-content">
+                        <div class="stat-row">
+                            <span class="stat-label">Version:</span>
+                            <span class="stat-value" id="dash-version">` + version + `</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Running on Port:</span>
+                            <span class="stat-value" id="dash-port">Loading...</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Uptime:</span>
+                            <span class="stat-value" id="dash-uptime">Loading...</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Memory Usage:</span>
+                            <span class="stat-value" id="dash-memory">~12 MB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <span class="dashboard-icon">📧</span>
+                        <h4>Newsletter Stats</h4>
+                    </div>
+                    <div class="dashboard-card-content">
+                        <div class="stat-row">
+                            <span class="stat-label">Total Emails Sent:</span>
+                            <span class="stat-value stat-highlight" id="dash-emails-sent">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Last Sent:</span>
+                            <span class="stat-value" id="dash-last-sent">Never</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Next Scheduled:</span>
+                            <span class="stat-value" id="dash-next-run">` + nextRun + `</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Timezone:</span>
+                            <span class="stat-value" id="dash-timezone">` + timezone + `</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <span class="dashboard-icon">🔌</span>
+                        <h4>Service Status</h4>
+                    </div>
+                    <div class="dashboard-card-content">
+                        <div class="stat-row">
+                            <span class="stat-label">Sonarr:</span>
+                            <span class="stat-value"><span id="status-sonarr" class="status-indicator">⚫</span> <span id="status-sonarr-text">Checking...</span></span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Radarr:</span>
+                            <span class="stat-value"><span id="status-radarr" class="status-indicator">⚫</span> <span id="status-radarr-text">Checking...</span></span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Email:</span>
+                            <span class="stat-value"><span id="status-email" class="status-indicator">⚫</span> <span id="status-email-text">Checking...</span></span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Trakt:</span>
+                            <span class="stat-value"><span id="status-trakt" class="status-indicator">⚫</span> <span id="status-trakt-text">Checking...</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card dashboard-logs">
+                    <div class="dashboard-card-header">
+                        <span class="dashboard-icon">📋</span>
+                        <h4>Recent Logs</h4>
+                    </div>
+                    <div class="dashboard-card-content">
+                        <div id="dashboard-logs" class="dashboard-logs-container">
+                            Loading logs...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons" style="margin-top: 30px;">
+                <button class="btn" onclick="previewNewsletter()" aria-label="Generate newsletter preview">
+                    <span>👁️ Preview Newsletter</span>
+                </button>
+                <button class="btn" onclick="sendNow()" aria-label="Send newsletter immediately">
+                    <span>📤 Send Now</span>
+                </button>
+                <button class="btn btn-secondary" onclick="showTab('config')" aria-label="Go to configuration">
+                    <span>⚙️ Configuration</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="config-tab" class="tab-content" role="tabpanel">
             <div class="info-banner">
                 <p><strong>⏰ Next Scheduled Send:</strong> ` + nextRun + `</p>
                 <p><strong>🌍 Timezone:</strong> <span id="current-timezone">` + timezone + `</span></p>
@@ -816,24 +1000,91 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             }
         });
 
+        let dashboardInterval;
+
         function showTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => {
                 t.classList.remove('active');
                 t.setAttribute('aria-selected', 'false');
             });
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            
+
             event.target.classList.add('active');
             event.target.setAttribute('aria-selected', 'true');
             document.getElementById(tabName + '-tab').classList.add('active');
 
-            if (tabName === 'logs') {
+            // Clear intervals
+            if (logsInterval) {
+                clearInterval(logsInterval);
+            }
+            if (dashboardInterval) {
+                clearInterval(dashboardInterval);
+            }
+
+            // Handle tab-specific actions
+            if (tabName === 'dashboard') {
+                loadDashboard();
+                dashboardInterval = setInterval(loadDashboard, 10000); // Update every 10 seconds
+            } else if (tabName === 'logs') {
                 loadLogs();
                 logsInterval = setInterval(loadLogs, 5000);
-            } else {
-                if (logsInterval) {
-                    clearInterval(logsInterval);
-                }
+            }
+        }
+
+        async function loadDashboard() {
+            try {
+                const resp = await fetch('/api/dashboard');
+                const data = await resp.json();
+
+                // Update system stats
+                document.getElementById('dash-version').textContent = data.version;
+                document.getElementById('dash-port').textContent = data.port;
+                document.getElementById('dash-uptime').textContent = data.uptime;
+                document.getElementById('dash-memory').textContent = '~' + data.memory_usage_mb.toFixed(1) + ' MB';
+
+                // Update newsletter stats
+                document.getElementById('dash-emails-sent').textContent = data.total_emails_sent;
+                document.getElementById('dash-last-sent').textContent = data.last_sent_date;
+                document.getElementById('dash-next-run').textContent = data.next_scheduled_run;
+                document.getElementById('dash-timezone').textContent = data.timezone;
+
+                // Update service status
+                updateServiceStatus('sonarr', data.service_status.sonarr);
+                updateServiceStatus('radarr', data.service_status.radarr);
+                updateServiceStatus('email', data.service_status.email);
+                updateServiceStatus('trakt', data.service_status.trakt);
+
+                // Update dashboard logs (last 20 lines)
+                const logsResp = await fetch('/api/logs');
+                const logs = await logsResp.text();
+                const logLines = logs.trim().split('\n');
+                const recentLogs = logLines.slice(-20).join('\n');
+                document.getElementById('dashboard-logs').textContent = recentLogs || 'No logs available';
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+            }
+        }
+
+        function updateServiceStatus(service, status) {
+            const indicator = document.getElementById('status-' + service);
+            const text = document.getElementById('status-' + service + '-text');
+
+            if (status === 'ok') {
+                indicator.textContent = '🟢';
+                text.textContent = 'Connected';
+                text.style.color = '#10b981';
+            } else if (status === 'configured') {
+                indicator.textContent = '🟡';
+                text.textContent = 'Configured';
+                text.style.color = '#f59e0b';
+            } else if (status === 'not_configured') {
+                indicator.textContent = '⚪';
+                text.textContent = 'Not Configured';
+                text.style.color = '#8899aa';
+            } else if (status === 'error') {
+                indicator.textContent = '🔴';
+                text.textContent = 'Error';
+                text.style.color = '#ef4444';
             }
         }
 
@@ -1356,8 +1607,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             document.getElementById('loading-overlay').classList.remove('show');
         }
 
-        // Load config on page load
+        // Load data on page load
         loadConfig();
+        loadDashboard(); // Load dashboard data immediately
         checkUpdates();
     </script>
 </body>
