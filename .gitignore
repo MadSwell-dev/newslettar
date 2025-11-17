@@ -1,2 +1,32 @@
 # Build artifacts
 newslettar
+*.exe
+*.dll
+*.so
+*.dylib
+build/
+dist/
+
+# Environment and local config
+.env
+logs.txt
+data/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test coverage
+*.out
+coverage.html
+
+# Temporary files
+*.tmp
+*.bak
+
+# OS files
+Thumbs.db

@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+
+# Documentation (not needed in container)
+*.md
+
+# Environment files
+.env
+data/
+
+# Build artifacts
+newslettar
+logs.txt
+build/
+dist/
+
+# Scripts (not needed in container)
+install.sh
+docker-setup.sh
+docker-compose.yml
+scripts/
+Makefile
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test files
+*_test.go
+coverage.out
+coverage.html
