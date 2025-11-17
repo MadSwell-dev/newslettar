@@ -339,22 +339,25 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 
 		envMap := readEnvFile()
 
+		// Masked placeholder - don't update if this value is sent back
+		const maskedPlaceholder = "••••••••"
+
 		// Update configuration fields
-		// Only update fields if they are provided (not empty)
+		// Only update fields if they are provided (not empty) and not masked placeholders
 		// Don't delete fields that aren't sent in the request
 		if webCfg.SonarrURL != "" {
 			envMap["SONARR_URL"] = webCfg.SonarrURL
 		}
-		if webCfg.SonarrAPIKey != "" {
+		if webCfg.SonarrAPIKey != "" && webCfg.SonarrAPIKey != maskedPlaceholder {
 			envMap["SONARR_API_KEY"] = webCfg.SonarrAPIKey
 		}
 		if webCfg.RadarrURL != "" {
 			envMap["RADARR_URL"] = webCfg.RadarrURL
 		}
-		if webCfg.RadarrAPIKey != "" {
+		if webCfg.RadarrAPIKey != "" && webCfg.RadarrAPIKey != maskedPlaceholder {
 			envMap["RADARR_API_KEY"] = webCfg.RadarrAPIKey
 		}
-		if webCfg.TraktClientID != "" {
+		if webCfg.TraktClientID != "" && webCfg.TraktClientID != maskedPlaceholder {
 			envMap["TRAKT_CLIENT_ID"] = webCfg.TraktClientID
 		}
 		if webCfg.SMTPHost != "" {
@@ -366,7 +369,7 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.SMTPUser != "" {
 			envMap["SMTP_USER"] = webCfg.SMTPUser
 		}
-		if webCfg.SMTPPass != "" {
+		if webCfg.SMTPPass != "" && webCfg.SMTPPass != maskedPlaceholder {
 			envMap["SMTP_PASS"] = webCfg.SMTPPass
 		}
 		if webCfg.FromEmail != "" {
