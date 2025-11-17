@@ -44,10 +44,11 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             position: relative;
         }
         .header-logo-link {
-            display: block;
+            display: inline-block;
             text-decoration: none;
             cursor: pointer;
             transition: opacity 0.2s ease;
+            line-height: 0;
         }
         .header-logo-link:hover {
             opacity: 0.8;
