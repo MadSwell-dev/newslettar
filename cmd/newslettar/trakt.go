@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -63,11 +62,9 @@ func getSonarrLibrary(ctx context.Context, cfg *Config) map[string]bool {
 	}
 
 	req.Header.Set("X-Api-Key", cfg.SonarrAPIKey)
-	client := &http.Client{
-		Timeout: time.Duration(cfg.APITimeout) * time.Second,
-	}
 
-	resp, err := client.Do(req)
+	// Use global HTTP client with connection pooling for better performance
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return make(map[string]bool)
 	}
@@ -77,18 +74,14 @@ func getSonarrLibrary(ctx context.Context, cfg *Config) map[string]bool {
 		return make(map[string]bool)
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return make(map[string]bool)
-	}
-
+	// Use streaming JSON decoder for better memory efficiency
 	var series []struct {
 		ImdbID    string `json:"imdbId"`
 		TvdbID    int    `json:"tvdbId"`
 		Monitored bool   `json:"monitored"`
 	}
 
-	if err := json.Unmarshal(body, &series); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&series); err != nil {
 		return make(map[string]bool)
 	}
 
@@ -130,11 +123,9 @@ func getRadarrLibrary(ctx context.Context, cfg *Config) map[string]bool {
 	}
 
 	req.Header.Set("X-Api-Key", cfg.RadarrAPIKey)
-	client := &http.Client{
-		Timeout: time.Duration(cfg.APITimeout) * time.Second,
-	}
 
-	resp, err := client.Do(req)
+	// Use global HTTP client with connection pooling for better performance
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return make(map[string]bool)
 	}
@@ -144,18 +135,14 @@ func getRadarrLibrary(ctx context.Context, cfg *Config) map[string]bool {
 		return make(map[string]bool)
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return make(map[string]bool)
-	}
-
+	// Use streaming JSON decoder for better memory efficiency
 	var movies []struct {
 		ImdbID    string `json:"imdbId"`
 		TmdbID    int    `json:"tmdbId"`
 		Monitored bool   `json:"monitored"`
 	}
 
-	if err := json.Unmarshal(body, &movies); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&movies); err != nil {
 		return make(map[string]bool)
 	}
 
@@ -316,28 +303,20 @@ func fetchTraktShows(ctx context.Context, cfg *Config, url string, filterToNextW
 	req.Header.Set("trakt-api-version", "2")
 	req.Header.Set("trakt-api-key", cfg.TraktClientID)
 
-	client := &http.Client{
-		Timeout: time.Duration(cfg.APITimeout) * time.Second,
-	}
-
-	resp, err := client.Do(req)
+	// Use global HTTP client with connection pooling for better performance
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch from Trakt: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("trakt API error (status %d): %s", resp.StatusCode, string(body))
+		return nil, fmt.Errorf("trakt API error (status %d)", resp.StatusCode)
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read Trakt response: %w", err)
-	}
-
+	// Use streaming JSON decoder for better memory efficiency
 	var responses []traktShowResponse
-	if err := json.Unmarshal(body, &responses); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&responses); err != nil {
 		return nil, fmt.Errorf("failed to parse Trakt response: %w", err)
 	}
 
@@ -417,28 +396,20 @@ func fetchTraktMovies(ctx context.Context, cfg *Config, url string, filterToNext
 	req.Header.Set("trakt-api-version", "2")
 	req.Header.Set("trakt-api-key", cfg.TraktClientID)
 
-	client := &http.Client{
-		Timeout: time.Duration(cfg.APITimeout) * time.Second,
-	}
-
-	resp, err := client.Do(req)
+	// Use global HTTP client with connection pooling for better performance
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch from Trakt: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("trakt API error (status %d): %s", resp.StatusCode, string(body))
+		return nil, fmt.Errorf("trakt API error (status %d)", resp.StatusCode)
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read Trakt response: %w", err)
-	}
-
+	// Use streaming JSON decoder for better memory efficiency
 	var responses []traktMovieResponse
-	if err := json.Unmarshal(body, &responses); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&responses); err != nil {
 		return nil, fmt.Errorf("failed to parse Trakt response: %w", err)
 	}
 

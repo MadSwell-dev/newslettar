@@ -354,7 +354,6 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		if webCfg.TraktClientID != "" {
 			envMap["TRAKT_CLIENT_ID"] = webCfg.TraktClientID
-			log.Printf("Setting TRAKT_CLIENT_ID to: %s", webCfg.TraktClientID)
 		}
 		if webCfg.SMTPHost != "" {
 			envMap["SMTP_HOST"] = webCfg.SMTPHost
@@ -456,8 +455,9 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 			envContent.WriteString(fmt.Sprintf("%s=%s\n", key, value))
 		}
 
-		log.Printf("DEBUG: Writing .env file. TRAKT_CLIENT_ID in map: %v", envMap["TRAKT_CLIENT_ID"])
-		if err := os.WriteFile(".env", []byte(envContent.String()), 0644); err != nil {
+		// Write .env file with restricted permissions (owner read/write only)
+		// 0600 prevents other users from reading API keys and passwords
+		if err := os.WriteFile(".env", []byte(envContent.String()), 0600); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -475,16 +475,36 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 	envMap := readEnvFile()
 	cfg := getConfig()
 	w.Header().Set("Content-Type", "application/json")
+
+	// Mask sensitive fields (API keys, passwords) for security
+	// Only return masked values, never expose actual credentials in GET responses
+	maskedSonarrKey := ""
+	if key := getEnvFromFileOnly(envMap, "SONARR_API_KEY", ""); key != "" {
+		maskedSonarrKey = "••••••••"
+	}
+	maskedRadarrKey := ""
+	if key := getEnvFromFileOnly(envMap, "RADARR_API_KEY", ""); key != "" {
+		maskedRadarrKey = "••••••••"
+	}
+	maskedTraktKey := ""
+	if key := getEnvFromFileOnly(envMap, "TRAKT_CLIENT_ID", ""); key != "" {
+		maskedTraktKey = "••••••••"
+	}
+	maskedSMTPPass := ""
+	if cfg.SMTPPass != "" {
+		maskedSMTPPass = "••••••••"
+	}
+
 	json.NewEncoder(w).Encode(map[string]string{
 		"sonarr_url":                     getEnvFromFileOnly(envMap, "SONARR_URL", ""),
-		"sonarr_api_key":                 getEnvFromFileOnly(envMap, "SONARR_API_KEY", ""),
+		"sonarr_api_key":                 maskedSonarrKey,
 		"radarr_url":                     getEnvFromFileOnly(envMap, "RADARR_URL", ""),
-		"radarr_api_key":                 getEnvFromFileOnly(envMap, "RADARR_API_KEY", ""),
-		"trakt_client_id":                getEnvFromFileOnly(envMap, "TRAKT_CLIENT_ID", ""),
+		"radarr_api_key":                 maskedRadarrKey,
+		"trakt_client_id":                maskedTraktKey,
 		"smtp_host":                      cfg.SMTPHost,
 		"smtp_port":                      cfg.SMTPPort,
 		"smtp_user":                      cfg.SMTPUser,
-		"smtp_pass":                      cfg.SMTPPass,
+		"smtp_pass":                      maskedSMTPPass,
 		"from_email":                     getEnvFromFile(envMap, "FROM_EMAIL", ""),
 		"from_name":                      getEnvFromFile(envMap, "FROM_NAME", DefaultFromName),
 		"to_emails":                      getEnvFromFile(envMap, "TO_EMAILS", ""),
@@ -647,7 +667,17 @@ func testEmailHandler(w http.ResponseWriter, r *http.Request) {
 			if err = client.Hello("localhost"); err != nil {
 				message = fmt.Sprintf("EHLO failed: %v", err)
 			} else if ok, _ := client.Extension("STARTTLS"); ok {
-				config := &tls.Config{ServerName: req.SMTP}
+				// Secure TLS configuration - require TLS 1.2+ and strong ciphers
+				config := &tls.Config{
+					ServerName: req.SMTP,
+					MinVersion: tls.VersionTLS12,
+					CipherSuites: []uint16{
+						tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+						tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+						tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+						tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+					},
+				}
 				if err = client.StartTLS(config); err != nil {
 					message = fmt.Sprintf("STARTTLS failed: %v", err)
 				} else {

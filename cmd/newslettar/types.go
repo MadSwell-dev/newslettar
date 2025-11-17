@@ -50,6 +50,31 @@ func (c *APICache) Clear() {
 	c.cache = make(map[string]CacheEntry)
 }
 
+// CleanupExpired removes expired cache entries to prevent unbounded memory growth
+func (c *APICache) CleanupExpired() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	now := time.Now()
+	for key, entry := range c.cache {
+		if now.After(entry.ExpiresAt) {
+			delete(c.cache, key)
+		}
+	}
+}
+
+// StartPeriodicCleanup starts a goroutine that periodically removes expired cache entries
+func (c *APICache) StartPeriodicCleanup(interval time.Duration) {
+	go func() {
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+
+		for range ticker.C {
+			c.CleanupExpired()
+		}
+	}()
+}
+
 // Config structures
 type Config struct {
 	SonarrURL                   string
