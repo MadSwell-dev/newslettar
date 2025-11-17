@@ -8,7 +8,8 @@ func getUIHTML(version string, nextRun string, timezone string) string {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Newslettar</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white'>📺</text></svg>">
+    <!-- TODO: Replace data:image/svg+xml;base64,PLACEHOLDER_FAVICON with base64 encoded /assets/newslettar_logo.svg -->
+    <link rel="icon" href="data:image/svg+xml;base64,PLACEHOLDER_FAVICON">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -35,19 +36,29 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         }
         
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1a2332;
             padding: 30px;
             border-radius: 12px;
             margin-bottom: 30px;
             text-align: center;
+            border-bottom: 3px solid #667eea;
+            position: relative;
+        }
+        .header-logo {
+            max-width: 250px;
+            height: auto;
+            margin: 0 auto 15px;
+            display: block;
         }
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
+            color: #e8e8e8;
         }
         .version {
-            opacity: 0.9;
-            font-size: 0.9em;
+            opacity: 0.7;
+            font-size: 0.85em;
+            color: #8899aa;
         }
         .tabs {
             display: flex;
@@ -387,8 +398,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 <body>
     <div class="container">
         <div class="header">
-            <h1>📺 Newslettar</h1>
-            <p class="version">Version ` + version + `</p>
+            <!-- TODO: Replace data:image/svg+xml;base64,PLACEHOLDER_LOGO_WHITE with base64 encoded /assets/newslettar_white.svg -->
+            <img src="data:image/svg+xml;base64,PLACEHOLDER_LOGO_WHITE" alt="Newslettar" class="header-logo">
+            <p class="version">v` + version + `</p>
         </div>
 
         <div class="tabs" role="tablist">
