@@ -20,6 +20,7 @@ import (
 
 // Register all HTTP handlers
 func registerHandlers() {
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
 	http.HandleFunc("/", withGzip(uiHandler))
 	http.HandleFunc("/health", healthHandler)
 	http.HandleFunc("/api/config", configHandler)
@@ -426,36 +427,36 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 	cfg := getConfig()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"sonarr_url":                    getEnvFromFileOnly(envMap, "SONARR_URL", ""),
-		"sonarr_api_key":                getEnvFromFileOnly(envMap, "SONARR_API_KEY", ""),
-		"radarr_url":                    getEnvFromFileOnly(envMap, "RADARR_URL", ""),
-		"radarr_api_key":                getEnvFromFileOnly(envMap, "RADARR_API_KEY", ""),
-		"trakt_client_id":               getEnvFromFileOnly(envMap, "TRAKT_CLIENT_ID", ""),
-		"smtp_host":                     cfg.SMTPHost,
-		"smtp_port":                     cfg.SMTPPort,
-		"smtp_user":                     cfg.SMTPUser,
-		"smtp_pass":                     cfg.SMTPPass,
-		"from_email":                    getEnvFromFile(envMap, "FROM_EMAIL", ""),
-		"from_name":                     getEnvFromFile(envMap, "FROM_NAME", DefaultFromName),
-		"to_emails":                     getEnvFromFile(envMap, "TO_EMAILS", ""),
-		"timezone":                      getEnvFromFile(envMap, "TIMEZONE", DefaultTimezone),
-		"schedule_day":                  getEnvFromFile(envMap, "SCHEDULE_DAY", DefaultScheduleDay),
-		"schedule_time":                 getEnvFromFile(envMap, "SCHEDULE_TIME", DefaultScheduleTime),
-		"show_posters":                  getEnvFromFile(envMap, "SHOW_POSTERS", DefaultShowPosters),
-		"show_downloaded":               getEnvFromFile(envMap, "SHOW_DOWNLOADED", DefaultShowDownloaded),
-		"show_series_overview":          getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", DefaultShowSeriesOverview),
-		"show_episode_overview":         getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", DefaultShowEpisodeOverview),
-		"show_unmonitored":              getEnvFromFile(envMap, "SHOW_UNMONITORED", DefaultShowUnmonitored),
-		"show_series_ratings":           getEnvFromFile(envMap, "SHOW_SERIES_RATINGS", DefaultShowSeriesRatings),
-		"dark_mode":                     getEnvFromFile(envMap, "DARK_MODE", DefaultDarkMode),
-		"show_trakt_anticipated_series":      getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_SERIES", DefaultShowTraktAnticipatedSeries),
-		"show_trakt_watched_series":          getEnvFromFile(envMap, "SHOW_TRAKT_WATCHED_SERIES", DefaultShowTraktWatchedSeries),
-		"show_trakt_anticipated_movies":      getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_MOVIES", DefaultShowTraktAnticipatedMovies),
-		"show_trakt_watched_movies":          getEnvFromFile(envMap, "SHOW_TRAKT_WATCHED_MOVIES", DefaultShowTraktWatchedMovies),
-		"trakt_anticipated_series_limit":     getEnvFromFile(envMap, "TRAKT_ANTICIPATED_SERIES_LIMIT", "5"),
-		"trakt_watched_series_limit":         getEnvFromFile(envMap, "TRAKT_WATCHED_SERIES_LIMIT", "5"),
-		"trakt_anticipated_movies_limit":     getEnvFromFile(envMap, "TRAKT_ANTICIPATED_MOVIES_LIMIT", "5"),
-		"trakt_watched_movies_limit":         getEnvFromFile(envMap, "TRAKT_WATCHED_MOVIES_LIMIT", "5"),
+		"sonarr_url":                     getEnvFromFileOnly(envMap, "SONARR_URL", ""),
+		"sonarr_api_key":                 getEnvFromFileOnly(envMap, "SONARR_API_KEY", ""),
+		"radarr_url":                     getEnvFromFileOnly(envMap, "RADARR_URL", ""),
+		"radarr_api_key":                 getEnvFromFileOnly(envMap, "RADARR_API_KEY", ""),
+		"trakt_client_id":                getEnvFromFileOnly(envMap, "TRAKT_CLIENT_ID", ""),
+		"smtp_host":                      cfg.SMTPHost,
+		"smtp_port":                      cfg.SMTPPort,
+		"smtp_user":                      cfg.SMTPUser,
+		"smtp_pass":                      cfg.SMTPPass,
+		"from_email":                     getEnvFromFile(envMap, "FROM_EMAIL", ""),
+		"from_name":                      getEnvFromFile(envMap, "FROM_NAME", DefaultFromName),
+		"to_emails":                      getEnvFromFile(envMap, "TO_EMAILS", ""),
+		"timezone":                       getEnvFromFile(envMap, "TIMEZONE", DefaultTimezone),
+		"schedule_day":                   getEnvFromFile(envMap, "SCHEDULE_DAY", DefaultScheduleDay),
+		"schedule_time":                  getEnvFromFile(envMap, "SCHEDULE_TIME", DefaultScheduleTime),
+		"show_posters":                   getEnvFromFile(envMap, "SHOW_POSTERS", DefaultShowPosters),
+		"show_downloaded":                getEnvFromFile(envMap, "SHOW_DOWNLOADED", DefaultShowDownloaded),
+		"show_series_overview":           getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", DefaultShowSeriesOverview),
+		"show_episode_overview":          getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", DefaultShowEpisodeOverview),
+		"show_unmonitored":               getEnvFromFile(envMap, "SHOW_UNMONITORED", DefaultShowUnmonitored),
+		"show_series_ratings":            getEnvFromFile(envMap, "SHOW_SERIES_RATINGS", DefaultShowSeriesRatings),
+		"dark_mode":                      getEnvFromFile(envMap, "DARK_MODE", DefaultDarkMode),
+		"show_trakt_anticipated_series":  getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_SERIES", DefaultShowTraktAnticipatedSeries),
+		"show_trakt_watched_series":      getEnvFromFile(envMap, "SHOW_TRAKT_WATCHED_SERIES", DefaultShowTraktWatchedSeries),
+		"show_trakt_anticipated_movies":  getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_MOVIES", DefaultShowTraktAnticipatedMovies),
+		"show_trakt_watched_movies":      getEnvFromFile(envMap, "SHOW_TRAKT_WATCHED_MOVIES", DefaultShowTraktWatchedMovies),
+		"trakt_anticipated_series_limit": getEnvFromFile(envMap, "TRAKT_ANTICIPATED_SERIES_LIMIT", "5"),
+		"trakt_watched_series_limit":     getEnvFromFile(envMap, "TRAKT_WATCHED_SERIES_LIMIT", "5"),
+		"trakt_anticipated_movies_limit": getEnvFromFile(envMap, "TRAKT_ANTICIPATED_MOVIES_LIMIT", "5"),
+		"trakt_watched_movies_limit":     getEnvFromFile(envMap, "TRAKT_WATCHED_MOVIES_LIMIT", "5"),
 	})
 }
 
