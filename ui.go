@@ -580,14 +580,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         </div>
 
         <div id="config-tab" class="tab-content" role="tabpanel">
-            <div class="info-banner">
-                <p><strong>⏰ Next Scheduled Send:</strong> ` + nextRun + `</p>
-                <p><strong>🌍 Timezone:</strong> <span id="current-timezone">` + timezone + `</span></p>
-                <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">
-                    ℹ️ Scheduler runs internally (no systemd timer needed). Changes apply immediately.
-                </p>
-            </div>
-
             <form id="config-form">
                 <h3 style="margin-bottom: 15px; color: #667eea;">Schedule Settings</h3>
                 
@@ -1232,8 +1224,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 document.getElementById('trakt-watched-movies-limit-container').style.display =
                     data.show_trakt_watched_movies !== 'false' ? 'block' : 'none';
 
-                document.getElementById('current-timezone').textContent = data.timezone || 'UTC';
-                
                 await updateTimezoneInfo();
             } catch (error) {
                 showNotification('Failed to load configuration: ' + error.message, 'error');

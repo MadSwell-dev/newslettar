@@ -48,6 +48,11 @@ func main() {
 	// Load config once at startup
 	cachedConfig = loadConfig()
 
+	// Load statistics from disk (persistent across restarts)
+	if err := loadStats(); err != nil {
+		log.Printf("⚠️  Could not load statistics: %v (starting fresh)", err)
+	}
+
 	// Validate configuration and display warnings
 	warnings := validateConfig(cachedConfig)
 	if len(warnings) > 0 {

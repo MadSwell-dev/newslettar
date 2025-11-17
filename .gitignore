@@ -9,6 +9,7 @@ dist/
 
 # Environment and local config
 .env
+.stats.json
 logs.txt
 data/
 
