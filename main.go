@@ -14,7 +14,7 @@ import (
 //go:embed templates/*.html
 var templateFS embed.FS
 
-const version = "1.5.1"
+const version = "1.6.0"
 
 // Track server start time for uptime monitoring
 var startTime = time.Now()
@@ -31,6 +31,9 @@ var httpClient = &http.Client{
 
 // Precompiled templates (compiled once at startup)
 var emailTemplate *template.Template
+
+// Global statistics tracker
+var stats = &Statistics{}
 
 func init() {
 	// Redirect log output to our ring buffer

@@ -1,16 +1,14 @@
 {
-  "version": "1.5.1",
+  "version": "1.6.0",
   "released": "2025-11-17",
   "changelog": [
-    "Improved unmonitored items filter to only apply to upcoming releases (next week)",
-    "Last week's downloaded content now shows all items regardless of monitor status",
-    "Major documentation overhaul with comprehensive README",
-    "Added Makefile build system for easy development",
-    "Added Debian package builder (.deb creation)",
-    "Added LICENSE (MIT) and CONTRIBUTING.md",
-    "Fixed Dockerfile to include all source files and assets",
-    "Enhanced .gitignore and added .dockerignore",
-    "Consolidated all documentation into single README",
-    "Ready for public release and collaboration"
+    "Added comprehensive Dashboard tab as the main view",
+    "Dashboard displays system stats (uptime, memory, version, port)",
+    "Dashboard shows newsletter statistics (emails sent, last sent, next run)",
+    "Dashboard includes real-time service status indicators for Sonarr/Radarr/Email/Trakt",
+    "Dashboard displays recent logs with auto-refresh",
+    "Added quick action buttons to Dashboard (Preview, Send Now, Configuration)",
+    "Dashboard auto-updates every 10 seconds when active",
+    "Backend now tracks total emails sent and last sent timestamp"
   ]
 }

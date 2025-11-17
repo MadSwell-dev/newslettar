@@ -1,6 +1,6 @@
 # CLAUDE.md - AI Assistant Guide for Newslettar
 
-> **Last Updated:** 2025-11-17 (v1.5.1)
+> **Last Updated:** 2025-11-17 (v1.6.0)
 > **Purpose:** Comprehensive guide for AI assistants working on the Newslettar codebase
 
 ---
@@ -40,6 +40,7 @@
 3. **Generates HTML newsletters** using Go templates
 4. **Sends scheduled emails** via SMTP with internal cron
 5. **Provides Web UI** for configuration and testing on port 8080
+6. **Dashboard view** with system stats, newsletter metrics, service status, and live logs
 
 ### Design Philosophy
 
@@ -201,7 +202,7 @@ const maxLogLines = 500
 |------|-------|------------------------|
 | `main.go` | 69 | Entry point, initialization, global singletons |
 | `server.go` | 91 | HTTP server, cron scheduler, graceful shutdown |
-| `handlers.go` | 715 | HTTP request handlers, Web UI routes |
+| `handlers.go` | 808 | HTTP request handlers, Web UI routes, dashboard API |
 | `ui.go` | 1,365 | Embedded Web UI HTML templates |
 | `newsletter.go` | 442 | Newsletter generation orchestration |
 | `api.go` | 455 | Sonarr/Radarr API client with retry/cache |
@@ -222,7 +223,8 @@ const maxLogLines = 500
 - `httpClient` - Reused HTTP client with connection pooling
 - `emailTemplate` - Precompiled Go template for emails
 - `startTime` - Server start time for uptime tracking
-- `version` - Application version (1.5.1)
+- `stats` - Global statistics tracker for dashboard
+- `version` - Application version (1.6.0)
 
 **Embedded Resources:**
 ```go
@@ -253,6 +255,7 @@ http.HandleFunc("/api/send", sendHandler)
 - `previewHandler()` - Generate newsletter preview
 - `sendHandler()` - Trigger immediate newsletter send
 - `healthHandler()` - Health check endpoint
+- `dashboardHandler()` - Dashboard stats API (system, newsletter, service status)
 
 **JSON Response Pattern:**
 ```go
@@ -327,6 +330,8 @@ type APIResponse struct {
 - `Episode`, `Movie`, `Series` - Media data
 - `APICache`, `CacheEntry` - Caching infrastructure
 - `APIResponse` - Standardized JSON responses
+- `Statistics` - Email statistics tracking (thread-safe)
+- `DashboardData` - Dashboard API response structure
 
 **Memory Optimization:**
 > Comment: "only fields we actually need (reduces memory & JSON parsing time)"
@@ -931,6 +936,61 @@ curl -X POST http://localhost:8080/api/test-email
 curl http://localhost:8080/api/preview > preview.html
 open preview.html  # macOS
 xdg-open preview.html  # Linux
+```
+
+### Dashboard Feature
+
+**Overview:**
+The Dashboard tab (v1.6.0+) is the default view when accessing the Web UI. It provides a comprehensive overview of the system status, newsletter statistics, service health, and recent logs.
+
+**Key Components:**
+
+1. **System Stats Card:**
+   - Application version
+   - Running port number
+   - System uptime (days, hours, minutes)
+   - Memory usage (~12MB baseline)
+
+2. **Newsletter Stats Card:**
+   - Total emails sent (lifetime counter)
+   - Last sent date and time
+   - Next scheduled run
+   - Configured timezone
+
+3. **Service Status Card:**
+   - Real-time connection checks for:
+     - Sonarr (🟢 Connected, 🔴 Error, ⚪ Not Configured)
+     - Radarr (🟢 Connected, 🔴 Error, ⚪ Not Configured)
+     - Email (🟡 Configured, ⚪ Not Configured)
+     - Trakt (🟡 Configured, ⚪ Not Configured)
+
+4. **Recent Logs Card:**
+   - Last 20 log entries
+   - Auto-scrolls to bottom
+   - Updates with dashboard refresh
+
+5. **Quick Actions:**
+   - Preview Newsletter button
+   - Send Now button
+   - Go to Configuration button
+
+**Technical Details:**
+
+- Dashboard data fetched from `/api/dashboard` endpoint
+- Auto-refreshes every 10 seconds when active
+- Statistics tracked in global `stats` variable (thread-safe)
+- Service status uses lightweight API calls with 5-second timeout
+- Email statistics incremented in `newsletter.go` after successful send
+
+**Accessing Dashboard Data:**
+```bash
+# Get dashboard JSON data
+curl http://localhost:8080/api/dashboard
+
+# Response includes:
+# - version, uptime, memory_usage_mb, port
+# - total_emails_sent, last_sent_date, next_scheduled_run
+# - service_status (map of service names to status strings)
 ```
 
 ---

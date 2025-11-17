@@ -245,6 +245,13 @@ func runNewsletter() {
 		log.Fatalf("❌ Failed to send email: %v", err)
 	}
 
+	// Update statistics after successful send
+	stats.mu.Lock()
+	stats.TotalEmailsSent += len(cfg.ToEmails)
+	stats.LastSentDate = now
+	stats.LastSentDateStr = now.Format("2006-01-02 15:04:05 MST")
+	stats.mu.Unlock()
+
 	log.Println("✅ Newsletter sent successfully!")
 
 	// Clear data to free memory immediately
