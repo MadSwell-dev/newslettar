@@ -378,9 +378,8 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.FromName != "" {
 			envMap["FROM_NAME"] = webCfg.FromName
 		}
-		if webCfg.ToEmails != "" {
-			envMap["TO_EMAILS"] = webCfg.ToEmails
-		}
+		// Always update TO_EMAILS, even if empty (allows clearing all recipients)
+		envMap["TO_EMAILS"] = webCfg.ToEmails
 		if webCfg.Timezone != "" {
 			envMap["TIMEZONE"] = webCfg.Timezone
 		}
