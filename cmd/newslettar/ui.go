@@ -43,6 +43,15 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             border-bottom: 3px solid #667eea;
             position: relative;
         }
+        .header-logo-link {
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        .header-logo-link:hover {
+            opacity: 0.8;
+        }
         .header-logo {
             max-width: 250px;
             height: auto;
@@ -541,7 +550,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 <body>
     <div class="container">
         <div class="header">
-            <img src="/assets/newslettar_white.svg" alt="Newslettar" class="header-logo">
+            <a href="/" class="header-logo-link">
+                <img src="/assets/newslettar_white.svg" alt="Newslettar" class="header-logo">
+            </a>
             <p class="version">v` + version + `</p>
         </div>
 
