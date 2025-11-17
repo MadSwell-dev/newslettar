@@ -40,7 +40,7 @@ REPO_URL="https://raw.githubusercontent.com/agencefanfare/newslettar/main"
 GITHUB_REPO="https://github.com/agencefanfare/newslettar"
 
 # Check if installation already exists and offer to clean it
-if [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/main.go" ]; then
+if [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/cmd/newslettar/main.go" ]; then
     echo -e "${YELLOW}⚠ Existing installation found at $INSTALL_DIR${NC}"
     echo -e "${YELLOW}Removing old installation to start fresh...${NC}"
     rm -rf "$INSTALL_DIR"
@@ -124,54 +124,42 @@ else
 fi
 
 # Check if we have a successful clone directory with files
-if [ -d "$TEMP_CLONE" ] && [ -f "$TEMP_CLONE/main.go" ]; then
+if [ -d "$TEMP_CLONE" ] && [ -f "$TEMP_CLONE/cmd/newslettar/main.go" ]; then
     echo -e "${BLUE}  Copying files from clone...${NC}"
-    
-    # Copy all Go files explicitly
-    echo -e "${BLUE}    Copying .go files...${NC}"
-    cp -v "$TEMP_CLONE"/main.go "$INSTALL_DIR/" 2>&1 | grep -E "main\.go|error|cannot" || true
-    cp -v "$TEMP_CLONE"/types.go "$INSTALL_DIR/" 2>&1 | grep -E "types\.go|error|cannot" || true
-    cp -v "$TEMP_CLONE"/config.go "$INSTALL_DIR/" 2>&1 | grep -E "config\.go|error|cannot" || true
-    cp -v "$TEMP_CLONE"/api.go "$INSTALL_DIR/" 2>&1 | grep -E "api\.go|error|cannot" || true
-    cp -v "$TEMP_CLONE"/newsletter.go "$INSTALL_DIR/" 2>&1 | grep -E "newsletter\.go|error|cannot" || true
-    cp -v "$TEMP_CLONE"/handlers.go "$INSTALL_DIR/" 2>&1 | grep -E "handlers\.go|error|cannot" || true
-    cp -v "$TEMP_CLONE"/server.go "$INSTALL_DIR/" 2>&1 | grep -E "server\.go|error|cannot" || true
-    cp -v "$TEMP_CLONE"/utils.go "$INSTALL_DIR/" 2>&1 | grep -E "utils\.go|error|cannot" || true
-    cp -v "$TEMP_CLONE"/ui.go "$INSTALL_DIR/" 2>&1 | grep -E "ui\.go|error|cannot" || true
+
+    # Copy cmd directory with all Go source files
+    echo -e "${BLUE}    Copying cmd/ directory...${NC}"
+    mkdir -p "$INSTALL_DIR/cmd"
+    cp -r "$TEMP_CLONE"/cmd/* "$INSTALL_DIR/cmd/" 2>&1 | grep -E "error|cannot" || echo "    ✓ cmd/ copied"
+
+    # Copy Go module files
+    echo -e "${BLUE}    Copying Go module files...${NC}"
     cp -v "$TEMP_CLONE"/go.mod "$INSTALL_DIR/" 2>&1 | grep -E "go\.mod|error|cannot" || true
     cp -v "$TEMP_CLONE"/go.sum "$INSTALL_DIR/" 2>&1 | grep -E "go\.sum|error|cannot" || true
     cp -v "$TEMP_CLONE"/version.json "$INSTALL_DIR/" 2>&1 | grep -E "version\.json|error|cannot" || true
-    
-    # Copy templates directory
-    mkdir -p "$INSTALL_DIR/templates"
-    if [ -d "$TEMP_CLONE/templates" ]; then
-        cp -r "$TEMP_CLONE/templates"/* "$INSTALL_DIR/templates/" || echo "Warning: Failed to copy templates"
-    fi
-    
+
     # Copy git info if available
     cp -r "$TEMP_CLONE"/.git "$INSTALL_DIR/" 2>/dev/null || true
     cp "$TEMP_CLONE"/.gitignore "$INSTALL_DIR/" 2>/dev/null || true
-    
+
     rm -rf "$TEMP_CLONE"
 fi
 
 # If clone didn't work, fall back to wget
-if [ ! -f "$INSTALL_DIR/main.go" ]; then
-    echo -e "${YELLOW}  Using fallback method: downloading files directly...${NC}"
-    mkdir -p "$INSTALL_DIR/templates"
-    for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod go.sum version.json; do
-        echo -e "${BLUE}    Downloading ${file}...${NC}"
-        wget -q -O "$INSTALL_DIR/$file" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/${file}" || {
-            echo -e "${RED}Failed to download $file${NC}"
-            exit 1
-        }
-    done
-    
-    echo -e "${BLUE}    Downloading email template...${NC}"
-    wget -q -O "$INSTALL_DIR/templates/email.html" "https://raw.githubusercontent.com/agencefanfare/newslettar/main/templates/email.html" || {
-        echo -e "${RED}Failed to download email template${NC}"
+if [ ! -f "$INSTALL_DIR/cmd/newslettar/main.go" ]; then
+    echo -e "${YELLOW}  Using fallback method: downloading archive...${NC}"
+    echo -e "${BLUE}    Downloading latest release...${NC}"
+
+    # Download the repository as a tar.gz archive
+    wget -q -O /tmp/newslettar.tar.gz "https://github.com/agencefanfare/newslettar/archive/refs/heads/main.tar.gz" || {
+        echo -e "${RED}Failed to download repository${NC}"
         exit 1
     }
+
+    # Extract to install directory
+    tar -xzf /tmp/newslettar.tar.gz -C /tmp/
+    cp -r /tmp/newslettar-main/* "$INSTALL_DIR/"
+    rm -rf /tmp/newslettar.tar.gz /tmp/newslettar-main
 fi
 
 echo -e "${GREEN}✓ Application downloaded${NC}"
@@ -180,13 +168,20 @@ echo -e "${GREEN}✓ Application downloaded${NC}"
 echo -e "${BLUE}  DEBUG: Files in $INSTALL_DIR:${NC}"
 ls -la "$INSTALL_DIR/" 2>&1 | head -20
 
-# Verify all critical files were copied
+# Verify critical structure was copied
 MISSING=""
-for file in main.go types.go config.go api.go newsletter.go handlers.go server.go utils.go ui.go go.mod version.json; do
-    if [ ! -f "$INSTALL_DIR/$file" ]; then
-        MISSING="$MISSING\n  - $file"
-    fi
-done
+if [ ! -d "$INSTALL_DIR/cmd/newslettar" ]; then
+    MISSING="$MISSING\n  - cmd/newslettar directory"
+fi
+if [ ! -f "$INSTALL_DIR/cmd/newslettar/main.go" ]; then
+    MISSING="$MISSING\n  - cmd/newslettar/main.go"
+fi
+if [ ! -f "$INSTALL_DIR/go.mod" ]; then
+    MISSING="$MISSING\n  - go.mod"
+fi
+if [ ! -f "$INSTALL_DIR/version.json" ]; then
+    MISSING="$MISSING\n  - version.json"
+fi
 
 if [ -n "$MISSING" ]; then
     echo -e "${RED}ERROR: Missing files after download:$MISSING${NC}"
@@ -204,7 +199,7 @@ echo -e "${GREEN}✓ Dependencies installed${NC}"
 
 echo -e "${YELLOW}[6/8] Building Newslettar with optimizations...${NC}"
 echo -e "${BLUE}  Using build flags: -ldflags=\"-s -w\" -trimpath${NC}"
-/usr/local/go/bin/go build -ldflags="-s -w" -trimpath -o newslettar .
+/usr/local/go/bin/go build -ldflags="-s -w" -trimpath -o newslettar ./cmd/newslettar
 chmod +x newslettar
 BINARY_SIZE=$(du -h newslettar | cut -f1)
 echo -e "${GREEN}✓ Built successfully (${BINARY_SIZE})${NC}"
@@ -327,7 +322,7 @@ case "$1" in
         fi
         
         /usr/local/go/bin/go mod tidy
-        /usr/local/go/bin/go build -ldflags="-s -w" -trimpath -o newslettar .
+        /usr/local/go/bin/go build -ldflags="-s -w" -trimpath -o newslettar ./cmd/newslettar
         if [ $? -ne 0 ]; then
             echo -e "${RED}Build failed!${NC}"
             mv .env.backup .env

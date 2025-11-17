@@ -318,29 +318,34 @@ make fmt
 
 ```
 newslettar/
-├── main.go              # Entry point
-├── types.go             # Data structures
-├── config.go            # Configuration management
-├── constants.go         # Application constants
-├── api.go               # Sonarr/Radarr API client
-├── trakt.go             # Trakt.tv API client
-├── newsletter.go        # Newsletter generation logic
-├── handlers.go          # HTTP handlers for Web UI
-├── server.go            # HTTP server & scheduler
-├── ui.go                # Web UI HTML templates
-├── utils.go             # Utility functions
-├── templates/
-│   └── email.html       # Email HTML template
-├── assets/
-│   ├── newslettar_logo.svg      # Logo
-│   ├── newslettar_black.svg     # Logo (black)
-│   └── newslettar_white.svg     # Logo (white)
+├── cmd/
+│   └── newslettar/           # Application source code
+│       ├── main.go           # Entry point
+│       ├── types.go          # Data structures
+│       ├── config.go         # Configuration management
+│       ├── constants.go      # Application constants
+│       ├── api.go            # Sonarr/Radarr API client
+│       ├── trakt.go          # Trakt.tv API client
+│       ├── newsletter.go     # Newsletter generation logic
+│       ├── handlers.go       # HTTP handlers for Web UI
+│       ├── server.go         # HTTP server & scheduler
+│       ├── ui.go             # Web UI HTML templates
+│       ├── utils.go          # Utility functions
+│       ├── templates/        # Email templates (embedded)
+│       │   └── email.html    # Email HTML template
+│       └── assets/           # Static assets (embedded)
+│           ├── newslettar_logo.svg   # Logo
+│           ├── newslettar_black.svg  # Logo (black)
+│           └── newslettar_white.svg  # Logo (white)
+├── docs/                     # Documentation
+│   ├── CLAUDE.md             # AI assistant guide
+│   └── CONTRIBUTING.md       # Contribution guide
 ├── scripts/
-│   └── build-deb.sh     # Debian package builder
-├── Dockerfile           # Docker image definition
-├── docker-compose.yml   # Docker Compose configuration
-├── Makefile             # Build automation
-└── README.md            # This file
+│   └── build-deb.sh          # Debian package builder
+├── Dockerfile                # Docker image definition
+├── docker-compose.yml        # Docker Compose configuration
+├── Makefile                  # Build automation
+└── README.md                 # This file
 ```
 
 ### Development Workflow
