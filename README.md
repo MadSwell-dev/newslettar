@@ -144,7 +144,7 @@ make build
 
 ## ⚙️ Configuration
 
-Configuration is done through a `.env` file. Here are the key settings:
+Configuration is done through a `.env` file. Copy `.env.example` to `.env` and customize:
 
 ```bash
 # Sonarr Configuration
@@ -155,10 +155,11 @@ SONARR_API_KEY=your_api_key_here
 RADARR_URL=http://localhost:7878
 RADARR_API_KEY=your_api_key_here
 
-# Trakt.tv (Optional - for trending content)
+# Trakt Configuration (Optional - enables trending series and movies)
+# Get your Client ID from https://trakt.tv/oauth/applications
 TRAKT_CLIENT_ID=your_client_id_here
 
-# Email Configuration (Works with any SMTP provider)
+# Email Configuration (Works with any SMTP provider: Gmail, Mailgun, SendGrid, etc.)
 SMTP_HOST=smtp.mailgun.org
 SMTP_PORT=587
 SMTP_USER=your_email@domain.com
@@ -167,19 +168,33 @@ FROM_NAME=Newslettar
 FROM_EMAIL=newsletter@yourdomain.com
 TO_EMAILS=user1@example.com,user2@example.com
 
-# Schedule Settings
+# Schedule Settings (Internal Cron - No systemd timer needed!)
 TIMEZONE=America/New_York
 SCHEDULE_DAY=Sun
 SCHEDULE_TIME=09:00
 
 # Template Settings
-SHOW_POSTERS=true
-SHOW_DOWNLOADED=true
-SHOW_QUALITY_PROFILES=false
-DARK_MODE=true
+SHOW_POSTERS=true                    # Show poster images in emails
+SHOW_DOWNLOADED=true                 # Include already downloaded content
+SHOW_UNMONITORED=false               # Include unmonitored content
+SHOW_SERIES_OVERVIEW=false           # Show series descriptions
+SHOW_EPISODE_OVERVIEW=false          # Show episode summaries
+DARK_MODE=true                       # Use dark mode theme
 
-# Web UI
+# Trakt Features (Requires TRAKT_CLIENT_ID)
+SHOW_TRAKT_ANTICIPATED_SERIES=false  # Show anticipated TV series
+SHOW_TRAKT_WATCHED_SERIES=false      # Show most watched TV series
+SHOW_TRAKT_ANTICIPATED_MOVIES=false  # Show anticipated movies
+SHOW_TRAKT_WATCHED_MOVIES=false      # Show most watched movies
+
+# Web UI Port
 WEBUI_PORT=8080
+
+# Performance Tuning (Optional - defaults are fine for most users)
+# API_PAGE_SIZE=1000                 # Items per API page
+# MAX_RETRIES=3                      # API retry attempts
+# PREVIEW_RETRIES=2                  # Preview generation retries
+# API_TIMEOUT=30                     # API timeout in seconds
 ```
 
 ### Getting API Keys
