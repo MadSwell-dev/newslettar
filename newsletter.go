@@ -193,15 +193,13 @@ func runNewsletter() {
 		return
 	}
 
-	// Filter unmonitored items if the setting is disabled
+	// Filter unmonitored items from next week releases only (last week already downloaded)
 	if !cfg.ShowUnmonitored {
-		log.Println("📋 Filtering out unmonitored items...")
+		log.Println("📋 Filtering out unmonitored items from upcoming releases...")
 		upcomingEpisodes = filterMonitoredEpisodes(upcomingEpisodes)
-		downloadedEpisodes = filterMonitoredEpisodes(downloadedEpisodes)
 		upcomingMovies = filterMonitoredMovies(upcomingMovies)
-		downloadedMovies = filterMonitoredMovies(downloadedMovies)
-		log.Printf("✓ After filtering: %d upcoming episodes, %d downloaded episodes, %d upcoming movies, %d downloaded movies",
-			len(upcomingEpisodes), len(downloadedEpisodes), len(upcomingMovies), len(downloadedMovies))
+		log.Printf("✓ After filtering: %d upcoming episodes, %d upcoming movies",
+			len(upcomingEpisodes), len(upcomingMovies))
 	}
 
 	// Check if we have any content to send
