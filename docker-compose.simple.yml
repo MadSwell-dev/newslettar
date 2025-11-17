@@ -1,0 +1,132 @@
+# =============================================================================
+# Newslettar - Simplified Docker Compose
+# =============================================================================
+# Perfect for: Proxmox Docker containers, any Docker host
+#
+# QUICK START:
+#   1. Download: wget https://raw.githubusercontent.com/agencefanfare/newslettar/main/docker-compose.simple.yml
+#   2. Edit this file: nano docker-compose.simple.yml (edit environment variables below)
+#   3. Run: docker-compose -f docker-compose.simple.yml up -d
+#   4. Access: http://localhost:8080
+#
+# No .env file needed - all configuration is inline below.
+
+version: '3.8'
+
+services:
+  newslettar:
+    # Option 1: Use pre-built image from Docker Hub (when available)
+    # image: agencefanfare/newslettar:latest
+
+    # Option 2: Build from GitHub repository directly
+    build:
+      context: https://github.com/agencefanfare/newslettar.git
+      dockerfile: Dockerfile
+
+    container_name: newslettar
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      # === REQUIRED: Sonarr Configuration ===
+      SONARR_URL: "http://192.168.1.100:8989"
+      SONARR_API_KEY: "your-sonarr-api-key-here"
+
+      # === REQUIRED: Radarr Configuration ===
+      RADARR_URL: "http://192.168.1.100:7878"
+      RADARR_API_KEY: "your-radarr-api-key-here"
+
+      # === REQUIRED: Email Configuration ===
+      # For Gmail: smtp.gmail.com:587 (use App Password, not regular password)
+      # For Mailgun: smtp.mailgun.org:587
+      # For SendGrid: smtp.sendgrid.net:587
+      SMTP_HOST: "smtp.gmail.com"
+      SMTP_PORT: "587"
+      SMTP_USER: "your-email@gmail.com"
+      SMTP_PASS: "your-app-password-here"
+      FROM_EMAIL: "newsletter@yourdomain.com"
+      FROM_NAME: "Media Newsletter"
+      TO_EMAILS: "family@example.com,friends@example.com"
+
+      # === OPTIONAL: Schedule Configuration ===
+      TIMEZONE: "America/New_York"
+      SCHEDULE_DAY: "Sun"
+      SCHEDULE_TIME: "09:00"
+
+      # === OPTIONAL: Trakt.tv Integration ===
+      # Get your Client ID from https://trakt.tv/oauth/applications
+      # TRAKT_CLIENT_ID: "your-trakt-client-id-here"
+
+      # === OPTIONAL: Newsletter Display Options ===
+      SHOW_POSTERS: "true"
+      SHOW_DOWNLOADED: "true"
+      SHOW_SERIES_OVERVIEW: "true"
+      SHOW_EPISODE_OVERVIEW: "false"
+      DARK_MODE: "false"
+
+      # === OPTIONAL: Trakt Trending Content ===
+      # SHOW_TRAKT_ANTICIPATED_SERIES: "true"
+      # SHOW_TRAKT_WATCHED_SERIES: "true"
+      # SHOW_TRAKT_ANTICIPATED_MOVIES: "true"
+      # SHOW_TRAKT_WATCHED_MOVIES: "true"
+      # TRAKT_ANTICIPATED_SERIES_LIMIT: "5"
+      # TRAKT_WATCHED_SERIES_LIMIT: "5"
+
+      # === OPTIONAL: Web UI Port ===
+      WEBUI_PORT: "8080"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+    networks:
+      - newslettar-net
+
+networks:
+  newslettar-net:
+    driver: bridge
+
+# ==============================================================================
+# IMPORTANT NOTES FOR DOCKER NETWORKING:
+# ==============================================================================
+# When Newslettar runs in Docker and needs to access Sonarr/Radarr on the host:
+#
+# Linux:    Use host IP (usually 192.168.x.x or your LAN IP)
+#           Example: SONARR_URL: "http://192.168.1.100:8989"
+#
+# Mac:      Use: host.docker.internal
+#           Example: SONARR_URL: "http://host.docker.internal:8989"
+#
+# Windows:  Use: host.docker.internal
+#           Example: SONARR_URL: "http://host.docker.internal:8989"
+#
+# Same Docker Network: Use container name
+#           Example: SONARR_URL: "http://sonarr:8989"
+# ==============================================================================
+
+# ==============================================================================
+# QUICK START GUIDE:
+# ==============================================================================
+# 1. Download this file:
+#    wget https://raw.githubusercontent.com/agencefanfare/newslettar/main/docker-compose.simple.yml
+#
+# 2. Edit the environment variables above with your settings
+#
+# 3. Start the container:
+#    docker-compose -f docker-compose.simple.yml up -d
+#
+# 4. Access the web UI:
+#    http://localhost:8080
+#
+# 5. View logs:
+#    docker-compose -f docker-compose.simple.yml logs -f
+#
+# 6. Stop/restart:
+#    docker-compose -f docker-compose.simple.yml stop
+#    docker-compose -f docker-compose.simple.yml restart
+# ==============================================================================

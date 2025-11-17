@@ -10,14 +10,25 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      # Mount .env file for configuration
+      # Mount .env file for configuration (create data/.env first)
       - ./data/.env:/opt/newslettar/.env
       # Optional: persist logs
       - ./data/logs:/opt/newslettar/logs
     environment:
-      # Override these via .env file or here
-      - TIMEZONE=UTC
-      - WEBUI_PORT=8080
+      # Environment variables can be set here to override .env file
+      # Uncomment and configure as needed:
+      # SONARR_URL: "http://192.168.1.100:8989"
+      # SONARR_API_KEY: "your-api-key"
+      # RADARR_URL: "http://192.168.1.100:7878"
+      # RADARR_API_KEY: "your-api-key"
+      # SMTP_HOST: "smtp.gmail.com"
+      # SMTP_PORT: "587"
+      # SMTP_USER: "your-email@gmail.com"
+      # SMTP_PASS: "your-password"
+      # FROM_EMAIL: "newsletter@yourdomain.com"
+      # TO_EMAILS: "user@example.com"
+      TIMEZONE: "UTC"
+      WEBUI_PORT: "8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -30,3 +41,18 @@ services:
 networks:
   newslettar-net:
     driver: bridge
+
+# ==============================================================================
+# USAGE:
+# ==============================================================================
+# 1. Create configuration:
+#    mkdir -p data && cp .env.example data/.env && nano data/.env
+#
+# 2. Start:
+#    docker-compose up -d
+#
+# 3. View logs:
+#    docker-compose logs -f
+#
+# For simpler setup without .env file, see: docker-compose.simple.yml
+# ==============================================================================

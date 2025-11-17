@@ -1,0 +1,136 @@
+name: Build and Release Binaries
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v1.2.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build binaries for ${{ matrix.os }}-${{ matrix.arch }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+            goarch: amd64
+          - os: linux
+            arch: arm64
+            goarch: arm64
+          - os: linux
+            arch: armv6
+            goarch: arm
+            goarm: '6'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build binary
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.goarch }}
+          GOARM: ${{ matrix.goarm }}
+        run: |
+          # Build with optimizations
+          go build -v \
+            -ldflags="-s -w -X main.Version=${{ steps.version.outputs.VERSION }}" \
+            -trimpath \
+            -o newslettar \
+            ./cmd/newslettar
+
+          # Verify binary was created
+          ls -lh newslettar
+          file newslettar
+
+      - name: Create archive
+        run: |
+          ARCHIVE_NAME="newslettar_${{ steps.version.outputs.VERSION }}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz"
+          tar -czf "${ARCHIVE_NAME}" newslettar
+
+          # Generate checksums
+          sha256sum "${ARCHIVE_NAME}" > "${ARCHIVE_NAME}.sha256"
+
+          echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> $GITHUB_ENV
+          ls -lh "${ARCHIVE_NAME}"
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ${{ env.ARCHIVE_NAME }}
+            ${{ env.ARCHIVE_NAME }}.sha256
+          tag_name: ${{ steps.version.outputs.VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-deb:
+    name: Build Debian package
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev
+
+      - name: Build Debian package
+        run: |
+          if [ -f scripts/build-deb.sh ]; then
+            chmod +x scripts/build-deb.sh
+            bash scripts/build-deb.sh
+          else
+            echo "Debian build script not found, skipping"
+            exit 0
+          fi
+
+      - name: Upload Debian package to release
+        if: success()
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.deb
+          tag_name: ${{ steps.version.outputs.VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
