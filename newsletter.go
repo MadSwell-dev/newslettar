@@ -230,6 +230,35 @@ func runNewsletter() {
 		TraktWatchedSeries:     traktWatchedSeries,
 		TraktAnticipatedMovies: traktAnticipatedMovies,
 		TraktWatchedMovies:     traktWatchedMovies,
+		// Customizable strings
+		EmailTitle:                cfg.EmailTitle,
+		EmailIntro:                cfg.EmailIntro,
+		WeekRangePrefix:           cfg.WeekRangePrefix,
+		ComingThisWeekHeading:     cfg.ComingThisWeekHeading,
+		TVShowsHeading:            cfg.TVShowsHeading,
+		MoviesHeading:             cfg.MoviesHeading,
+		NoShowsMessage:            cfg.NoShowsMessage,
+		NoMoviesMessage:           cfg.NoMoviesMessage,
+		DownloadedSectionHeading:  cfg.DownloadedSectionHeading,
+		NoDownloadedShowsMessage:  cfg.NoDownloadedShowsMessage,
+		NoDownloadedMoviesMessage: cfg.NoDownloadedMoviesMessage,
+		TrendingSectionHeading:    cfg.TrendingSectionHeading,
+		AnticipatedSeriesHeading:  cfg.AnticipatedSeriesHeading,
+		WatchedSeriesHeading:      cfg.WatchedSeriesHeading,
+		AnticipatedMoviesHeading:  cfg.AnticipatedMoviesHeading,
+		WatchedMoviesHeading:      cfg.WatchedMoviesHeading,
+		FooterText:                cfg.FooterText,
+		// Display options
+		ShowPosters:                cfg.ShowPosters,
+		ShowDownloaded:             cfg.ShowDownloaded,
+		ShowSeriesOverview:         cfg.ShowSeriesOverview,
+		ShowEpisodeOverview:        cfg.ShowEpisodeOverview,
+		ShowSeriesRatings:          cfg.ShowSeriesRatings,
+		DarkMode:                   cfg.DarkMode,
+		ShowTraktAnticipatedSeries: cfg.ShowTraktAnticipatedSeries,
+		ShowTraktWatchedSeries:     cfg.ShowTraktWatchedSeries,
+		ShowTraktAnticipatedMovies: cfg.ShowTraktAnticipatedMovies,
+		ShowTraktWatchedMovies:     cfg.ShowTraktWatchedMovies,
 	}
 
 	log.Println("📝 Generating newsletter HTML...")
@@ -269,34 +298,8 @@ func runNewsletter() {
 
 // Generate newsletter HTML using precompiled template
 func generateNewsletterHTML(data NewsletterData, cfg *Config) (string, error) {
-	templateData := struct {
-		NewsletterData
-		ShowPosters                bool
-		ShowDownloaded             bool
-		ShowSeriesOverview         bool
-		ShowEpisodeOverview        bool
-		ShowSeriesRatings          bool
-		DarkMode                   bool
-		ShowTraktAnticipatedSeries bool
-		ShowTraktWatchedSeries     bool
-		ShowTraktAnticipatedMovies bool
-		ShowTraktWatchedMovies     bool
-	}{
-		NewsletterData:             data,
-		ShowPosters:                cfg.ShowPosters,
-		ShowDownloaded:             cfg.ShowDownloaded,
-		ShowSeriesOverview:         cfg.ShowSeriesOverview,
-		ShowEpisodeOverview:        cfg.ShowEpisodeOverview,
-		ShowSeriesRatings:          cfg.ShowSeriesRatings,
-		DarkMode:                   cfg.DarkMode,
-		ShowTraktAnticipatedSeries: cfg.ShowTraktAnticipatedSeries,
-		ShowTraktWatchedSeries:     cfg.ShowTraktWatchedSeries,
-		ShowTraktAnticipatedMovies: cfg.ShowTraktAnticipatedMovies,
-		ShowTraktWatchedMovies:     cfg.ShowTraktWatchedMovies,
-	}
-
 	var buf bytes.Buffer
-	if err := emailTemplate.Execute(&buf, templateData); err != nil {
+	if err := emailTemplate.Execute(&buf, data); err != nil {
 		return "", err
 	}
 

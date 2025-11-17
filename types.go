@@ -91,6 +91,24 @@ type Config struct {
 	EmailBatchSize  int    // Number of recipients per batch
 	EmailBatchDelay int    // Delay between batches in seconds
 	LogLevel        string // debug, info, warn, error
+	// Customizable email strings
+	EmailTitle                string
+	EmailIntro                string
+	WeekRangePrefix           string
+	ComingThisWeekHeading     string
+	TVShowsHeading            string
+	MoviesHeading             string
+	NoShowsMessage            string
+	NoMoviesMessage           string
+	DownloadedSectionHeading  string
+	NoDownloadedShowsMessage  string
+	NoDownloadedMoviesMessage string
+	TrendingSectionHeading    string
+	AnticipatedSeriesHeading  string
+	WatchedSeriesHeading      string
+	AnticipatedMoviesHeading  string
+	WatchedMoviesHeading      string
+	FooterText                string
 }
 
 // Minimal structs - only fields we actually need (reduces memory & JSON parsing time)
@@ -215,6 +233,35 @@ type NewsletterData struct {
 	TraktWatchedSeries     []TraktShow
 	TraktAnticipatedMovies []TraktMovie
 	TraktWatchedMovies     []TraktMovie
+	// Customizable strings
+	EmailTitle                string
+	EmailIntro                string
+	WeekRangePrefix           string
+	ComingThisWeekHeading     string
+	TVShowsHeading            string
+	MoviesHeading             string
+	NoShowsMessage            string
+	NoMoviesMessage           string
+	DownloadedSectionHeading  string
+	NoDownloadedShowsMessage  string
+	NoDownloadedMoviesMessage string
+	TrendingSectionHeading    string
+	AnticipatedSeriesHeading  string
+	WatchedSeriesHeading      string
+	AnticipatedMoviesHeading  string
+	WatchedMoviesHeading      string
+	FooterText                string
+	// Template display options (needed for template rendering)
+	ShowPosters                bool
+	ShowDownloaded             bool
+	ShowSeriesOverview         bool
+	ShowEpisodeOverview        bool
+	ShowSeriesRatings          bool
+	DarkMode                   bool
+	ShowTraktAnticipatedSeries bool
+	ShowTraktWatchedSeries     bool
+	ShowTraktAnticipatedMovies bool
+	ShowTraktWatchedMovies     bool
 }
 
 type WebConfig struct {
@@ -248,6 +295,24 @@ type WebConfig struct {
 	TraktWatchedSeriesLimit     string `json:"trakt_watched_series_limit"`
 	TraktAnticipatedMoviesLimit string `json:"trakt_anticipated_movies_limit"`
 	TraktWatchedMoviesLimit     string `json:"trakt_watched_movies_limit"`
+	// Customizable email strings
+	EmailTitle                string `json:"email_title"`
+	EmailIntro                string `json:"email_intro"`
+	WeekRangePrefix           string `json:"week_range_prefix"`
+	ComingThisWeekHeading     string `json:"coming_this_week_heading"`
+	TVShowsHeading            string `json:"tv_shows_heading"`
+	MoviesHeading             string `json:"movies_heading"`
+	NoShowsMessage            string `json:"no_shows_message"`
+	NoMoviesMessage           string `json:"no_movies_message"`
+	DownloadedSectionHeading  string `json:"downloaded_section_heading"`
+	NoDownloadedShowsMessage  string `json:"no_downloaded_shows_message"`
+	NoDownloadedMoviesMessage string `json:"no_downloaded_movies_message"`
+	TrendingSectionHeading    string `json:"trending_section_heading"`
+	AnticipatedSeriesHeading  string `json:"anticipated_series_heading"`
+	WatchedSeriesHeading      string `json:"watched_series_heading"`
+	AnticipatedMoviesHeading  string `json:"anticipated_movies_heading"`
+	WatchedMoviesHeading      string `json:"watched_movies_heading"`
+	FooterText                string `json:"footer_text"`
 }
 
 // Statistics for dashboard

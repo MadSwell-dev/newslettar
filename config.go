@@ -101,6 +101,24 @@ func loadConfig() *Config {
 		EmailBatchSize:  getEnvIntFromFile(envMap, "EMAIL_BATCH_SIZE", DefaultEmailBatchSize),
 		EmailBatchDelay: getEnvIntFromFile(envMap, "EMAIL_BATCH_DELAY", int(DefaultEmailBatchDelay/time.Second)),
 		LogLevel:        getEnvFromFile(envMap, "LOG_LEVEL", DefaultLogLevel),
+		// Customizable email strings
+		EmailTitle:                getEnvFromFile(envMap, "EMAIL_TITLE", DefaultEmailTitle),
+		EmailIntro:                getEnvFromFile(envMap, "EMAIL_INTRO", DefaultEmailIntro),
+		WeekRangePrefix:           getEnvFromFile(envMap, "WEEK_RANGE_PREFIX", DefaultWeekRangePrefix),
+		ComingThisWeekHeading:     getEnvFromFile(envMap, "COMING_THIS_WEEK_HEADING", DefaultComingThisWeekHeading),
+		TVShowsHeading:            getEnvFromFile(envMap, "TV_SHOWS_HEADING", DefaultTVShowsHeading),
+		MoviesHeading:             getEnvFromFile(envMap, "MOVIES_HEADING", DefaultMoviesHeading),
+		NoShowsMessage:            getEnvFromFile(envMap, "NO_SHOWS_MESSAGE", DefaultNoShowsMessage),
+		NoMoviesMessage:           getEnvFromFile(envMap, "NO_MOVIES_MESSAGE", DefaultNoMoviesMessage),
+		DownloadedSectionHeading:  getEnvFromFile(envMap, "DOWNLOADED_SECTION_HEADING", DefaultDownloadedSectionHeading),
+		NoDownloadedShowsMessage:  getEnvFromFile(envMap, "NO_DOWNLOADED_SHOWS_MESSAGE", DefaultNoDownloadedShowsMessage),
+		NoDownloadedMoviesMessage: getEnvFromFile(envMap, "NO_DOWNLOADED_MOVIES_MESSAGE", DefaultNoDownloadedMoviesMessage),
+		TrendingSectionHeading:    getEnvFromFile(envMap, "TRENDING_SECTION_HEADING", DefaultTrendingSectionHeading),
+		AnticipatedSeriesHeading:  getEnvFromFile(envMap, "ANTICIPATED_SERIES_HEADING", DefaultAnticipatedSeriesHeading),
+		WatchedSeriesHeading:      getEnvFromFile(envMap, "WATCHED_SERIES_HEADING", DefaultWatchedSeriesHeading),
+		AnticipatedMoviesHeading:  getEnvFromFile(envMap, "ANTICIPATED_MOVIES_HEADING", DefaultAnticipatedMoviesHeading),
+		WatchedMoviesHeading:      getEnvFromFile(envMap, "WATCHED_MOVIES_HEADING", DefaultWatchedMoviesHeading),
+		FooterText:                getEnvFromFile(envMap, "FOOTER_TEXT", DefaultFooterText),
 	}
 }
 
