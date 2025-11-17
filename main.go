@@ -53,6 +53,10 @@ func main() {
 		log.Printf("⚠️  Could not load statistics: %v (starting fresh)", err)
 	}
 
+	// Start periodic cache cleanup to prevent unbounded memory growth
+	// Clean up expired entries every 10 minutes (cache TTL is 5 minutes)
+	apiCache.StartPeriodicCleanup(10 * time.Minute)
+
 	// Validate configuration and display warnings
 	warnings := validateConfig(cachedConfig)
 	if len(warnings) > 0 {
