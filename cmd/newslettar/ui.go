@@ -359,6 +359,84 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         .info-banner strong {
             color: #e8e8e8;
         }
+
+        /* Email tags */
+        .email-tags-container {
+            width: 100%;
+            min-height: 46px;
+            padding: 8px;
+            background: #0f1419;
+            border: 2px solid #2a3444;
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            cursor: text;
+            transition: border-color 0.3s;
+        }
+        .email-tags-container:focus-within {
+            border-color: #667eea;
+        }
+        .email-tags-container.error {
+            border-color: #eb3349;
+        }
+        .email-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            animation: tagSlideIn 0.2s ease-out;
+        }
+        .email-tag-remove {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            width: 18px;
+            height: 18px;
+            line-height: 1;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+        .email-tag-remove:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .email-tag-input {
+            flex: 1;
+            min-width: 200px;
+            border: none;
+            background: transparent;
+            color: #e8e8e8;
+            font-size: 14px;
+            outline: none;
+            padding: 6px 0;
+        }
+        .email-tag-input::placeholder {
+            color: #8899aa;
+        }
+        @keyframes tagSlideIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .email-section {
+            background: #252f3f;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .email-section h3 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
         
         /* Preview Modal */
         .modal {
@@ -676,6 +754,20 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
 
                 <h3 style="margin-bottom: 15px; color: #667eea;">Email Settings</h3>
+
+                <div class="email-section">
+                    <h3>📧 Email Recipients</h3>
+                    <p style="color: #8899aa; font-size: 0.9em; margin-bottom: 15px;">Add email addresses to receive the newsletter. Type an email and press comma or Enter to add it.</p>
+                    <div class="form-group">
+                        <label for="email-tag-input">Recipient Email Addresses</label>
+                        <div id="email-tags-container" class="email-tags-container" onclick="document.getElementById('email-tag-input').focus()">
+                            <input type="text" id="email-tag-input" class="email-tag-input" placeholder="Add email address..." aria-label="Add recipient email">
+                        </div>
+                        <input type="hidden" name="to_emails" id="to_emails">
+                        <div class="error-message" id="to-emails-error">Please enter a valid email address</div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="smtp_host">SMTP Server</label>
                     <input type="text" name="smtp_host" id="smtp_host" placeholder="smtp.mailgun.org" aria-label="SMTP Server">
@@ -700,11 +792,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                     <label for="from_email">From Email</label>
                     <input type="email" name="from_email" id="from_email" placeholder="newsletter@yourdomain.com" aria-label="From Email">
                     <div class="error-message" id="from-email-error">Please enter a valid email address</div>
-                </div>
-                <div class="form-group">
-                    <label for="to_emails">To Emails (comma-separated)</label>
-                    <input type="text" name="to_emails" id="to_emails" placeholder="user@example.com, user2@example.com" aria-label="To Emails">
-                    <div class="error-message" id="to-emails-error">Please enter valid email addresses</div>
                 </div>
                 <button type="button" class="btn btn-secondary" onclick="testConnection('email')" aria-label="Test email authentication">
                     <span>Test Email Auth</span>
@@ -1107,10 +1194,23 @@ func getUIHTML(version string, nextRun string, timezone string) string {
     </div>
 
     <script>
-        // Keyboard navigation
+        // Keyboard navigation and click-outside-to-close
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closePreview();
+                closeEditStringsModal();
+            }
+        });
+
+        // Click outside modal to close
+        document.getElementById('preview-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'preview-modal') {
+                closePreview();
+            }
+        });
+
+        document.getElementById('edit-strings-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'edit-strings-modal') {
                 closeEditStringsModal();
             }
         });
@@ -1212,11 +1312,84 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             }
         }
 
+        // Email tag management
+        let emailTags = [];
+
+        function addEmailTag(email) {
+            if (!email) return;
+
+            // Validate email
+            if (!validateEmail(email)) {
+                document.getElementById('to-emails-error').classList.add('show');
+                document.getElementById('email-tags-container').classList.add('error');
+                setTimeout(() => {
+                    document.getElementById('to-emails-error').classList.remove('show');
+                    document.getElementById('email-tags-container').classList.remove('error');
+                }, 3000);
+                return;
+            }
+
+            // Check for duplicates
+            if (emailTags.includes(email)) {
+                return;
+            }
+
+            // Add to array
+            emailTags.push(email);
+
+            // Create tag element
+            const tag = document.createElement('div');
+            tag.className = 'email-tag';
+            tag.dataset.email = email;
+            tag.innerHTML = '<span>' + email + '</span>' +
+                '<button type="button" class="email-tag-remove" onclick="removeEmailTag(\'' + email + '\')" aria-label="Remove ' + email + '">&times;</button>';
+
+            // Insert before input
+            const input = document.getElementById('email-tag-input');
+            input.parentElement.insertBefore(tag, input);
+
+            // Update hidden field
+            updateEmailsField();
+        }
+
+        function removeEmailTag(email) {
+            // Remove from array
+            emailTags = emailTags.filter(e => e !== email);
+
+            // Remove element
+            const tags = document.querySelectorAll('.email-tag');
+            tags.forEach(tag => {
+                if (tag.dataset.email === email) {
+                    tag.remove();
+                }
+            });
+
+            // Update hidden field
+            updateEmailsField();
+        }
+
+        function updateEmailsField() {
+            document.getElementById('to_emails').value = emailTags.join(', ');
+        }
+
+        function loadEmailTags(emailsString) {
+            // Clear existing tags
+            emailTags = [];
+            const existingTags = document.querySelectorAll('.email-tag');
+            existingTags.forEach(tag => tag.remove());
+
+            // Add tags from string
+            if (emailsString) {
+                const emails = emailsString.split(',').map(e => e.trim()).filter(e => e);
+                emails.forEach(email => addEmailTag(email));
+            }
+        }
+
         // Real-time validation
         function validateURL(input) {
             const value = input.value.trim();
             if (!value) return true;
-            
+
             try {
                 new URL(value);
                 return true;
@@ -1232,7 +1405,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         function validateEmails(input) {
             const value = input.value.trim();
             if (!value) return true;
-            
+
             const emails = value.split(',').map(e => e.trim());
             return emails.every(email => validateEmail(email));
         }
@@ -1280,15 +1453,29 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 }
             });
 
-            toEmails.addEventListener('blur', function() {
-                if (this.value && !validateEmails(this)) {
-                    this.classList.add('error');
-                    this.classList.remove('success');
-                    document.getElementById('to-emails-error').classList.add('show');
-                } else if (this.value) {
-                    this.classList.remove('error');
-                    this.classList.add('success');
-                    document.getElementById('to-emails-error').classList.remove('show');
+            // Email tags functionality
+            const emailTagInput = document.getElementById('email-tag-input');
+            const emailTagsContainer = document.getElementById('email-tags-container');
+
+            emailTagInput.addEventListener('keydown', (e) => {
+                if (e.key === ',' || e.key === 'Enter') {
+                    e.preventDefault();
+                    addEmailTag(emailTagInput.value.trim());
+                    emailTagInput.value = '';
+                } else if (e.key === 'Backspace' && emailTagInput.value === '') {
+                    // Remove last tag if backspace is pressed on empty input
+                    const tags = emailTagsContainer.querySelectorAll('.email-tag');
+                    if (tags.length > 0) {
+                        removeEmailTag(tags[tags.length - 1].dataset.email);
+                    }
+                }
+            });
+
+            emailTagInput.addEventListener('blur', () => {
+                // Add email if there's text when input loses focus
+                if (emailTagInput.value.trim()) {
+                    addEmailTag(emailTagInput.value.trim());
+                    emailTagInput.value = '';
                 }
             });
 
@@ -1354,6 +1541,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 document.querySelector('[name="from_email"]').value = data.from_email || '';
                 document.querySelector('[name="from_name"]').value = data.from_name || 'Newslettar';
                 document.querySelector('[name="to_emails"]').value = data.to_emails || '';
+                loadEmailTags(data.to_emails || '');
                 document.querySelector('[name="timezone"]').value = data.timezone || 'UTC';
                 document.querySelector('[name="schedule_day"]').value = data.schedule_day || 'Sun';
                 document.querySelector('[name="schedule_time"]').value = data.schedule_time || '09:00';
@@ -1655,14 +1843,21 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         }
 
         async function sendNow() {
+            // Check if there are any recipient emails configured
+            const toEmailsValue = document.getElementById('to_emails').value.trim();
+            if (emailTags.length === 0 && !toEmailsValue) {
+                showNotification('Cannot send newsletter: No recipient email addresses configured. Please add at least one email address in the Configuration tab.', 'error');
+                return;
+            }
+
             if (!confirm('Send newsletter now?')) return;
-            
+
             const button = event.target.closest('button');
             button.classList.add('loading');
             button.disabled = true;
-            
+
             showNotification('Sending newsletter...', 'success');
-            
+
             try {
                 const resp = await fetch('/api/send', { method: 'POST' });
                 const data = await resp.json();
