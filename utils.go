@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -243,4 +244,63 @@ func isNewerVersion(remote, current string) bool {
 	}
 
 	return false
+}
+
+// Load statistics from disk (persistent across restarts)
+func loadStats() error {
+	const statsFile = ".stats.json"
+
+	data, err := os.ReadFile(statsFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil // No stats file yet, that's fine
+		}
+		return err
+	}
+
+	stats.mu.Lock()
+	defer stats.mu.Unlock()
+
+	var savedStats struct {
+		TotalEmailsSent int    `json:"total_emails_sent"`
+		LastSentDate    string `json:"last_sent_date"`
+	}
+
+	if err := json.Unmarshal(data, &savedStats); err != nil {
+		return err
+	}
+
+	stats.TotalEmailsSent = savedStats.TotalEmailsSent
+	stats.LastSentDateStr = savedStats.LastSentDate
+
+	if savedStats.LastSentDate != "" {
+		if t, err := time.Parse(time.RFC3339, savedStats.LastSentDate); err == nil {
+			stats.LastSentDate = t
+		}
+	}
+
+	log.Printf("✓ Loaded statistics: %d emails sent, last sent: %s", stats.TotalEmailsSent, stats.LastSentDateStr)
+	return nil
+}
+
+// Save statistics to disk
+func saveStats() error {
+	const statsFile = ".stats.json"
+
+	stats.mu.RLock()
+	savedStats := struct {
+		TotalEmailsSent int    `json:"total_emails_sent"`
+		LastSentDate    string `json:"last_sent_date"`
+	}{
+		TotalEmailsSent: stats.TotalEmailsSent,
+		LastSentDate:    stats.LastSentDateStr,
+	}
+	stats.mu.RUnlock()
+
+	data, err := json.MarshalIndent(savedStats, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(statsFile, data, 0644)
 }

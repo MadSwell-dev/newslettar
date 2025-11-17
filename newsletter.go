@@ -252,6 +252,11 @@ func runNewsletter() {
 	stats.LastSentDateStr = now.Format("2006-01-02 15:04:05 MST")
 	stats.mu.Unlock()
 
+	// Persist statistics to disk
+	if err := saveStats(); err != nil {
+		log.Printf("⚠️  Failed to save statistics: %v", err)
+	}
+
 	log.Println("✅ Newsletter sent successfully!")
 
 	// Clear data to free memory immediately
@@ -412,7 +417,7 @@ func getNextScheduledRun(day, timeStr string, loc *time.Location) string {
 		}
 	}
 
-	return nextRun.Format("Monday, January 2, 2006 at 3:04 PM MST")
+	return nextRun.Format("Jan 2, 2006 3:04 PM MST")
 }
 
 // Monitorable is a constraint for types that have a Monitored field
