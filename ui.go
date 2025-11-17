@@ -911,8 +911,22 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
             <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
 
+            <h3 style="margin-bottom: 20px;">Customize Email Text</h3>
+
+            <div class="info-banner" style="margin-bottom: 20px;">
+                <p style="font-size: 0.9em;">
+                    ℹ️ Customize all static text in your newsletter, including headings, messages, and the footer. Perfect for translating your newsletter to other languages or personalizing the content.
+                </p>
+            </div>
+
+            <button class="btn" onclick="openEditStringsModal()" aria-label="Edit email strings">
+                <span>✏️ Edit Email Strings</span>
+            </button>
+
+            <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
+
             <h3 style="margin-bottom: 20px;">Actions</h3>
-            
+
             <div class="action-buttons">
                 <button class="btn btn-secondary" onclick="previewNewsletter()" aria-label="Preview newsletter">
                     <span>👁️ Preview Newsletter</span>
@@ -921,7 +935,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                     <span>📧 Send Newsletter Now</span>
                 </button>
             </div>
-            
+
             <p style="margin-top: 15px; color: #8899aa; font-size: 0.9em;">
                 Preview generates the email based on current settings without sending. Send Now will generate and send immediately.
             </p>
@@ -956,6 +970,135 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         </div>
     </div>
 
+    <!-- Edit Strings Modal -->
+    <div id="edit-strings-modal" class="modal" role="dialog" aria-labelledby="edit-strings-title" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="edit-strings-title">✏️ Edit Email Strings</h2>
+                <button class="modal-close" onclick="closeEditStringsModal()" aria-label="Close edit strings">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: calc(90vh - 140px); overflow-y: auto;">
+                <div style="margin-bottom: 20px; background: #252f3f; padding: 15px; border-radius: 8px; border-left: 3px solid #11998e;">
+                    <p style="color: #a0b0c0; font-size: 0.9em; margin: 0;">
+                        💡 <strong style="color: #e8e8e8;">Tip:</strong> Leave fields empty to hide that section from your emails. Perfect for customization and translation!
+                    </p>
+                </div>
+
+                <form id="edit-strings-form">
+                    <div class="form-group">
+                        <label for="email-title">Email Title</label>
+                        <input type="text" id="email-title" name="email_title" placeholder="e.g., 📺 Your Weekly Newslettar">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email-intro">Email Introduction (optional)</label>
+                        <textarea id="email-intro" name="email_intro" rows="3" style="width: 100%; padding: 12px; background: #0f1419; border: 2px solid #2a3444; border-radius: 8px; color: #e8e8e8; font-size: 14px; font-family: inherit; resize: vertical;" placeholder="A brief introduction paragraph shown under the title (leave empty to hide)"></textarea>
+                        <small style="color: #8899aa; font-size: 0.85em; display: block; margin-top: 5px;">This paragraph appears below the email title. Leave empty if you don't want an introduction.</small>
+                    </div>
+
+                    <hr style="margin: 25px 0; border: none; border-top: 1px solid #2a3444;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">Section Headings</h4>
+
+                    <div class="form-group">
+                        <label for="week-range-prefix">Week Range Prefix</label>
+                        <input type="text" id="week-range-prefix" name="week_range_prefix" placeholder="e.g., Week of">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="coming-this-week-heading">Coming This Week Heading</label>
+                        <input type="text" id="coming-this-week-heading" name="coming_this_week_heading" placeholder="e.g., 📅 Coming This Week">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tv-shows-heading">TV Shows Heading</label>
+                        <input type="text" id="tv-shows-heading" name="tv_shows_heading" placeholder="e.g., TV Shows">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="movies-heading">Movies Heading</label>
+                        <input type="text" id="movies-heading" name="movies_heading" placeholder="e.g., Movies">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="downloaded-section-heading">Downloaded Section Heading</label>
+                        <input type="text" id="downloaded-section-heading" name="downloaded_section_heading" placeholder="e.g., 📥 Downloaded Last Week">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="trending-section-heading">Trending Section Heading</label>
+                        <input type="text" id="trending-section-heading" name="trending_section_heading" placeholder="e.g., 🔥 Trending">
+                    </div>
+
+                    <hr style="margin: 25px 0; border: none; border-top: 1px solid #2a3444;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">Empty State Messages</h4>
+
+                    <div class="form-group">
+                        <label for="no-shows-message">No Shows Message</label>
+                        <input type="text" id="no-shows-message" name="no_shows_message" placeholder="e.g., No shows scheduled for this week">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="no-movies-message">No Movies Message</label>
+                        <input type="text" id="no-movies-message" name="no_movies_message" placeholder="e.g., No movies scheduled for this week">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="no-downloaded-shows-message">No Downloaded Shows Message</label>
+                        <input type="text" id="no-downloaded-shows-message" name="no_downloaded_shows_message" placeholder="e.g., No shows downloaded this week">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="no-downloaded-movies-message">No Downloaded Movies Message</label>
+                        <input type="text" id="no-downloaded-movies-message" name="no_downloaded_movies_message" placeholder="e.g., No movies downloaded this week">
+                    </div>
+
+                    <hr style="margin: 25px 0; border: none; border-top: 1px solid #2a3444;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">Trakt Trending Headings</h4>
+
+                    <div class="form-group">
+                        <label for="anticipated-series-heading">Anticipated Series Heading</label>
+                        <input type="text" id="anticipated-series-heading" name="anticipated_series_heading" placeholder="e.g., Most Anticipated Series (Next Week)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="watched-series-heading">Watched Series Heading</label>
+                        <input type="text" id="watched-series-heading" name="watched_series_heading" placeholder="e.g., Most Watched Series (Last Week)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="anticipated-movies-heading">Anticipated Movies Heading</label>
+                        <input type="text" id="anticipated-movies-heading" name="anticipated_movies_heading" placeholder="e.g., Most Anticipated Movies (Next Week)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="watched-movies-heading">Watched Movies Heading</label>
+                        <input type="text" id="watched-movies-heading" name="watched_movies_heading" placeholder="e.g., Most Watched Movies (Last Week)">
+                    </div>
+
+                    <hr style="margin: 25px 0; border: none; border-top: 1px solid #2a3444;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">Footer</h4>
+
+                    <div class="form-group">
+                        <label for="footer-text">Footer Text</label>
+                        <input type="text" id="footer-text" name="footer_text" placeholder="e.g., Generated by Newslettar">
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 30px;">
+                        <button type="button" class="btn btn-success" onclick="saveEmailStrings()" style="flex: 1;" aria-label="Save email strings">
+                            <span>💾 Save Changes</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetEmailStrings()" style="flex: 1;" aria-label="Reset to defaults">
+                            <span>↩️ Reset to Defaults</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeEditStringsModal()" aria-label="Cancel">
+                            <span>✖️ Cancel</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite">
         <div class="loading-spinner"></div>
@@ -966,6 +1109,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closePreview();
+                closeEditStringsModal();
             }
         });
 
@@ -1360,6 +1504,137 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
         function closePreview() {
             document.getElementById('preview-modal').classList.remove('show');
+        }
+
+        // Edit Strings Modal Functions
+        async function openEditStringsModal() {
+            try {
+                // Fetch current config
+                const resp = await fetch('/api/config');
+                const config = await resp.json();
+
+                // Populate form fields
+                document.getElementById('email-title').value = config.email_title || '';
+                document.getElementById('email-intro').value = config.email_intro || '';
+                document.getElementById('week-range-prefix').value = config.week_range_prefix || '';
+                document.getElementById('coming-this-week-heading').value = config.coming_this_week_heading || '';
+                document.getElementById('tv-shows-heading').value = config.tv_shows_heading || '';
+                document.getElementById('movies-heading').value = config.movies_heading || '';
+                document.getElementById('no-shows-message').value = config.no_shows_message || '';
+                document.getElementById('no-movies-message').value = config.no_movies_message || '';
+                document.getElementById('downloaded-section-heading').value = config.downloaded_section_heading || '';
+                document.getElementById('no-downloaded-shows-message').value = config.no_downloaded_shows_message || '';
+                document.getElementById('no-downloaded-movies-message').value = config.no_downloaded_movies_message || '';
+                document.getElementById('trending-section-heading').value = config.trending_section_heading || '';
+                document.getElementById('anticipated-series-heading').value = config.anticipated_series_heading || '';
+                document.getElementById('watched-series-heading').value = config.watched_series_heading || '';
+                document.getElementById('anticipated-movies-heading').value = config.anticipated_movies_heading || '';
+                document.getElementById('watched-movies-heading').value = config.watched_movies_heading || '';
+                document.getElementById('footer-text').value = config.footer_text || '';
+
+                // Show modal
+                document.getElementById('edit-strings-modal').classList.add('show');
+            } catch (error) {
+                console.error('Failed to load config:', error);
+                showNotification('Failed to load current configuration', 'error');
+            }
+        }
+
+        function closeEditStringsModal() {
+            document.getElementById('edit-strings-modal').classList.remove('show');
+        }
+
+        async function saveEmailStrings() {
+            const button = event.target.closest('button');
+            button.classList.add('loading');
+            button.disabled = true;
+
+            try {
+                // Get current config first
+                const respGet = await fetch('/api/config');
+                const currentConfig = await respGet.json();
+
+                // Update with email string values
+                const updatedConfig = {
+                    ...currentConfig,
+                    email_title: document.getElementById('email-title').value,
+                    email_intro: document.getElementById('email-intro').value,
+                    week_range_prefix: document.getElementById('week-range-prefix').value,
+                    coming_this_week_heading: document.getElementById('coming-this-week-heading').value,
+                    tv_shows_heading: document.getElementById('tv-shows-heading').value,
+                    movies_heading: document.getElementById('movies-heading').value,
+                    no_shows_message: document.getElementById('no-shows-message').value,
+                    no_movies_message: document.getElementById('no-movies-message').value,
+                    downloaded_section_heading: document.getElementById('downloaded-section-heading').value,
+                    no_downloaded_shows_message: document.getElementById('no-downloaded-shows-message').value,
+                    no_downloaded_movies_message: document.getElementById('no-downloaded-movies-message').value,
+                    trending_section_heading: document.getElementById('trending-section-heading').value,
+                    anticipated_series_heading: document.getElementById('anticipated-series-heading').value,
+                    watched_series_heading: document.getElementById('watched-series-heading').value,
+                    anticipated_movies_heading: document.getElementById('anticipated-movies-heading').value,
+                    watched_movies_heading: document.getElementById('watched-movies-heading').value,
+                    footer_text: document.getElementById('footer-text').value
+                };
+
+                // Save to backend
+                const respPost = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedConfig)
+                });
+
+                if (respPost.ok) {
+                    showNotification('Email strings saved successfully!', 'success');
+                    closeEditStringsModal();
+                } else {
+                    throw new Error('Failed to save configuration');
+                }
+            } catch (error) {
+                console.error('Error saving email strings:', error);
+                showNotification('Failed to save email strings', 'error');
+            } finally {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+
+        async function resetEmailStrings() {
+            if (!confirm('Reset all email strings to default values? This will overwrite your current customizations.')) {
+                return;
+            }
+
+            const button = event.target.closest('button');
+            button.classList.add('loading');
+            button.disabled = true;
+
+            try {
+                // Set default values (from constants.go)
+                document.getElementById('email-title').value = '📺 Your Weekly Newslettar';
+                document.getElementById('email-intro').value = '';
+                document.getElementById('week-range-prefix').value = 'Week of';
+                document.getElementById('coming-this-week-heading').value = '📅 Coming This Week';
+                document.getElementById('tv-shows-heading').value = 'TV Shows';
+                document.getElementById('movies-heading').value = 'Movies';
+                document.getElementById('no-shows-message').value = 'No shows scheduled for this week';
+                document.getElementById('no-movies-message').value = 'No movies scheduled for this week';
+                document.getElementById('downloaded-section-heading').value = '📥 Downloaded Last Week';
+                document.getElementById('no-downloaded-shows-message').value = 'No shows downloaded this week';
+                document.getElementById('no-downloaded-movies-message').value = 'No movies downloaded this week';
+                document.getElementById('trending-section-heading').value = '🔥 Trending';
+                document.getElementById('anticipated-series-heading').value = 'Most Anticipated Series (Next Week)';
+                document.getElementById('watched-series-heading').value = 'Most Watched Series (Last Week)';
+                document.getElementById('anticipated-movies-heading').value = 'Most Anticipated Movies (Next Week)';
+                document.getElementById('watched-movies-heading').value = 'Most Watched Movies (Last Week)';
+                document.getElementById('footer-text').value = 'Generated by Newslettar';
+
+                showNotification('Reset to default values. Click "Save Changes" to apply.', 'success');
+            } catch (error) {
+                console.error('Error resetting email strings:', error);
+                showNotification('Failed to reset email strings', 'error');
+            } finally {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
         }
 
         async function sendNow() {

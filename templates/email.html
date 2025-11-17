@@ -95,13 +95,16 @@
 <body>
     <div class="container">
         <div class="email-header">
-            <h1>📺 Your Weekly Newslettar</h1>
+            <h1>{{.EmailTitle}}</h1>
+            {{if .EmailIntro}}
+            <p class="email-header-subtitle">{{.EmailIntro}}</p>
+            {{end}}
         </div>
-        <div class="date-range">Week of {{.WeekStart}} - {{.WeekEnd}}</div>
+        <div class="date-range">{{.WeekRangePrefix}} {{.WeekStart}} - {{.WeekEnd}}</div>
 
         <div class="section">
-            <h2>📅 Coming This Week</h2>
-            <h3>TV Shows <span class="count-badge">{{len .UpcomingSeriesGroups}}</span></h3>
+            <h2>{{.ComingThisWeekHeading}}</h2>
+            <h3>{{.TVShowsHeading}} <span class="count-badge">{{len .UpcomingSeriesGroups}}</span></h3>
             {{if .UpcomingSeriesGroups}}
                 {{range .UpcomingSeriesGroups}}
                 <div class="series-group">
@@ -146,10 +149,10 @@
                 </div>
                 {{end}}
             {{else}}
-                <div class="empty">No shows scheduled for this week</div>
+                <div class="empty">{{.NoShowsMessage}}</div>
             {{end}}
 
-            <h3>Movies <span class="count-badge">{{len .UpcomingMovies}}</span></h3>
+            <h3>{{.MoviesHeading}} <span class="count-badge">{{len .UpcomingMovies}}</span></h3>
             {{if .UpcomingMovies}}
                 {{range .UpcomingMovies}}
                 <div class="movie-item">
@@ -179,14 +182,14 @@
                 </div>
                 {{end}}
             {{else}}
-                <div class="empty">No movies scheduled for this week</div>
+                <div class="empty">{{.NoMoviesMessage}}</div>
             {{end}}
         </div>
 
         {{if .ShowDownloaded}}
         <div class="section downloaded-section">
-            <h2>📥 Downloaded Last Week</h2>
-            <h3>TV Shows <span class="count-badge">{{len .DownloadedSeriesGroups}}</span></h3>
+            <h2>{{.DownloadedSectionHeading}}</h2>
+            <h3>{{.TVShowsHeading}} <span class="count-badge">{{len .DownloadedSeriesGroups}}</span></h3>
             {{if .DownloadedSeriesGroups}}
                 {{range .DownloadedSeriesGroups}}
                 <div class="series-group">
@@ -230,10 +233,10 @@
                 </div>
                 {{end}}
             {{else}}
-                <div class="empty">No shows downloaded this week</div>
+                <div class="empty">{{.NoDownloadedShowsMessage}}</div>
             {{end}}
 
-            <h3>Movies <span class="count-badge">{{len .DownloadedMovies}}</span></h3>
+            <h3>{{.MoviesHeading}} <span class="count-badge">{{len .DownloadedMovies}}</span></h3>
             {{if .DownloadedMovies}}
                 {{range .DownloadedMovies}}
                 <div class="movie-item">
@@ -262,17 +265,17 @@
                 </div>
                 {{end}}
             {{else}}
-                <div class="empty">No movies downloaded this week</div>
+                <div class="empty">{{.NoDownloadedMoviesMessage}}</div>
             {{end}}
         </div>
         {{end}}
 
         {{if or .TraktAnticipatedSeries .TraktWatchedSeries .TraktAnticipatedMovies .TraktWatchedMovies}}
         <div class="section trakt-section" style="font-size: 0.9em;">
-            <h2 style="font-size: 1.3em;">🔥 Trending</h2>
+            <h2 style="font-size: 1.3em;">{{.TrendingSectionHeading}}</h2>
 
             {{if .TraktAnticipatedSeries}}
-            <h3 style="font-size: 1.1em;">Most Anticipated Series (Next Week) <span class="count-badge">{{len .TraktAnticipatedSeries}}</span></h3>
+            <h3 style="font-size: 1.1em;">{{.AnticipatedSeriesHeading}} <span class="count-badge">{{len .TraktAnticipatedSeries}}</span></h3>
             {{range .TraktAnticipatedSeries}}
             <div class="trakt-item" style="margin-bottom: 14px;">
                 <div style="display: block; margin-bottom: 4px;">
@@ -286,7 +289,7 @@
             {{end}}
 
             {{if .TraktWatchedSeries}}
-            <h3 style="font-size: 1.1em;">Most Watched Series (Last Week) <span class="count-badge">{{len .TraktWatchedSeries}}</span></h3>
+            <h3 style="font-size: 1.1em;">{{.WatchedSeriesHeading}} <span class="count-badge">{{len .TraktWatchedSeries}}</span></h3>
             {{range .TraktWatchedSeries}}
             <div class="trakt-item" style="margin-bottom: 14px;">
                 <div style="display: block; margin-bottom: 4px;">
@@ -300,7 +303,7 @@
             {{end}}
 
             {{if .TraktAnticipatedMovies}}
-            <h3 style="font-size: 1.1em;">Most Anticipated Movies (Next Week) <span class="count-badge">{{len .TraktAnticipatedMovies}}</span></h3>
+            <h3 style="font-size: 1.1em;">{{.AnticipatedMoviesHeading}} <span class="count-badge">{{len .TraktAnticipatedMovies}}</span></h3>
             {{range .TraktAnticipatedMovies}}
             <div class="trakt-item" style="margin-bottom: 14px;">
                 <div style="display: block; margin-bottom: 4px;">
@@ -314,7 +317,7 @@
             {{end}}
 
             {{if .TraktWatchedMovies}}
-            <h3 style="font-size: 1.1em;">Most Watched Movies (Last Week) <span class="count-badge">{{len .TraktWatchedMovies}}</span></h3>
+            <h3 style="font-size: 1.1em;">{{.WatchedMoviesHeading}} <span class="count-badge">{{len .TraktWatchedMovies}}</span></h3>
             {{range .TraktWatchedMovies}}
             <div class="trakt-item" style="margin-bottom: 14px;">
                 <div style="display: block; margin-bottom: 4px;">
@@ -329,7 +332,7 @@
         </div>
         {{end}}
 
-        <div class="footer">Generated by Newslettar • {{.WeekEnd}}</div>
+        <div class="footer">{{.FooterText}} • {{.WeekEnd}}</div>
     </div>
 </body>
 </html>

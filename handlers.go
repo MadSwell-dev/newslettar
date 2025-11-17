@@ -279,6 +279,35 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 		TraktWatchedSeries:     traktWatchedSeries,
 		TraktAnticipatedMovies: traktAnticipatedMovies,
 		TraktWatchedMovies:     traktWatchedMovies,
+		// Customizable strings
+		EmailTitle:                cfg.EmailTitle,
+		EmailIntro:                cfg.EmailIntro,
+		WeekRangePrefix:           cfg.WeekRangePrefix,
+		ComingThisWeekHeading:     cfg.ComingThisWeekHeading,
+		TVShowsHeading:            cfg.TVShowsHeading,
+		MoviesHeading:             cfg.MoviesHeading,
+		NoShowsMessage:            cfg.NoShowsMessage,
+		NoMoviesMessage:           cfg.NoMoviesMessage,
+		DownloadedSectionHeading:  cfg.DownloadedSectionHeading,
+		NoDownloadedShowsMessage:  cfg.NoDownloadedShowsMessage,
+		NoDownloadedMoviesMessage: cfg.NoDownloadedMoviesMessage,
+		TrendingSectionHeading:    cfg.TrendingSectionHeading,
+		AnticipatedSeriesHeading:  cfg.AnticipatedSeriesHeading,
+		WatchedSeriesHeading:      cfg.WatchedSeriesHeading,
+		AnticipatedMoviesHeading:  cfg.AnticipatedMoviesHeading,
+		WatchedMoviesHeading:      cfg.WatchedMoviesHeading,
+		FooterText:                cfg.FooterText,
+		// Display options
+		ShowPosters:                cfg.ShowPosters,
+		ShowDownloaded:             cfg.ShowDownloaded,
+		ShowSeriesOverview:         cfg.ShowSeriesOverview,
+		ShowEpisodeOverview:        cfg.ShowEpisodeOverview,
+		ShowSeriesRatings:          cfg.ShowSeriesRatings,
+		DarkMode:                   cfg.DarkMode,
+		ShowTraktAnticipatedSeries: cfg.ShowTraktAnticipatedSeries,
+		ShowTraktWatchedSeries:     cfg.ShowTraktWatchedSeries,
+		ShowTraktAnticipatedMovies: cfg.ShowTraktAnticipatedMovies,
+		ShowTraktWatchedMovies:     cfg.ShowTraktWatchedMovies,
 	}
 
 	html, err := generateNewsletterHTML(data, cfg)
@@ -402,6 +431,25 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		if webCfg.TraktWatchedMoviesLimit != "" {
 			envMap["TRAKT_WATCHED_MOVIES_LIMIT"] = webCfg.TraktWatchedMoviesLimit
 		}
+		// Email string customization
+		// Allow empty strings for these fields (user can intentionally clear them)
+		envMap["EMAIL_TITLE"] = webCfg.EmailTitle
+		envMap["EMAIL_INTRO"] = webCfg.EmailIntro
+		envMap["WEEK_RANGE_PREFIX"] = webCfg.WeekRangePrefix
+		envMap["COMING_THIS_WEEK_HEADING"] = webCfg.ComingThisWeekHeading
+		envMap["TV_SHOWS_HEADING"] = webCfg.TVShowsHeading
+		envMap["MOVIES_HEADING"] = webCfg.MoviesHeading
+		envMap["NO_SHOWS_MESSAGE"] = webCfg.NoShowsMessage
+		envMap["NO_MOVIES_MESSAGE"] = webCfg.NoMoviesMessage
+		envMap["DOWNLOADED_SECTION_HEADING"] = webCfg.DownloadedSectionHeading
+		envMap["NO_DOWNLOADED_SHOWS_MESSAGE"] = webCfg.NoDownloadedShowsMessage
+		envMap["NO_DOWNLOADED_MOVIES_MESSAGE"] = webCfg.NoDownloadedMoviesMessage
+		envMap["TRENDING_SECTION_HEADING"] = webCfg.TrendingSectionHeading
+		envMap["ANTICIPATED_SERIES_HEADING"] = webCfg.AnticipatedSeriesHeading
+		envMap["WATCHED_SERIES_HEADING"] = webCfg.WatchedSeriesHeading
+		envMap["ANTICIPATED_MOVIES_HEADING"] = webCfg.AnticipatedMoviesHeading
+		envMap["WATCHED_MOVIES_HEADING"] = webCfg.WatchedMoviesHeading
+		envMap["FOOTER_TEXT"] = webCfg.FooterText
 
 		var envContent strings.Builder
 		for key, value := range envMap {
@@ -458,6 +506,24 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		"trakt_watched_series_limit":     getEnvFromFile(envMap, "TRAKT_WATCHED_SERIES_LIMIT", "5"),
 		"trakt_anticipated_movies_limit": getEnvFromFile(envMap, "TRAKT_ANTICIPATED_MOVIES_LIMIT", "5"),
 		"trakt_watched_movies_limit":     getEnvFromFile(envMap, "TRAKT_WATCHED_MOVIES_LIMIT", "5"),
+		// Email string customization
+		"email_title":                  getEnvFromFile(envMap, "EMAIL_TITLE", DefaultEmailTitle),
+		"email_intro":                  getEnvFromFile(envMap, "EMAIL_INTRO", DefaultEmailIntro),
+		"week_range_prefix":            getEnvFromFile(envMap, "WEEK_RANGE_PREFIX", DefaultWeekRangePrefix),
+		"coming_this_week_heading":     getEnvFromFile(envMap, "COMING_THIS_WEEK_HEADING", DefaultComingThisWeekHeading),
+		"tv_shows_heading":             getEnvFromFile(envMap, "TV_SHOWS_HEADING", DefaultTVShowsHeading),
+		"movies_heading":               getEnvFromFile(envMap, "MOVIES_HEADING", DefaultMoviesHeading),
+		"no_shows_message":             getEnvFromFile(envMap, "NO_SHOWS_MESSAGE", DefaultNoShowsMessage),
+		"no_movies_message":            getEnvFromFile(envMap, "NO_MOVIES_MESSAGE", DefaultNoMoviesMessage),
+		"downloaded_section_heading":   getEnvFromFile(envMap, "DOWNLOADED_SECTION_HEADING", DefaultDownloadedSectionHeading),
+		"no_downloaded_shows_message":  getEnvFromFile(envMap, "NO_DOWNLOADED_SHOWS_MESSAGE", DefaultNoDownloadedShowsMessage),
+		"no_downloaded_movies_message": getEnvFromFile(envMap, "NO_DOWNLOADED_MOVIES_MESSAGE", DefaultNoDownloadedMoviesMessage),
+		"trending_section_heading":     getEnvFromFile(envMap, "TRENDING_SECTION_HEADING", DefaultTrendingSectionHeading),
+		"anticipated_series_heading":   getEnvFromFile(envMap, "ANTICIPATED_SERIES_HEADING", DefaultAnticipatedSeriesHeading),
+		"watched_series_heading":       getEnvFromFile(envMap, "WATCHED_SERIES_HEADING", DefaultWatchedSeriesHeading),
+		"anticipated_movies_heading":   getEnvFromFile(envMap, "ANTICIPATED_MOVIES_HEADING", DefaultAnticipatedMoviesHeading),
+		"watched_movies_heading":       getEnvFromFile(envMap, "WATCHED_MOVIES_HEADING", DefaultWatchedMoviesHeading),
+		"footer_text":                  getEnvFromFile(envMap, "FOOTER_TEXT", DefaultFooterText),
 	})
 }
 
