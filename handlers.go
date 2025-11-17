@@ -748,43 +748,31 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		lastSent = "Never"
 	}
 
-	// Check service status
+	// Check service status (config only - no API calls for performance)
 	serviceStatus := make(map[string]string)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
 
-	// Check Sonarr
+	// Check Sonarr configuration
 	if cfg.SonarrURL != "" && cfg.SonarrAPIKey != "" {
-		_, err := fetchSonarrHistoryWithRetry(ctx, cfg, time.Now().AddDate(0, 0, -1), 1)
-		if err != nil {
-			serviceStatus["sonarr"] = "error"
-		} else {
-			serviceStatus["sonarr"] = "ok"
-		}
+		serviceStatus["sonarr"] = "configured"
 	} else {
 		serviceStatus["sonarr"] = "not_configured"
 	}
 
-	// Check Radarr
+	// Check Radarr configuration
 	if cfg.RadarrURL != "" && cfg.RadarrAPIKey != "" {
-		_, err := fetchRadarrHistoryWithRetry(ctx, cfg, time.Now().AddDate(0, 0, -1), 1)
-		if err != nil {
-			serviceStatus["radarr"] = "error"
-		} else {
-			serviceStatus["radarr"] = "ok"
-		}
+		serviceStatus["radarr"] = "configured"
 	} else {
 		serviceStatus["radarr"] = "not_configured"
 	}
 
-	// Check Email (just config check, not actual send)
+	// Check Email configuration
 	if cfg.SMTPHost != "" && cfg.SMTPPort != "" && cfg.FromEmail != "" && len(cfg.ToEmails) > 0 {
 		serviceStatus["email"] = "configured"
 	} else {
 		serviceStatus["email"] = "not_configured"
 	}
 
-	// Check Trakt
+	// Check Trakt configuration
 	if cfg.TraktClientID != "" {
 		serviceStatus["trakt"] = "configured"
 	} else {
