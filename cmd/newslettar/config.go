@@ -158,10 +158,15 @@ func getEnvFromFile(envMap map[string]string, key, defaultValue string) string {
 	return defaultValue
 }
 
-// getEnvFromFileOnly reads only from the env file, not from system environment variables
-// Use this for user-configurable fields that can be deleted via UI
+// getEnvFromFileOnly reads from the env file first, then system environment variables
+// This allows Docker users to use env vars without .env file, while still allowing
+// web UI users to clear values (empty string in .env takes precedence over system env)
 func getEnvFromFileOnly(envMap map[string]string, key, defaultValue string) string {
 	if val, exists := envMap[key]; exists {
+		return val
+	}
+	// Fall back to system environment variables if not in .env file
+	if val := os.Getenv(key); val != "" {
 		return val
 	}
 	return defaultValue

@@ -28,36 +28,6 @@ WORKDIR /opt/newslettar
 COPY --from=builder /build/newslettar .
 COPY --from=builder /build/version.json ./
 
-# Create default .env file
-RUN echo "# Sonarr Configuration\n\
-SONARR_URL=http://localhost:8989\n\
-SONARR_API_KEY=\n\
-\n\
-# Radarr Configuration\n\
-RADARR_URL=http://localhost:7878\n\
-RADARR_API_KEY=\n\
-\n\
-# Email Configuration\n\
-MAILGUN_SMTP=smtp.mailgun.org\n\
-MAILGUN_PORT=587\n\
-MAILGUN_USER=\n\
-MAILGUN_PASS=\n\
-FROM_NAME=Newslettar\n\
-FROM_EMAIL=newsletter@yourdomain.com\n\
-TO_EMAILS=user@example.com\n\
-\n\
-# Schedule Settings\n\
-TIMEZONE=UTC\n\
-SCHEDULE_DAY=Sun\n\
-SCHEDULE_TIME=09:00\n\
-\n\
-# Template Settings\n\
-SHOW_POSTERS=true\n\
-SHOW_DOWNLOADED=true\n\
-\n\
-# Web UI Port\n\
-WEBUI_PORT=8080" > .env.example
-
 # Make binary executable
 RUN chmod +x newslettar
 
@@ -69,4 +39,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8080/health || exit 1
 
 # Run the application
+# Configuration can be provided via:
+# 1. Environment variables (recommended for Docker)
+# 2. Mounted .env file at /opt/newslettar/.env (recommended for docker-compose)
 CMD ["./newslettar", "-web"]

@@ -23,28 +23,36 @@ Newslettar automatically generates beautiful, scheduled email newsletters summar
 
 ## 🚀 Quick Start
 
-### Docker (Recommended)
+### Method 1: Docker (Recommended - No Git Clone Required!)
 
-The fastest way to get started:
+Download a single file and run:
 
 ```bash
-# Clone the repository
-git clone https://github.com/agencefanfare/newslettar.git
-cd newslettar
+# Download docker-compose file
+wget https://raw.githubusercontent.com/agencefanfare/newslettar/main/docker-compose.simple.yml
 
-# Run the setup script
-bash docker-setup.sh
+# Edit the environment variables with your settings
+nano docker-compose.simple.yml
 
-# Edit configuration
-nano data/.env
+# Start (builds automatically from GitHub)
+docker-compose -f docker-compose.simple.yml up -d
 
-# Start the container (or re-run setup script)
-docker start newslettar
+# Access web UI
+open http://localhost:8080
 ```
 
-Access the web UI at `http://localhost:8080`
+### Method 2: Pre-built Binary (Fastest - Linux/Proxmox/LXC)
 
-### Debian/Ubuntu Package
+One command installs everything:
+
+```bash
+# Downloads pre-compiled binary from GitHub Releases (~13MB, no Go compiler needed)
+curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install-binary.sh | sudo bash
+```
+
+Then configure via web UI at `http://your-server-ip:8080`
+
+### Method 3: Debian Package (For Package Managers)
 
 ```bash
 # Download the latest .deb package
@@ -53,98 +61,150 @@ wget https://github.com/agencefanfare/newslettar/releases/latest/download/newsle
 # Install
 sudo dpkg -i newslettar_*_amd64.deb
 
-# Configure
-newslettar-ctl edit
-
-# Start
-newslettar-ctl start
-```
-
-### One-Line Install (Debian/Ubuntu/Proxmox LXC)
-
-```bash
-curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install.sh | bash
+# Configure via web UI at http://your-server-ip:8080
+# Or edit config: newslettar-ctl edit
 ```
 
 ## 📋 Requirements
 
-### For Docker
-- Docker installed
-- 300MB disk space
-- Port 8080 available (or configure different port)
+### For Docker (Method 1)
+- Docker and docker-compose installed
+- ~100MB disk space (for image and data)
+- Port 8080 available (configurable)
 
-### For Native Installation
+### For Pre-built Binary (Method 2 - Recommended for Proxmox/LXC)
 - Debian 11+, Ubuntu 20.04+, or similar Linux distribution
-- Go 1.23+ (automatically installed by install script)
 - systemd (for service management)
+- ~50MB disk space
+- **No Go compiler needed!**
 
-### General Requirements
-- Access to Sonarr and Radarr instances
+### For Debian Package (Method 3)
+- Debian 11+ or Ubuntu 20.04+
+- dpkg package manager
+- ~50MB disk space
+
+### General Requirements (All Methods)
+- Access to Sonarr and/or Radarr instances
 - SMTP server for sending emails (Gmail, Mailgun, SendGrid, etc.)
 - (Optional) Trakt.tv API key for trending content
 
-## 📖 Installation Methods
+## 📖 Detailed Installation Guide
 
-### Method 1: Docker Compose
+### Docker: Standalone Compose File (Simplest)
 
-1. **Clone and prepare:**
-   ```bash
-   git clone https://github.com/agencefanfare/newslettar.git
-   cd newslettar
-   mkdir -p data
-   cp .env.example data/.env
-   ```
-
-2. **Edit configuration:**
-   ```bash
-   nano data/.env
-   ```
-
-3. **Start:**
-   ```bash
-   docker-compose up -d
-   ```
-
-4. **Access:** `http://localhost:8080`
-
-### Method 2: Debian Package (Advanced)
-
-Build and install your own package:
+Perfect for Docker users who don't want to clone the repo:
 
 ```bash
-# Build the package
+# 1. Download the standalone docker-compose file
+wget https://raw.githubusercontent.com/agencefanfare/newslettar/main/docker-compose.simple.yml
+
+# 2. Edit configuration inline (no separate .env file needed)
+nano docker-compose.simple.yml
+
+# 3. Start the container
+docker-compose -f docker-compose.simple.yml up -d
+
+# 4. View logs
+docker-compose -f docker-compose.simple.yml logs -f
+```
+
+**How it works:** The compose file builds the image directly from GitHub and accepts all configuration via environment variables.
+
+### Docker: Traditional Setup (For Development)
+
+If you want to modify the code or use the traditional approach:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/agencefanfare/newslettar.git
+cd newslettar
+
+# 2. Create and configure .env file
+mkdir -p data
+cp .env.example data/.env
+nano data/.env
+
+# 3. Start with docker-compose
+docker-compose up -d
+
+# Or use the setup script
+bash docker-setup.sh
+```
+
+### Linux: Pre-built Binary Installation
+
+**Recommended for Proxmox LXC containers and production servers:**
+
+```bash
+# One-command installation (downloads ~13MB binary, no compilation)
+curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install-binary.sh | sudo bash
+
+# The script will:
+# - Download pre-built binary from GitHub Releases
+# - Install to /opt/newslettar
+# - Create systemd service
+# - Start the service automatically
+# - Configure Web UI on port 8080
+```
+
+**Management commands:**
+```bash
+newslettar-ctl start      # Start service
+newslettar-ctl stop       # Stop service
+newslettar-ctl status     # Check status
+newslettar-ctl logs       # View logs
+newslettar-ctl web        # Show Web UI URL
+newslettar-ctl update     # Update to latest version
+```
+
+### Linux: Source Compilation (Advanced)
+
+Only needed if you want to modify the code or pre-built binaries don't work:
+
+```bash
+# Use the source-based installer
+curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install.sh | sudo bash
+
+# This will:
+# - Install Go 1.23+ compiler (~400MB)
+# - Clone source code
+# - Compile from source
+# - Install as systemd service
+```
+
+### Debian Package: Build Your Own (Advanced)
+
+For package maintainers or custom deployments:
+
+```bash
+# Clone and build
+git clone https://github.com/agencefanfare/newslettar.git
+cd newslettar
 make deb
 
 # Install
 sudo dpkg -i dist/newslettar_*.deb
 
-# Configure
+# Configure and start
 newslettar-ctl edit
-
-# Start
 newslettar-ctl start
-```
-
-### Method 3: Manual Build
-
-```bash
-# Install Go 1.23+
-wget https://go.dev/dl/go1.23.5.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.23.5.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
-
-# Clone and build
-git clone https://github.com/agencefanfare/newslettar.git
-cd newslettar
-make build
-
-# Run
-./build/newslettar -web
 ```
 
 ## ⚙️ Configuration
 
-Configuration is done through a `.env` file. Copy `.env.example` to `.env` and customize:
+Configuration can be done via:
+1. **Web UI** (recommended) - Configure everything at `http://localhost:8080`
+2. **Environment variables** - Perfect for Docker deployments
+3. **`.env` file** - Traditional approach for native installations
+
+### Configuration Priority
+
+The app checks configuration in this order:
+1. `.env` file (if present)
+2. Environment variables (fallback)
+3. Default values
+
+### Example Configuration
 
 ```bash
 # Sonarr Configuration
