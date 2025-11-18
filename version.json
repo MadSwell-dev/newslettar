@@ -1,10 +1,9 @@
 {
-  "version": "0.9.3",
+  "version": "0.9.4",
   "released": "2025-11-18",
   "changelog": [
-    "FIX: Removed custom Docker network to resolve sysctl permission errors",
-    "FIX: Removed unused imports preventing build",
-    "FIX: Update icon now amber colored and properly centered",
-    "FIX: Switched to Alpine Linux base image for better Docker compatibility"
+    "FIX: Radarr/Sonarr URLs now clear properly when fields are emptied",
+    "FIX: Preview loads correctly with only one service configured",
+    "FIX: Newsletter generation skips unconfigured services without retry delays"
   ]
 }

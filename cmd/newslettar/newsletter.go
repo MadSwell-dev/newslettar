@@ -42,69 +42,86 @@ func runNewsletter() {
 	log.Println("📡 Fetching data in parallel...")
 	startFetch := time.Now()
 
-	// Count API calls (4 for Sonarr/Radarr + up to 4 for Trakt if enabled)
-	apiCalls := 4
-	if cfg.ShowTraktAnticipatedSeries || cfg.ShowTraktWatchedSeries ||
-		cfg.ShowTraktAnticipatedMovies || cfg.ShowTraktWatchedMovies {
-		if cfg.ShowTraktAnticipatedSeries {
-			apiCalls++
-		}
-		if cfg.ShowTraktWatchedSeries {
-			apiCalls++
-		}
-		if cfg.ShowTraktAnticipatedMovies {
-			apiCalls++
-		}
-		if cfg.ShowTraktWatchedMovies {
-			apiCalls++
-		}
+	// Check which services are configured
+	hasSonarr := cfg.SonarrURL != "" && cfg.SonarrAPIKey != ""
+	hasRadarr := cfg.RadarrURL != "" && cfg.RadarrAPIKey != ""
+
+	// Count API calls (only for configured services + Trakt if enabled)
+	apiCalls := 0
+	if hasSonarr {
+		apiCalls += 2 // history + calendar
+	}
+	if hasRadarr {
+		apiCalls += 2 // history + calendar
+	}
+	if cfg.ShowTraktAnticipatedSeries {
+		apiCalls++
+	}
+	if cfg.ShowTraktWatchedSeries {
+		apiCalls++
+	}
+	if cfg.ShowTraktAnticipatedMovies {
+		apiCalls++
+	}
+	if cfg.ShowTraktWatchedMovies {
+		apiCalls++
 	}
 
 	wg.Add(apiCalls)
 
-	go func() {
-		defer wg.Done()
-		log.Println("📺 Fetching Sonarr history...")
-		downloadedEpisodes, errSonarrHistory = fetchSonarrHistoryWithRetry(ctx, cfg, weekStart, cfg.MaxRetries)
-		if errSonarrHistory != nil {
-			log.Printf("⚠️  Sonarr history error: %v", errSonarrHistory)
-		} else {
-			log.Printf("✓ Found %d downloaded episodes", len(downloadedEpisodes))
-		}
-	}()
+	// Only fetch from Sonarr if configured
+	if hasSonarr {
+		go func() {
+			defer wg.Done()
+			log.Println("📺 Fetching Sonarr history...")
+			downloadedEpisodes, errSonarrHistory = fetchSonarrHistoryWithRetry(ctx, cfg, weekStart, cfg.MaxRetries)
+			if errSonarrHistory != nil {
+				log.Printf("⚠️  Sonarr history error: %v", errSonarrHistory)
+			} else {
+				log.Printf("✓ Found %d downloaded episodes", len(downloadedEpisodes))
+			}
+		}()
 
-	go func() {
-		defer wg.Done()
-		log.Println("📺 Fetching Sonarr calendar...")
-		upcomingEpisodes, errSonarrCalendar = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.MaxRetries)
-		if errSonarrCalendar != nil {
-			log.Printf("⚠️  Sonarr calendar error: %v", errSonarrCalendar)
-		} else {
-			log.Printf("✓ Found %d upcoming episodes", len(upcomingEpisodes))
-		}
-	}()
+		go func() {
+			defer wg.Done()
+			log.Println("📺 Fetching Sonarr calendar...")
+			upcomingEpisodes, errSonarrCalendar = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.MaxRetries)
+			if errSonarrCalendar != nil {
+				log.Printf("⚠️  Sonarr calendar error: %v", errSonarrCalendar)
+			} else {
+				log.Printf("✓ Found %d upcoming episodes", len(upcomingEpisodes))
+			}
+		}()
+	} else {
+		log.Println("📺 Sonarr not configured, skipping...")
+	}
 
-	go func() {
-		defer wg.Done()
-		log.Println("🎬 Fetching Radarr history...")
-		downloadedMovies, errRadarrHistory = fetchRadarrHistoryWithRetry(ctx, cfg, weekStart, cfg.MaxRetries)
-		if errRadarrHistory != nil {
-			log.Printf("⚠️  Radarr history error: %v", errRadarrHistory)
-		} else {
-			log.Printf("✓ Found %d downloaded movies", len(downloadedMovies))
-		}
-	}()
+	// Only fetch from Radarr if configured
+	if hasRadarr {
+		go func() {
+			defer wg.Done()
+			log.Println("🎬 Fetching Radarr history...")
+			downloadedMovies, errRadarrHistory = fetchRadarrHistoryWithRetry(ctx, cfg, weekStart, cfg.MaxRetries)
+			if errRadarrHistory != nil {
+				log.Printf("⚠️  Radarr history error: %v", errRadarrHistory)
+			} else {
+				log.Printf("✓ Found %d downloaded movies", len(downloadedMovies))
+			}
+		}()
 
-	go func() {
-		defer wg.Done()
-		log.Println("🎬 Fetching Radarr calendar...")
-		upcomingMovies, errRadarrCalendar = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.MaxRetries)
-		if errRadarrCalendar != nil {
-			log.Printf("⚠️  Radarr calendar error: %v", errRadarrCalendar)
-		} else {
-			log.Printf("✓ Found %d upcoming movies", len(upcomingMovies))
-		}
-	}()
+		go func() {
+			defer wg.Done()
+			log.Println("🎬 Fetching Radarr calendar...")
+			upcomingMovies, errRadarrCalendar = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.MaxRetries)
+			if errRadarrCalendar != nil {
+				log.Printf("⚠️  Radarr calendar error: %v", errRadarrCalendar)
+			} else {
+				log.Printf("✓ Found %d upcoming movies", len(upcomingMovies))
+			}
+		}()
+	} else {
+		log.Println("🎬 Radarr not configured, skipping...")
+	}
 
 	// Fetch Trakt data if enabled
 	if cfg.ShowTraktAnticipatedSeries {
