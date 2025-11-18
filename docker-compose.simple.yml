@@ -24,16 +24,6 @@ services:
     container_name: newslettar
     restart: unless-stopped
 
-    # Required for nested Docker environments (Proxmox LXC, Docker-in-Docker)
-    userns_mode: "host"
-    security_opt:
-      - apparmor:unconfined
-      - seccomp:unconfined
-
-    # ONLY enable if you get sysctl permission errors in nested environments
-    # This grants full privileges to the container - use with caution
-    privileged: true
-
     ports:
       - "8080:8080"
 
@@ -139,21 +129,17 @@ networks:
 #    docker-compose -f docker-compose.simple.yml restart
 #
 # ==============================================================================
-# TROUBLESHOOTING - PROXMOX LXC / NESTED DOCKER:
+# TROUBLESHOOTING:
 # ==============================================================================
-# If you get "permission denied" errors with sysctl:
+# Container won't start:
+#   - Check logs: docker compose -f docker-compose.simple.yml logs -f
+#   - Remove and recreate: docker rm -f newslettar && docker compose -f docker-compose.simple.yml up -d
 #
-# 1. The docker-compose file includes 'privileged: true' by default for nested
-#    containers. If you want to disable it for security reasons on non-nested
-#    environments, you can comment out that line.
+# Can't access Sonarr/Radarr:
+#   - Linux: Use your host's LAN IP (e.g., 192.168.1.100)
+#   - Mac/Windows: Use host.docker.internal instead of localhost
 #
-# 2. If running in Proxmox LXC, ensure your LXC container has nesting enabled.
-#    Edit /etc/pve/lxc/<CTID>.conf and add:
-#
-#    features: nesting=1
-#
-# 3. After making changes, remove the existing container and restart:
-#    docker rm -f newslettar
-#    docker compose -f docker-compose.simple.yml up -d
-#
+# Email not sending:
+#   - For Gmail, use an App Password, not your regular password
+#   - Check SMTP settings match your email provider's documentation
 # ==============================================================================
