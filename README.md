@@ -1,138 +1,75 @@
-# 📧 Newslettar
+# Newslettar
 
 **Automated newsletter generator for Sonarr and Radarr**
 
-Newslettar automatically generates beautiful, scheduled email newsletters summarizing new TV shows and movies from your Sonarr and Radarr installations. Keep your family, friends, or community informed about what's new on your media server!
+Generate beautiful, scheduled email newsletters summarizing new TV shows and movies from your Sonarr and Radarr installations.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.23-00ADD8?logo=go)](https://golang.org/)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://hub.docker.com/r/agencefanfare/newslettar)
 
-## ✨ Features
+## Features
 
-- **📺 Sonarr & Radarr Integration** - Automatically fetches new episodes and movies
-- **🎬 Trakt.tv Integration** - Show trending series and movies in your newsletters
-- **📅 Scheduled Newsletters** - Weekly automated emails at your preferred time
-- **🎨 Beautiful HTML Templates** - Modern, responsive email design with poster images
-- **⚙️ Web UI Configuration** - Easy setup and testing through browser interface
-- **🚀 Lightweight** - Only ~12MB RAM usage, minimal CPU
-- **🐳 Docker Ready** - Deploy with a single command
-- **📦 Debian Package** - Native `.deb` installation available
-- **🔒 Secure** - No data collection, runs entirely on your infrastructure
-- **🌐 Timezone Aware** - Schedule in your local timezone
+- Sonarr & Radarr Integration - Automatically fetches new episodes and movies
+- Trakt.tv Integration - Show trending series and movies in newsletters
+- Scheduled Newsletters - Weekly automated emails at your preferred time
+- Beautiful HTML Templates - Modern, responsive email design with poster images
+- Web UI Configuration - Easy setup and testing through browser interface
+- Lightweight - Only ~12MB RAM usage, minimal CPU
+- Secure - No data collection, runs entirely on your infrastructure
 
-## 🚀 Quick Start
+## Architecture Support
 
-Choose your platform:
+| Platform | Support |
+|----------|---------|
+| amd64    | ✅      |
+| arm64    | ✅      |
+| armv6    | ✅      |
 
-### 🐳 **Proxmox Docker Container** or **Any Docker Host**
+## Quick Installation (Docker Compose)
 
+```yaml
+services:
+  newslettar:
+    image: agencefanfare/newslettar:latest
+    container_name: newslettar
+    ports:
+      - 8080:8080
+    environment:
+      - SONARR_URL=http://192.168.1.100:8989
+      - SONARR_API_KEY=your-api-key
+      - RADARR_URL=http://192.168.1.100:7878
+      - RADARR_API_KEY=your-api-key
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=your-email@gmail.com
+      - SMTP_PASS=your-app-password
+      - FROM_EMAIL=newsletter@yourdomain.com
+      - TO_EMAILS=user@example.com
+      - TIMEZONE=America/New_York
+      - SCHEDULE_DAY=Sun
+      - SCHEDULE_TIME=09:00
+    restart: unless-stopped
+```
+
+After deployment, access the web UI at http://localhost:8080 to configure and test.
+
+**Alternative:** Download standalone compose file with inline configuration:
 ```bash
 wget https://raw.githubusercontent.com/agencefanfare/newslettar/main/docker-compose.simple.yml
-nano docker-compose.simple.yml  # Edit your Sonarr/Radarr/Email settings
-docker-compose -f docker-compose.simple.yml up -d
+nano docker-compose.simple.yml  # Edit your settings
+docker compose -f docker-compose.simple.yml up -d
 ```
-Access: **http://localhost:8080**
 
----
+## Native Installation (Linux)
 
-### 📦 **Proxmox LXC (Debian 12)** or **Any Linux Server**
+One-command installation for Debian/Ubuntu servers and Proxmox LXC containers:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install-binary.sh | sudo bash
 ```
-Access: **http://your-server-ip:8080**
 
----
-
-**That's it!** Configure everything through the web interface.
-
-## 📋 Requirements
-
-### Docker Installation
-- Docker + docker-compose
-- ~100MB disk space
-- Port 8080 available
-
-### Linux/LXC Installation
-- Debian 11+ or Ubuntu 20.04+
-- ~50MB disk space
-- systemd
-
-### Both Need
-- Sonarr and/or Radarr URL + API key
-- SMTP email settings (Gmail, Mailgun, etc.)
-- (Optional) Trakt.tv Client ID
-
-## 📖 Detailed Installation Guide
-
-### 🖥️ Proxmox Users - Which Method?
-
-| Your Setup | Use This Method |
-|------------|----------------|
-| Proxmox with Docker installed | `docker-compose.simple.yml` (Docker method below) |
-| Proxmox LXC container (Debian 12) | `install-binary.sh` (Linux method below) |
-
-Both work perfectly on Proxmox!
-
----
-
-### Docker: Standalone Compose File (Simplest)
-
-Perfect for Docker users who don't want to clone the repo:
-
-```bash
-# 1. Download the standalone docker-compose file
-wget https://raw.githubusercontent.com/agencefanfare/newslettar/main/docker-compose.simple.yml
-
-# 2. Edit configuration inline (no separate .env file needed)
-nano docker-compose.simple.yml
-
-# 3. Start the container
-docker-compose -f docker-compose.simple.yml up -d
-
-# 4. View logs
-docker-compose -f docker-compose.simple.yml logs -f
-```
-
-**How it works:** The compose file builds the image directly from GitHub and accepts all configuration via environment variables.
-
-### Docker: Traditional Setup (For Development)
-
-If you want to modify the code or use the traditional approach:
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/agencefanfare/newslettar.git
-cd newslettar
-
-# 2. Create and configure .env file
-mkdir -p data
-cp .env.example data/.env
-nano data/.env
-
-# 3. Start with docker-compose
-docker-compose up -d
-
-# Or use the setup script
-bash docker-setup.sh
-```
-
-### Linux: Pre-built Binary Installation
-
-**Recommended for Proxmox LXC containers and production servers:**
-
-```bash
-# One-command installation (downloads ~13MB binary, no compilation)
-curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install-binary.sh | sudo bash
-
-# The script will:
-# - Download pre-built binary from GitHub Releases
-# - Install to /opt/newslettar
-# - Create systemd service
-# - Start the service automatically
-# - Configure Web UI on port 8080
-```
+The installer downloads a pre-built binary (~13MB), installs it to `/opt/newslettar`, creates a systemd service, and starts it automatically.
 
 **Management commands:**
 ```bash
@@ -144,489 +81,39 @@ newslettar-ctl web        # Show Web UI URL
 newslettar-ctl update     # Update to latest version
 ```
 
-### Linux: Source Compilation (Advanced)
+## Configuration
 
-Only needed if you want to modify the code or pre-built binaries don't work:
+All configuration can be done through the web UI at http://localhost:8080, or via environment variables for Docker deployments.
 
-```bash
-# Use the source-based installer
-curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install.sh | sudo bash
+Required settings:
+- Sonarr or Radarr URL and API key
+- SMTP email credentials
+- Email recipients
+- Schedule (day and time)
 
-# This will:
-# - Install Go 1.23+ compiler (~400MB)
-# - Clone source code
-# - Compile from source
-# - Install as systemd service
-```
+Optional:
+- Trakt.tv Client ID (for trending content)
+- Template customization (posters, overviews, dark mode)
 
-### Debian Package: Build Your Own (Advanced)
+Get API keys:
+- Sonarr/Radarr: Settings → General → Security → API Key
+- Trakt.tv: https://trakt.tv/oauth/applications
+- Gmail: Use App Passwords (requires 2FA)
 
-For package maintainers or custom deployments:
+## Documentation
 
-```bash
-# Clone and build
-git clone https://github.com/agencefanfare/newslettar.git
-cd newslettar
-make deb
+For detailed installation instructions, configuration options, troubleshooting, and development guides, see the [full documentation](https://github.com/agencefanfare/newslettar).
 
-# Install
-sudo dpkg -i dist/newslettar_*.deb
+## Contributing
 
-# Configure and start
-newslettar-ctl edit
-newslettar-ctl start
-```
+Contributions are welcome! Please open an issue or pull request on GitHub.
 
-## ⚙️ Configuration
+## License
 
-Configuration can be done via:
-1. **Web UI** (recommended) - Configure everything at `http://localhost:8080`
-2. **Environment variables** - Perfect for Docker deployments
-3. **`.env` file** - Traditional approach for native installations
-
-### Configuration Priority
-
-The app checks configuration in this order:
-1. `.env` file (if present)
-2. Environment variables (fallback)
-3. Default values
-
-### Example Configuration
-
-```bash
-# Sonarr Configuration
-SONARR_URL=http://localhost:8989
-SONARR_API_KEY=your_api_key_here
-
-# Radarr Configuration
-RADARR_URL=http://localhost:7878
-RADARR_API_KEY=your_api_key_here
-
-# Trakt Configuration (Optional - enables trending series and movies)
-# Get your Client ID from https://trakt.tv/oauth/applications
-TRAKT_CLIENT_ID=your_client_id_here
-
-# Email Configuration (Works with any SMTP provider: Gmail, Mailgun, SendGrid, etc.)
-SMTP_HOST=smtp.mailgun.org
-SMTP_PORT=587
-SMTP_USER=your_email@domain.com
-SMTP_PASS=your_password
-FROM_NAME=Newslettar
-FROM_EMAIL=newsletter@yourdomain.com
-TO_EMAILS=user1@example.com,user2@example.com
-
-# Schedule Settings (Internal Cron - No systemd timer needed!)
-TIMEZONE=America/New_York
-SCHEDULE_DAY=Sun
-SCHEDULE_TIME=09:00
-
-# Template Settings
-SHOW_POSTERS=true                    # Show poster images in emails
-SHOW_DOWNLOADED=true                 # Include already downloaded content
-SHOW_UNMONITORED=false               # Include unmonitored content
-SHOW_SERIES_OVERVIEW=false           # Show series descriptions
-SHOW_EPISODE_OVERVIEW=false          # Show episode summaries
-DARK_MODE=true                       # Use dark mode theme
-
-# Trakt Features (Requires TRAKT_CLIENT_ID)
-SHOW_TRAKT_ANTICIPATED_SERIES=false  # Show anticipated TV series
-SHOW_TRAKT_WATCHED_SERIES=false      # Show most watched TV series
-SHOW_TRAKT_ANTICIPATED_MOVIES=false  # Show anticipated movies
-SHOW_TRAKT_WATCHED_MOVIES=false      # Show most watched movies
-
-# Web UI Port
-WEBUI_PORT=8080
-
-# Performance Tuning (Optional - defaults are fine for most users)
-# API_PAGE_SIZE=1000                 # Items per API page
-# MAX_RETRIES=3                      # API retry attempts
-# PREVIEW_RETRIES=2                  # Preview generation retries
-# API_TIMEOUT=30                     # API timeout in seconds
-```
-
-### Getting API Keys
-
-**Sonarr/Radarr:**
-1. Open Sonarr/Radarr web interface
-2. Settings → General → Security → API Key
-3. Copy the key to your `.env` file
-
-**Trakt.tv (Optional):**
-1. Create account at https://trakt.tv
-2. Go to https://trakt.tv/oauth/applications
-3. Create new application
-4. Copy Client ID to your `.env` file
-
-**SMTP (Email):**
-- **Gmail:** Use App Passwords (requires 2FA enabled)
-- **Mailgun:** Free tier available, get SMTP credentials from dashboard
-- **SendGrid:** Free tier available, create API key for SMTP
-- **Any SMTP server:** Just need host, port, username, password
-
-## 🎯 Usage
-
-### Web UI
-
-Access the web interface at `http://localhost:8080` (or your configured port).
-
-Features:
-- **Dashboard** - View and test configuration
-- **Test Buttons** - Test Sonarr, Radarr, and email connections
-- **Preview** - See what your newsletter will look like
-- **Send Test** - Send a test newsletter immediately
-- **Configuration** - Edit settings through the UI
-
-### Command Line (Native Install)
-
-```bash
-# Start/Stop/Restart service
-newslettar-ctl start
-newslettar-ctl stop
-newslettar-ctl restart
-
-# View logs (live)
-newslettar-ctl logs
-
-# Edit configuration
-newslettar-ctl edit
-
-# Send test newsletter now
-newslettar-ctl test
-
-# Check status
-newslettar-ctl status
-
-# Show Web UI URL
-newslettar-ctl web
-
-# Check memory usage
-newslettar-ctl memory
-
-# Show version
-newslettar-ctl version
-```
-
-### Docker Commands
-
-```bash
-# View logs
-docker-compose logs -f
-
-# Restart
-docker-compose restart
-
-# Edit config
-nano data/.env
-docker-compose restart
-
-# Send test newsletter
-docker-compose exec newslettar ./newslettar
-
-# Stop
-docker-compose down
-
-# Update to latest
-git pull
-docker-compose build --no-cache
-docker-compose up -d
-```
-
-## 🔨 Development
-
-### Prerequisites
-
-- Go 1.23+
-- Make (optional, for using Makefile)
-
-### Building from Source
-
-```bash
-# Clone repository
-git clone https://github.com/agencefanfare/newslettar.git
-cd newslettar
-
-# Build
-make build
-
-# Run
-make run
-
-# Build for all platforms
-make build-all
-
-# Run tests
-make test
-
-# Format code
-make fmt
-```
-
-### Project Structure
-
-```
-newslettar/
-├── cmd/
-│   └── newslettar/           # Application source code
-│       ├── main.go           # Entry point
-│       ├── types.go          # Data structures
-│       ├── config.go         # Configuration management
-│       ├── constants.go      # Application constants
-│       ├── api.go            # Sonarr/Radarr API client
-│       ├── trakt.go          # Trakt.tv API client
-│       ├── newsletter.go     # Newsletter generation logic
-│       ├── handlers.go       # HTTP handlers for Web UI
-│       ├── server.go         # HTTP server & scheduler
-│       ├── ui.go             # Web UI HTML templates
-│       ├── utils.go          # Utility functions
-│       ├── templates/        # Email templates (embedded)
-│       │   └── email.html    # Email HTML template
-│       └── assets/           # Static assets (embedded)
-│           ├── newslettar_logo.svg   # Logo
-│           ├── newslettar_black.svg  # Logo (black)
-│           └── newslettar_white.svg  # Logo (white)
-├── docs/                     # Documentation
-│   ├── CLAUDE.md             # AI assistant guide
-│   └── CONTRIBUTING.md       # Contribution guide
-├── scripts/
-│   └── build-deb.sh          # Debian package builder
-├── Dockerfile                # Docker image definition
-├── docker-compose.yml        # Docker Compose configuration
-├── Makefile                  # Build automation
-└── README.md                 # This file
-```
-
-### Development Workflow
-
-1. **Make changes** to `.go` files
-2. **Test locally:** `make run`
-3. **Format code:** `make fmt`
-4. **Run tests:** `make test`
-5. **Build for production:** `make build`
-
-### Adding Features
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes
-4. Test thoroughly
-5. Commit: `git commit -m 'Add amazing feature'`
-6. Push: `git push origin feature/amazing-feature`
-7. Open a Pull Request
-
-## 🐳 Docker Details
-
-### Building Docker Image
-
-```bash
-# Build locally
-make docker-build
-
-# Or manually
-docker build -t newslettar:latest .
-```
-
-### Custom Docker Compose
-
-Create a `docker-compose.override.yml`:
-
-```yaml
-version: '3.8'
-services:
-  newslettar:
-    ports:
-      - "8888:8080"  # Custom port
-    environment:
-      - WEBUI_PORT=8080
-    mem_limit: 256m  # Custom memory limit
-```
-
-### Accessing Host Services from Docker
-
-**On Linux:**
-```bash
-SONARR_URL=http://172.17.0.1:8989
-RADARR_URL=http://172.17.0.1:7878
-```
-
-**On Mac/Windows:**
-```bash
-SONARR_URL=http://host.docker.internal:8989
-RADARR_URL=http://host.docker.internal:7878
-```
-
-## 📦 Debian Package Details
-
-### Building
-
-```bash
-make deb
-```
-
-This creates: `dist/newslettar_<version>_<arch>.deb`
-
-### What Gets Installed
-
-- Binary: `/opt/newslettar/newslettar`
-- Templates: `/opt/newslettar/templates/`
-- Assets: `/opt/newslettar/assets/`
-- Config: `/opt/newslettar/.env`
-- Service: `/etc/systemd/system/newslettar.service`
-- Control: `/usr/local/bin/newslettar-ctl`
-
-### Uninstalling
-
-```bash
-sudo dpkg -r newslettar
-```
-
-Configuration files remain in `/opt/newslettar/.env` for backup.
-
-## 🔧 Troubleshooting
-
-### Service Won't Start
-
-```bash
-# Check logs
-journalctl -u newslettar.service -n 50
-
-# Or for Docker
-docker-compose logs newslettar
-```
-
-### Can't Connect to Sonarr/Radarr
-
-1. Verify URLs are accessible from the server
-2. Check API keys are correct
-3. Ensure no firewall blocking
-4. For Docker: use correct host address (see Docker Details above)
-
-### Email Not Sending
-
-1. Test SMTP credentials manually
-2. Check spam folder
-3. Verify FROM_EMAIL is allowed by your SMTP provider
-4. Check logs for specific error messages
-
-### Port 8080 Already in Use
-
-Change the port:
-```bash
-# In .env
-WEBUI_PORT=8888
-
-# For Docker, also update docker-compose.yml
-ports:
-  - "8888:8080"
-```
-
-### Memory Issues
-
-The application uses ~12MB normally. If you see high memory:
-1. Check for configuration loops (schedule set to run too frequently)
-2. Reduce `API_PAGE_SIZE` in `.env`
-3. Disable poster images: `SHOW_POSTERS=false`
-
-## 📊 Performance
-
-- **Binary Size:** ~13 MB (stripped)
-- **Memory Usage:** ~12 MB at runtime
-- **Newsletter Generation:** 3-5 seconds with parallel API calls
-- **Startup Time:** <1 second
-- **CPU Usage:** <1% idle, <5% during newsletter generation
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how you can help:
-
-1. **Report Bugs** - Open an issue with details and reproduction steps
-2. **Suggest Features** - Describe your idea in an issue
-3. **Submit Pull Requests** - Fix bugs or add features
-4. **Improve Documentation** - Help make docs clearer
-5. **Share** - Star the repo and tell others!
-
-### Development Guidelines
-
-- Follow existing code style
-- Add tests for new features
-- Update documentation
-- Keep commits atomic and well-described
-- Ensure `make test` passes before submitting PR
-
-### Creating Releases (For Maintainers)
-
-To enable the pre-built binary installer, create a GitHub release:
-
-```bash
-# Update version in version.json first, then:
-git add version.json
-git commit -m "chore: bump version to v0.8.0"
-git push
-
-# Create and push tag
-git tag v0.8.0
-git push origin v0.8.0
-```
-
-The GitHub Actions workflow will automatically:
-- Build binaries for amd64, arm64, and armv6
-- Attach them to the release
-- Enable `install-binary.sh` to work
-
-## 📄 License
-
-This project is licensed under the MIT License - see below for details:
-
-```
-MIT License
+This project is licensed under the MIT License.
 
 Copyright (c) 2025 Agency Fanfare
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-## 🙏 Acknowledgments
-
-- **Sonarr & Radarr** - For their excellent APIs
-- **Trakt.tv** - For trending data
-- **Go Community** - For amazing tools and libraries
-- **Contributors** - Everyone who has helped improve this project
-
-## 📞 Support
-
-- **GitHub Issues:** https://github.com/agencefanfare/newslettar/issues
-- **Discussions:** https://github.com/agencefanfare/newslettar/discussions
-- **Email:** hello@agencefanfare.com
-
-## 🗺️ Roadmap
-
-- [ ] Multi-language support
-- [ ] Custom email templates
-- [ ] Plex integration
-- [ ] Jellyfin integration
-- [ ] Multiple newsletter recipients with different preferences
-- [ ] Web-based template editor
-- [ ] Statistics and analytics
-- [ ] Discord/Slack notifications
-- [ ] Docker Hub automated builds
-
 ---
 
-**Made with ❤️ by [Agency Fanfare](https://agencefanfare.com)**
-
-If you find this useful, please ⭐ star the repository!
+Made by [Agency Fanfare](https://agencefanfare.com)

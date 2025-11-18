@@ -1,14 +1,12 @@
 {
-  "version": "0.8.0",
-  "released": "2025-11-17",
+  "version": "0.8.1",
+  "released": "2025-11-18",
   "changelog": [
-    "INSTALL: Simplified Docker installation - single file, no git clone required",
-    "INSTALL: Pre-built binary installer for Linux/Proxmox LXC (13MB vs 400MB)",
-    "INSTALL: Environment variable support for Docker deployments (no .env file needed)",
-    "INSTALL: GitHub Actions workflow for automatic multi-arch binary releases",
-    "CONFIG: Support environment variables as fallback to .env file",
-    "DOCKER: New docker-compose.simple.yml for one-file deployment",
-    "DOCKER: Simplified Dockerfile (removed embedded .env generation)",
-    "DOCS: Reorganized installation guide by platform (Docker/Proxmox/LXC)"
+    "DOCKER: Simplified docker-compose configuration - removed unnecessary security settings",
+    "DOCKER: No more privileged mode or special security options required",
+    "DOCKER: Works on all Docker environments without sysctl permission errors",
+    "DOCS: Streamlined README to focus on quick installation",
+    "DOCS: Removed excessive emojis and unnecessary documentation from README",
+    "DOCS: Clear Docker and native installation sections"
   ]
 }
