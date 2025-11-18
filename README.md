@@ -104,16 +104,6 @@ Get API keys:
 
 For detailed installation instructions, configuration options, troubleshooting, and development guides, see the [full documentation](https://github.com/MadSwell-dev/newslettar).
 
-## Contributing
-
-Contributions are welcome! Please open an issue or pull request on GitHub.
-
-## License
-
-This project is licensed under the MIT License.
-
-Copyright (c) 2025 MadSwell
-
 ---
 
-Made by [MadSwell](https://github.com/MadSwell-dev)
+_This project was mostly vibe-coded with a lot of help from Claude. Feel free to do whatever you want with it._

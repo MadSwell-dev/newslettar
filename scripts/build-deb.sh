@@ -81,7 +81,7 @@ Version: $VERSION
 Section: web
 Priority: optional
 Architecture: $ARCH
-Maintainer: MadSwell <madswell.dev@gmail.com>
+Maintainer: Community
 Description: Automated newsletter generator for Sonarr and Radarr
  Newslettar automatically generates beautiful email newsletters
  summarizing new content from your Sonarr (TV) and Radarr (Movie)

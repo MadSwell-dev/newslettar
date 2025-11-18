@@ -1381,14 +1381,5 @@ git push origin v1.6.0
 
 ---
 
-## 📞 Getting Help
-
-- **GitHub Issues:** https://github.com/MadSwell-dev/newslettar/issues
-- **Discussions:** https://github.com/MadSwell-dev/newslettar/discussions
-- **Email:** madswell.dev@gmail.com
-
----
-
-**Last Updated:** 2025-11-17
-**Maintainer:** MadSwell
+**Last Updated:** 2025-11-18
 **License:** MIT
