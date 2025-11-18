@@ -27,18 +27,6 @@ services:
       # TO_EMAILS: "user@example.com"
       TIMEZONE: "UTC"
       WEBUI_PORT: "8080"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 5s
-    networks:
-      - newslettar-net
-
-networks:
-  newslettar-net:
-    driver: bridge
 
 # ==============================================================================
 # USAGE:
