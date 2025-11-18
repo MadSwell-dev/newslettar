@@ -43,6 +43,7 @@ GITHUB_REPO="https://github.com/MadSwell-dev/newslettar"
 if [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/cmd/newslettar/main.go" ]; then
     echo -e "${YELLOW}⚠ Existing installation found at $INSTALL_DIR${NC}"
     echo -e "${YELLOW}Removing old installation to start fresh...${NC}"
+    cd /tmp  # Change to safe directory before removing
     rm -rf "$INSTALL_DIR"
     echo -e "${GREEN}✓ Old installation removed${NC}"
     echo ""

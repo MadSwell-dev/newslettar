@@ -96,6 +96,9 @@ echo -e "${GREEN}✓ Downloaded ${BINARY_NAME}${NC}"
 
 echo -e "${YELLOW}[3/5] Installing Newslettar...${NC}"
 
+# Change to safe directory before removing installation
+cd /tmp
+
 # Remove old installation if exists
 if [ -d "$INSTALL_DIR" ]; then
     echo -e "${BLUE}  Removing old installation...${NC}"
@@ -107,7 +110,6 @@ fi
 mkdir -p "$INSTALL_DIR"
 
 # Extract binary and assets
-cd /tmp
 tar -xzf newslettar.tar.gz -C "$INSTALL_DIR"
 rm newslettar.tar.gz
 
