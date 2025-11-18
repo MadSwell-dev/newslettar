@@ -44,6 +44,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             position: relative;
         }
         .header-logo {
+            width: 250px;
             max-width: 250px;
             height: auto;
             margin: 0 auto 15px;
