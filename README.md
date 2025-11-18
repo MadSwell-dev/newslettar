@@ -4,7 +4,7 @@
 
 Generate beautiful, scheduled email newsletters summarizing new TV shows and movies from your Sonarr and Radarr installations.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](https://unlicense.org)
 [![Go Version](https://img.shields.io/badge/Go-1.23-00ADD8?logo=go)](https://golang.org/)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://hub.docker.com/r/madswell/newslettar)
 
@@ -104,16 +104,6 @@ Get API keys:
 
 For detailed installation instructions, configuration options, troubleshooting, and development guides, see the [full documentation](https://github.com/MadSwell-dev/newslettar).
 
-## Contributing
-
-Contributions are welcome! Please open an issue or pull request on GitHub.
-
-## License
-
-This project is licensed under the MIT License.
-
-Copyright (c) 2025 MadSwell
-
 ---
 
-Made by [MadSwell](https://github.com/MadSwell-dev)
+_This project was mostly vibe-coded with a lot of help from Claude. Feel free to do whatever you want with it._
