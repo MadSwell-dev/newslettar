@@ -1382,4 +1382,4 @@ git push origin v1.6.0
 ---
 
 **Last Updated:** 2025-11-18
-**License:** MIT
+**License:** Unlicense (Public Domain)
