@@ -11,8 +11,6 @@
 #
 # No .env file needed - all configuration is inline below.
 
-version: '3.8'
-
 services:
   newslettar:
     # Option 1: Use pre-built image from Docker Hub (when available)
