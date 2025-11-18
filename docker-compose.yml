@@ -7,6 +7,13 @@ services:
       dockerfile: Dockerfile
     container_name: newslettar
     restart: unless-stopped
+
+    # Required for nested Docker environments (Proxmox LXC, Docker-in-Docker)
+    userns_mode: "host"
+    security_opt:
+      - apparmor:unconfined
+      - seccomp:unconfined
+
     ports:
       - "8080:8080"
     volumes:
