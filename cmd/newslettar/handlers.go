@@ -799,7 +799,7 @@ func logsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func versionHandler(w http.ResponseWriter, r *http.Request) {
-	resp, err := httpClient.Get("https://raw.githubusercontent.com/agencefanfare/newslettar/main/version.json")
+	resp, err := httpClient.Get("https://raw.githubusercontent.com/MadSwell-dev/newslettar/main/version.json")
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -845,7 +845,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
-		"message": "Update started! Building in background...",
+		"message": "Update started! Downloading latest release...",
 	})
 
 	go func() {
@@ -853,21 +853,9 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 		log.Println("🔄 Starting update process...")
 
+		// Use the same update method as newslettar-ctl update
 		cmd := exec.Command("bash", "-c", `
-			set -e
-			cd /opt/newslettar
-			echo "Backing up .env..."
-			cp .env .env.backup
-			echo "Updating from GitHub..."
-			git fetch origin main -q
-			git reset --hard origin/main -q
-			echo "Building with optimization flags..."
-			/usr/local/go/bin/go build -ldflags="-s -w" -trimpath -o newslettar ./cmd/newslettar
-			echo "Restoring .env..."
-			mv .env.backup .env
-			echo "Restarting service..."
-			systemctl restart newslettar.service
-			echo "Update complete!"
+			curl -sSL https://raw.githubusercontent.com/MadSwell-dev/newslettar/main/install-binary.sh | bash
 		`)
 
 		output, err := cmd.CombinedOutput()
