@@ -61,6 +61,29 @@ nano docker-compose.simple.yml  # Edit your settings
 docker compose -f docker-compose.simple.yml up -d
 ```
 
+## Docker CLI
+
+```bash
+docker run -d \
+  --name newslettar \
+  -p 8080:8080 \
+  -e SONARR_URL=http://192.168.1.100:8989 \
+  -e SONARR_API_KEY=your-api-key \
+  -e RADARR_URL=http://192.168.1.100:7878 \
+  -e RADARR_API_KEY=your-api-key \
+  -e SMTP_HOST=smtp.gmail.com \
+  -e SMTP_PORT=587 \
+  -e SMTP_USER=your-email@gmail.com \
+  -e SMTP_PASS=your-app-password \
+  -e FROM_EMAIL=newsletter@yourdomain.com \
+  -e TO_EMAILS=user@example.com \
+  -e TIMEZONE=America/New_York \
+  -e SCHEDULE_DAY=Sun \
+  -e SCHEDULE_TIME=09:00 \
+  --restart unless-stopped \
+  madswell/newslettar:latest
+```
+
 ## Native Installation (Linux)
 
 One-command installation for Debian/Ubuntu servers and Proxmox LXC containers:
