@@ -1,7 +1,15 @@
 package main
 
 // getUIHTML returns the full HTML for the web UI
-func getUIHTML(version string, nextRun string, timezone string) string {
+func getUIHTML(version string, nextRun string, timezone string, isDocker bool) string {
+	// Set tooltip text based on install type
+	var updateTooltip string
+	if isDocker {
+		updateTooltip = "Update available! Run: docker pull madswell/newslettar:latest"
+	} else {
+		updateTooltip = "Update available! Run: newslettar-ctl update"
+	}
+
 	return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -612,7 +620,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             <a href="/" class="header-logo-link" aria-label="Go to dashboard">
                 <img src="/assets/newslettar_white.svg" alt="Newslettar" class="header-logo">
             </a>
-            <p class="version">v` + version + ` <span id="update-available-icon" class="version-info"><i data-lucide="info"></i><span class="tooltip">Update available! Use: docker pull madswell/newslettar:latest<br>or newslettar-ctl update (native)</span></span></p>
+            <p class="version">v` + version + ` <span id="update-available-icon" class="version-info"><i data-lucide="info"></i><span class="tooltip">` + updateTooltip + `</span></span></p>
         </div>
 
         <div class="tabs" role="tablist">

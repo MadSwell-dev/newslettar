@@ -71,7 +71,11 @@ func uiHandler(w http.ResponseWriter, r *http.Request) {
 	loc := getTimezone(cfg.Timezone)
 	nextRun := getNextScheduledRun(cfg.ScheduleDay, cfg.ScheduleTime, loc)
 
-	html := getUIHTML(version, nextRun, cfg.Timezone)
+	// Detect if running in Docker
+	_, err := os.Stat("/.dockerenv")
+	isDocker := err == nil
+
+	html := getUIHTML(version, nextRun, cfg.Timezone, isDocker)
 
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprint(w, html)
