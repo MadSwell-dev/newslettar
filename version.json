@@ -1,8 +1,9 @@
 {
-  "version": "0.9.1",
+  "version": "0.9.2",
   "released": "2025-11-18",
   "changelog": [
-    "NEW: Added Docker CLI instructions to README",
-    "Documentation improvements for Docker deployment"
+    "FIX: Switched to Alpine Linux base image for better Docker compatibility",
+    "FIX: Resolved sysctl permission errors in LXC/restricted environments",
+    "Added troubleshooting section to documentation"
   ]
 }
