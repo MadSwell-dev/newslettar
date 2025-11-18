@@ -63,6 +63,55 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             opacity: 0.7;
             font-size: 0.85em;
             color: #8899aa;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .version-info {
+            position: relative;
+            cursor: help;
+            display: none;
+        }
+        .version-info.visible {
+            display: inline-flex;
+        }
+        .version-info i {
+            width: 14px;
+            height: 14px;
+            opacity: 0.6;
+        }
+        .version-info:hover i {
+            opacity: 1;
+        }
+        .version-info .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 125%;
+            right: 0;
+            background: #252f3f;
+            color: #e8e8e8;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid #3a4a5f;
+            transition: opacity 0.2s, visibility 0.2s;
+            z-index: 1000;
+        }
+        .version-info .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            right: 15px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #3a4a5f transparent transparent transparent;
+        }
+        .version-info:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
         }
         .tabs {
             display: flex;
@@ -563,14 +612,13 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             <a href="/" class="header-logo-link" aria-label="Go to dashboard">
                 <img src="/assets/newslettar_white.svg" alt="Newslettar" class="header-logo">
             </a>
-            <p class="version">v` + version + `</p>
+            <p class="version">v` + version + ` <span id="update-available-icon" class="version-info"><i data-lucide="info"></i><span class="tooltip">Update available! Use: docker pull madswell/newslettar:latest<br>or newslettar-ctl update (native)</span></span></p>
         </div>
 
         <div class="tabs" role="tablist">
             <button class="tab active" role="tab" aria-selected="true" aria-controls="dashboard-tab" onclick="showTab('dashboard')"><i data-lucide="layout-dashboard"></i> Dashboard</button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="config-tab" onclick="showTab('config')"><i data-lucide="settings"></i> Configuration</button>
             <button class="tab" role="tab" aria-selected="false" aria-controls="template-tab" onclick="showTab('template')"><i data-lucide="mail"></i> Email Template</button>
-            <button class="tab" id="update-tab-button" role="tab" aria-selected="false" aria-controls="update-tab" onclick="showTab('update')" style="display: none;"><i data-lucide="refresh-cw"></i> Update</button>
         </div>
 
         <div id="dashboard-tab" class="tab-content active" role="tabpanel">
@@ -1049,21 +1097,6 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             <p style="margin-top: 15px; color: #8899aa; font-size: 0.9em;">
                 Preview generates the email based on current settings without sending. Send Now will generate and send immediately.
             </p>
-        </div>
-
-        <div id="update-tab" class="tab-content" role="tabpanel">
-            <h3 style="margin-bottom: 20px;"><i data-lucide="refresh-cw"></i> Update Newslettar</h3>
-            
-            <div id="version-info" aria-live="polite">
-                <p>Checking for updates...</p>
-            </div>
-
-            <button class="btn" onclick="checkUpdates()" style="margin-right: 10px;" aria-label="Check for updates">
-                <span><i data-lucide="search"></i> Check for Updates</span>
-            </button>
-            <button class="btn btn-success" id="update-btn" onclick="performUpdate()" style="display: none;" aria-label="Update now">
-                <span><i data-lucide="download"></i> Update Now</span>
-            </button>
         </div>
     </div>
 
@@ -1960,99 +1993,21 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             }
         }
 
-        async function checkUpdates(event) {
-            const button = event ? event.target : null;
-            if (button) {
-                button.classList.add('loading');
-                button.disabled = true;
-            }
-
+        async function checkUpdates() {
             try {
                 const resp = await fetch('/api/version');
                 const data = await resp.json();
 
-                let html = '<div style="background: #252f3f; padding: 20px; border-radius: 10px; margin-bottom: 20px;">';
-                html += '<p><strong>Current Version:</strong> ' + data.current_version + '</p>';
-                html += '<p><strong>Latest Version:</strong> ' + data.latest_version + '</p>';
-
-                if (data.update_available) {
-                    html += '<p style="color: #38ef7d; margin-top: 15px;"><strong>Update Available!</strong></p>';
-                    html += '<h4 style="margin-top: 15px;">What\'s New:</h4>';
-                    html += '<ul style="margin-left: 20px; margin-top: 10px;">';
-                    data.changelog.forEach(item => {
-                        html += '<li style="margin: 5px 0;">' + item + '</li>';
-                    });
-                    html += '</ul>';
-                    document.getElementById('update-btn').style.display = 'inline-block';
-                    document.getElementById('update-tab-button').style.display = 'inline-block';
-                } else {
-                    html += '<p style="color: #8899aa; margin-top: 15px;">You are running the latest version!</p>';
-                    document.getElementById('update-btn').style.display = 'none';
-                    document.getElementById('update-tab-button').style.display = 'none';
-                }
-
-                html += '</div>';
-                document.getElementById('version-info').innerHTML = html;
-            } catch (error) {
-                showNotification('Failed to check updates: ' + error.message, 'error');
-            } finally {
-                if (button) {
-                    button.classList.remove('loading');
-                    button.disabled = false;
-                }
-            }
-        }
-
-        async function performUpdate() {
-            if (!confirm('Update Newslettar? The page will reload automatically when the update completes.')) return;
-
-            const button = document.getElementById('update-btn');
-            button.classList.add('loading');
-            button.disabled = true;
-
-            showNotification('Starting update... Please wait...', 'success');
-
-            try {
-                await fetch('/api/update', { method: 'POST' });
-
-                // Poll server to check when it's back up
-                let attempts = 0;
-                const maxAttempts = 60; // 60 attempts * 2 seconds = 2 minutes max
-
-                const pollServer = async () => {
-                    attempts++;
-
-                    if (attempts > maxAttempts) {
-                        showNotification('Update may have failed. Please refresh manually.', 'error');
-                        button.classList.remove('loading');
-                        button.disabled = false;
-                        return;
+                const icon = document.getElementById('update-available-icon');
+                if (data.update_available && icon) {
+                    icon.classList.add('visible');
+                    // Re-render lucide icons to ensure the new icon shows
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
                     }
-
-                    try {
-                        // Try to fetch the version endpoint to see if server is back
-                        const response = await fetch('/api/version');
-                        if (response.ok) {
-                            // Server is back, reload the page
-                            showNotification('Update complete! Reloading...', 'success');
-                            setTimeout(() => location.reload(), 500);
-                        } else {
-                            // Server returned an error, keep polling
-                            setTimeout(pollServer, 2000);
-                        }
-                    } catch (error) {
-                        // Server not ready yet, keep polling
-                        setTimeout(pollServer, 2000);
-                    }
-                };
-
-                // Start polling after 5 seconds (give the update process time to start)
-                setTimeout(pollServer, 5000);
-
+                }
             } catch (error) {
-                showNotification('Update failed: ' + error.message, 'error');
-                button.classList.remove('loading');
-                button.disabled = false;
+                // Silently fail - update check is not critical
             }
         }
 

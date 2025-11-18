@@ -33,7 +33,6 @@ func registerHandlers() {
 	http.HandleFunc("/api/send", sendHandler)
 	http.HandleFunc("/api/logs", logsHandler)
 	http.HandleFunc("/api/version", versionHandler)
-	http.HandleFunc("/api/update", updateHandler)
 	http.HandleFunc("/api/preview", previewHandler)
 	http.HandleFunc("/api/timezone-info", timezoneInfoHandler)
 	http.HandleFunc("/api/dashboard", dashboardHandler)
@@ -839,98 +838,6 @@ func versionHandler(w http.ResponseWriter, r *http.Request) {
 		"released":         remoteVersion.Released,
 		"changelog":        remoteVersion.Changelog,
 	})
-}
-
-func updateHandler(w http.ResponseWriter, r *http.Request) {
-	// Check if running in Docker
-	if _, err := os.Stat("/.dockerenv"); err == nil {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"message": "Auto-update is not available for Docker installations. To update, run: docker pull madswell/newslettar:latest && docker compose up -d",
-		})
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Update started! Downloading latest release...",
-	})
-
-	go func() {
-		time.Sleep(1 * time.Second)
-
-		log.Println("🔄 Starting update process...")
-
-		// Smart update: download new binary and replace atomically without deleting config
-		updateScript := `
-set -e
-
-GITHUB_REPO="MadSwell-dev/newslettar"
-INSTALL_DIR="/opt/newslettar"
-
-# Detect architecture
-ARCH=$(dpkg --print-architecture 2>/dev/null || echo "amd64")
-case $ARCH in
-    amd64) BINARY_ARCH="amd64" ;;
-    arm64) BINARY_ARCH="arm64" ;;
-    armhf) BINARY_ARCH="armv6" ;;
-    *) BINARY_ARCH="amd64" ;;
-esac
-
-# Get latest release version
-LATEST_VERSION=$(curl -s "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-
-if [ -z "$LATEST_VERSION" ]; then
-    echo "Failed to get latest version"
-    exit 1
-fi
-
-echo "Downloading version ${LATEST_VERSION}..."
-
-# Download to temp
-BINARY_NAME="newslettar_${LATEST_VERSION}_linux_${BINARY_ARCH}.tar.gz"
-DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download/${LATEST_VERSION}/${BINARY_NAME}"
-
-cd /tmp
-curl -sSL "$DOWNLOAD_URL" -o newslettar-update.tar.gz || {
-    echo "Failed to download binary"
-    exit 1
-}
-
-# Extract to temp
-mkdir -p /tmp/newslettar-update
-tar -xzf newslettar-update.tar.gz -C /tmp/newslettar-update
-
-# Replace binary atomically (preserves .env and other config)
-if [ -f /tmp/newslettar-update/newslettar ]; then
-    chmod +x /tmp/newslettar-update/newslettar
-    mv /tmp/newslettar-update/newslettar ${INSTALL_DIR}/newslettar.new
-    mv ${INSTALL_DIR}/newslettar.new ${INSTALL_DIR}/newslettar
-    echo "Binary updated successfully"
-else
-    echo "Binary not found in archive"
-    exit 1
-fi
-
-# Cleanup
-rm -rf /tmp/newslettar-update /tmp/newslettar-update.tar.gz
-
-# Restart service
-systemctl restart newslettar.service
-echo "Service restarted"
-`
-
-		cmd := exec.Command("bash", "-c", updateScript)
-		output, err := cmd.CombinedOutput()
-		log.Printf("Update output: %s", string(output))
-		if err != nil {
-			log.Printf("❌ Update failed: %v", err)
-		} else {
-			log.Printf("✅ Update completed successfully")
-		}
-	}()
 }
 
 // Dashboard handler - returns system stats, newsletter stats, and service status
