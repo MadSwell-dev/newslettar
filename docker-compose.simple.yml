@@ -30,6 +30,10 @@ services:
       - apparmor:unconfined
       - seccomp:unconfined
 
+    # ONLY enable if you get sysctl permission errors in nested environments
+    # This grants full privileges to the container - use with caution
+    privileged: true
+
     ports:
       - "8080:8080"
 
@@ -137,18 +141,19 @@ networks:
 # ==============================================================================
 # TROUBLESHOOTING - PROXMOX LXC / NESTED DOCKER:
 # ==============================================================================
-# If you get "permission denied" errors with sysctl, try these steps:
+# If you get "permission denied" errors with sysctl:
 #
-# 1. First, remove any existing container:
-#    docker rm -f newslettar
+# 1. The docker-compose file includes 'privileged: true' by default for nested
+#    containers. If you want to disable it for security reasons on non-nested
+#    environments, you can comment out that line.
 #
-# 2. The docker-compose file already includes security settings for nested
-#    containers. If it still fails, you may need to run your LXC container
-#    with nesting enabled. In Proxmox, edit /etc/pve/lxc/<CTID>.conf:
+# 2. If running in Proxmox LXC, ensure your LXC container has nesting enabled.
+#    Edit /etc/pve/lxc/<CTID>.conf and add:
 #
 #    features: nesting=1
 #
-# 3. If still failing, as a last resort, uncomment this line above:
-#    privileged: true
+# 3. After making changes, remove the existing container and restart:
+#    docker rm -f newslettar
+#    docker compose -f docker-compose.simple.yml up -d
 #
 # ==============================================================================
