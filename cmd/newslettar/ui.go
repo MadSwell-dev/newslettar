@@ -43,10 +43,15 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             border-bottom: 3px solid #667eea;
             position: relative;
         }
+        .header-logo-link {
+            display: block;
+            text-align: center;
+            margin-bottom: 15px;
+        }
         .header-logo {
             max-width: 250px;
             height: auto;
-            margin: 0 auto 15px;
+            margin: 0 auto;
             display: block;
         }
         .header h1 {
@@ -541,7 +546,9 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 <body>
     <div class="container">
         <div class="header">
-            <img src="/assets/newslettar_white.svg" alt="Newslettar" class="header-logo">
+            <a href="/" class="header-logo-link" aria-label="Go to dashboard">
+                <img src="/assets/newslettar_white.svg" alt="Newslettar" class="header-logo">
+            </a>
             <p class="version">v` + version + `</p>
         </div>
 
