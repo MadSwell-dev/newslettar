@@ -392,7 +392,7 @@ go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest  # Linting
 
 ```bash
 # Clone repository
-git clone https://github.com/agencefanfare/newslettar.git
+git clone https://github.com/MadSwell-dev/newslettar.git
 cd newslettar
 
 # Copy configuration
@@ -1383,12 +1383,12 @@ git push origin v1.6.0
 
 ## 📞 Getting Help
 
-- **GitHub Issues:** https://github.com/agencefanfare/newslettar/issues
-- **Discussions:** https://github.com/agencefanfare/newslettar/discussions
-- **Email:** hello@agencefanfare.com
+- **GitHub Issues:** https://github.com/MadSwell-dev/newslettar/issues
+- **Discussions:** https://github.com/MadSwell-dev/newslettar/discussions
+- **Email:** madswell.dev@gmail.com
 
 ---
 
 **Last Updated:** 2025-11-17
-**Maintainer:** Agency Fanfare
+**Maintainer:** MadSwell
 **License:** MIT

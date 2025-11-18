@@ -70,10 +70,10 @@ docker-run: docker-build ## Build and run Docker container
 
 docker-push: docker-build ## Build and push Docker image (requires Docker Hub login)
 	@echo "Pushing Docker image..."
-	docker tag $(BINARY_NAME):$(VERSION) agencefanfare/$(BINARY_NAME):$(VERSION)
-	docker tag $(BINARY_NAME):$(VERSION) agencefanfare/$(BINARY_NAME):latest
-	docker push agencefanfare/$(BINARY_NAME):$(VERSION)
-	docker push agencefanfare/$(BINARY_NAME):latest
+	docker tag $(BINARY_NAME):$(VERSION) madswell/$(BINARY_NAME):$(VERSION)
+	docker tag $(BINARY_NAME):$(VERSION) madswell/$(BINARY_NAME):latest
+	docker push madswell/$(BINARY_NAME):$(VERSION)
+	docker push madswell/$(BINARY_NAME):latest
 	@echo "✓ Pushed to Docker Hub"
 
 deb: ## Build Debian package

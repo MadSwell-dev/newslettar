@@ -4,7 +4,7 @@
 # Perfect for: Proxmox Docker containers, any Docker host
 #
 # QUICK START:
-#   1. Download: wget https://raw.githubusercontent.com/agencefanfare/newslettar/main/docker-compose.simple.yml
+#   1. Download: wget https://raw.githubusercontent.com/MadSwell-dev/newslettar/main/docker-compose.simple.yml
 #   2. Edit this file: nano docker-compose.simple.yml (edit environment variables below)
 #   3. Run: docker-compose -f docker-compose.simple.yml up -d
 #   4. Access: http://localhost:8080
@@ -14,11 +14,11 @@
 services:
   newslettar:
     # Option 1: Use pre-built image from Docker Hub (when available)
-    # image: agencefanfare/newslettar:latest
+    # image: madswell/newslettar:latest
 
     # Option 2: Build from GitHub repository directly
     build:
-      context: https://github.com/agencefanfare/newslettar.git
+      context: https://github.com/MadSwell-dev/newslettar.git
       dockerfile: Dockerfile
 
     container_name: newslettar
@@ -97,7 +97,7 @@ services:
 # QUICK START GUIDE:
 # ==============================================================================
 # 1. Download this file:
-#    wget https://raw.githubusercontent.com/agencefanfare/newslettar/main/docker-compose.simple.yml
+#    wget https://raw.githubusercontent.com/MadSwell-dev/newslettar/main/docker-compose.simple.yml
 #
 # 2. Edit the environment variables above with your settings
 #

@@ -201,7 +201,7 @@ When adding features or making changes:
 Don't hesitate to ask questions by:
 - Opening a GitHub issue
 - Starting a discussion in GitHub Discussions
-- Emailing hello@agencefanfare.com
+- Emailing madswell.dev@gmail.com
 
 ## License
 
