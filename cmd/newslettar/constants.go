@@ -51,18 +51,18 @@ const (
 
 // Email string defaults
 const (
-	DefaultEmailTitle                = "📺 Your Weekly Newslettar"
+	DefaultEmailTitle                = "Your Weekly Newslettar"
 	DefaultEmailIntro                = ""
 	DefaultWeekRangePrefix           = "Week of"
-	DefaultComingThisWeekHeading     = "📅 Coming This Week"
+	DefaultComingThisWeekHeading     = "Coming This Week"
 	DefaultTVShowsHeading            = "TV Shows"
 	DefaultMoviesHeading             = "Movies"
 	DefaultNoShowsMessage            = "No shows scheduled for this week"
 	DefaultNoMoviesMessage           = "No movies scheduled for this week"
-	DefaultDownloadedSectionHeading  = "📥 Downloaded Last Week"
+	DefaultDownloadedSectionHeading  = "Downloaded Last Week"
 	DefaultNoDownloadedShowsMessage  = "No shows downloaded this week"
 	DefaultNoDownloadedMoviesMessage = "No movies downloaded this week"
-	DefaultTrendingSectionHeading    = "🔥 Trending"
+	DefaultTrendingSectionHeading    = "Trending"
 	DefaultAnticipatedSeriesHeading  = "Most Anticipated Series (Next Week)"
 	DefaultWatchedSeriesHeading      = "Most Watched Series (Last Week)"
 	DefaultAnticipatedMoviesHeading  = "Most Anticipated Movies (Next Week)"
