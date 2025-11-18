@@ -73,6 +73,7 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
             color: #8899aa;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
         }
         .version-info {
