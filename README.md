@@ -100,10 +100,6 @@ Get API keys:
 - Trakt.tv: https://trakt.tv/oauth/applications
 - Gmail: Use App Passwords (requires 2FA)
 
-## Documentation
-
-For detailed installation instructions, configuration options, troubleshooting, and development guides, see the [full documentation](https://github.com/MadSwell-dev/newslettar).
-
 ---
 
 _This project was mostly vibe-coded with a lot of help from Claude. Feel free to do whatever you want with it._

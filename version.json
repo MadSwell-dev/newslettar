@@ -1,11 +1,12 @@
 {
-  "version": "0.8.2",
+  "version": "0.8.3",
   "released": "2025-11-18",
   "changelog": [
-    "DOCKER: Removed healthcheck from Dockerfile to fix permission errors",
-    "DOCKER: Removed curl dependency to minimize image size and complexity",
-    "DOCKER: Simplified docker-compose.simple.yml for easier installation",
-    "DOCKER: Fixed sysctl permission denied error on certain Docker hosts",
-    "DOCKER: Ultra-simple installation similar to Profilarr"
+    "GITHUB: Updated account name from agencefanfare to MadSwell-dev",
+    "DOCKER: Updated Docker Hub repository to madswell/newslettar",
+    "LICENSE: Changed from MIT to Unlicense (public domain)",
+    "INSTALL: Fixed getcwd error during updates",
+    "DOCS: Removed contact information and contributing guidelines",
+    "DOCS: Removed documentation section from README"
   ]
 }
