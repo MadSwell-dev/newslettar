@@ -18,18 +18,14 @@ mkdir -p "$PACKAGE_DIR"
 # Create directory structure
 mkdir -p "$PACKAGE_DIR/DEBIAN"
 mkdir -p "$PACKAGE_DIR/opt/newslettar"
-mkdir -p "$PACKAGE_DIR/opt/newslettar/templates"
-mkdir -p "$PACKAGE_DIR/opt/newslettar/assets"
 mkdir -p "$PACKAGE_DIR/etc/systemd/system"
 mkdir -p "$PACKAGE_DIR/usr/local/bin"
 
-# Build the binary
+# Build the binary (templates and assets are embedded)
 echo "Building binary..."
-CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath -o "$PACKAGE_DIR/opt/newslettar/newslettar" .
+CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath -o "$PACKAGE_DIR/opt/newslettar/newslettar" ./cmd/newslettar
 
-# Copy templates and assets
-cp templates/email.html "$PACKAGE_DIR/opt/newslettar/templates/"
-cp assets/*.svg "$PACKAGE_DIR/opt/newslettar/assets/"
+# Copy version file
 cp version.json "$PACKAGE_DIR/opt/newslettar/"
 
 # Copy environment example

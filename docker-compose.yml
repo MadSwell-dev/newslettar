@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   newslettar:
     build:
@@ -7,6 +5,10 @@ services:
       dockerfile: Dockerfile
     container_name: newslettar
     restart: unless-stopped
+
+    # Use host user namespace to avoid sysctl permission issues in rootless Docker
+    userns_mode: "host"
+
     ports:
       - "8080:8080"
     volumes:
