@@ -934,13 +934,13 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
 
             <div class="template-option">
                 <div>
-                    <strong>Show Series Descriptions</strong>
+                    <strong>Show Release Descriptions</strong>
                     <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
-                        Display short description for each TV series
+                        Display short description for each release
                     </p>
                 </div>
                 <label class="toggle-switch">
-                    <input type="checkbox" id="show-series-overview" onchange="saveTemplateSettings()" aria-label="Toggle series descriptions">
+                    <input type="checkbox" id="show-series-overview" onchange="saveTemplateSettings()" aria-label="Toggle release descriptions">
                     <span class="toggle-slider"></span>
                 </label>
             </div>
