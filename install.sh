@@ -330,7 +330,7 @@ case "$1" in
             exit 1
         fi
         
-        rm -f .env.backup
+        mv .env.backup .env
         systemctl restart newslettar.service
         echo -e "${GREEN}✓ Updated successfully!${NC}"
         ;;
