@@ -1,7 +1,10 @@
 # Multi-stage build for Newslettar
-FROM golang:1.23.5-bookworm AS builder
+FROM golang:1.23.5-alpine AS builder
 
 WORKDIR /build
+
+# Install build dependencies
+RUN apk add --no-cache git
 
 # Copy source files (new structure with cmd/)
 COPY cmd/ cmd/
@@ -14,13 +17,12 @@ RUN go mod tidy && \
     -trimpath \
     -o newslettar ./cmd/newslettar
 
-# Final stage - minimal runtime image
-FROM debian:bookworm-slim
+# Final stage - minimal Alpine runtime image
+# Alpine is more compatible with restricted environments (LXC, rootless Docker)
+FROM alpine:3.20
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+# Install only essential runtime dependencies
+RUN apk add --no-cache ca-certificates tzdata
 
 WORKDIR /opt/newslettar
 

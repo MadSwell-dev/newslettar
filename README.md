@@ -104,6 +104,28 @@ newslettar-ctl web        # Show Web UI URL
 newslettar-ctl update     # Update to latest version
 ```
 
+## Troubleshooting
+
+### Docker Permission Error (sysctl)
+
+If you see an error like:
+```
+OCI runtime create failed: ... open sysctl net.ipv4.ip_unprivileged_port_start file: permission denied
+```
+
+This occurs when running Docker in restricted environments (LXC containers, rootless Docker, some VPS providers). Solutions:
+
+1. **Use the latest image** - We've switched to Alpine Linux for better compatibility
+2. **For LXC containers** - Enable nesting and required features in your LXC config:
+   ```
+   lxc.apparmor.profile = unconfined
+   security.nesting = true
+   ```
+3. **Alternative workaround** - Run with security options (less secure):
+   ```bash
+   docker run --security-opt seccomp=unconfined ...
+   ```
+
 ## Configuration
 
 All configuration can be done through the web UI at http://localhost:8080, or via environment variables for Docker deployments.
