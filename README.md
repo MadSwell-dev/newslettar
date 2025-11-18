@@ -36,9 +36,9 @@ services:
     ports:
       - 8080:8080
     environment:
-      - SONARR_URL=http://192.168.1.100:8989
+      - SONARR_URL=http://YOUR-SERVER-IP:8989
       - SONARR_API_KEY=your-api-key
-      - RADARR_URL=http://192.168.1.100:7878
+      - RADARR_URL=http://YOUR-SERVER-IP:7878
       - RADARR_API_KEY=your-api-key
       - SMTP_HOST=smtp.gmail.com
       - SMTP_PORT=587
@@ -69,9 +69,9 @@ Recommended for Proxmox LXC and restricted Docker environments:
 docker run -d \
   --name newslettar \
   --network host \
-  -e SONARR_URL=http://192.168.1.100:8989 \
+  -e SONARR_URL=http://YOUR-SERVER-IP:8989 \
   -e SONARR_API_KEY=your-api-key \
-  -e RADARR_URL=http://192.168.1.100:7878 \
+  -e RADARR_URL=http://YOUR-SERVER-IP:7878 \
   -e RADARR_API_KEY=your-api-key \
   -e SMTP_HOST=smtp.gmail.com \
   -e SMTP_PORT=587 \
