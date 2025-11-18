@@ -79,17 +79,21 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
             position: relative;
             cursor: help;
             display: none;
+            align-items: center;
         }
         .version-info.visible {
             display: inline-flex;
+            align-items: center;
         }
         .version-info i {
             width: 14px;
             height: 14px;
-            opacity: 0.6;
+            color: #f59e0b;
+            opacity: 0.9;
         }
         .version-info:hover i {
             opacity: 1;
+            color: #fbbf24;
         }
         .version-info .tooltip {
             visibility: hidden;
