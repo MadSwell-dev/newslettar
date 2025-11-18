@@ -1,10 +1,8 @@
 {
-  "version": "0.8.5",
+  "version": "0.9.0",
   "released": "2025-11-18",
   "changelog": [
-    "FIX: API keys no longer cleared when saving template settings/toggles",
-    "FIX: Removed .env from git tracking to prevent credential loss on updates",
-    "FIX: Configuration form detection prevents cross-contamination between tabs",
-    "SECURITY: .env file no longer tracked in version control"
+    "NEW: Automated Docker Hub publishing on release",
+    "Docker images available at madswell/newslettar"
   ]
 }
