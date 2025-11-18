@@ -25,6 +25,7 @@ services:
 
     container_name: newslettar
     restart: unless-stopped
+    userns_mode: "host"
 
     ports:
       - "8080:8080"
