@@ -17,7 +17,7 @@ var templateFS embed.FS
 //go:embed assets/*
 var assetsFS embed.FS
 
-const version = "0.8.2"
+const version = "0.8.4"
 
 // Track server start time for uptime monitoring
 var startTime = time.Now()
