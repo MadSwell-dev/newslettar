@@ -842,6 +842,16 @@ func versionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateHandler(w http.ResponseWriter, r *http.Request) {
+	// Check if running in Docker
+	if _, err := os.Stat("/.dockerenv"); err == nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Auto-update is not available for Docker installations. To update, run: docker pull madswell/newslettar:latest && docker compose up -d",
+		})
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
