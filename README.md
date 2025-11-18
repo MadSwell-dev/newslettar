@@ -63,10 +63,12 @@ docker compose -f docker-compose.simple.yml up -d
 
 ## Docker CLI
 
+Recommended for Proxmox LXC and restricted Docker environments:
+
 ```bash
 docker run -d \
   --name newslettar \
-  -p 8080:8080 \
+  --network host \
   -e SONARR_URL=http://192.168.1.100:8989 \
   -e SONARR_API_KEY=your-api-key \
   -e RADARR_URL=http://192.168.1.100:7878 \
@@ -83,6 +85,10 @@ docker run -d \
   --restart unless-stopped \
   madswell/newslettar:latest
 ```
+
+With `--network host`, access the UI at `http://<your-host-ip>:8080`.
+
+**Alternative (standard Docker):** Replace `--network host` with `-p 8080:8080` for port mapping.
 
 ## Native Installation (Linux)
 
