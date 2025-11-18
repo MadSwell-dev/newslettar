@@ -2,7 +2,7 @@
 
 # Newslettar Installer v1.1.0 (Refactored & Optimized)
 # Run this INSIDE your Debian LXC container
-# curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install.sh | bash
+# curl -sSL https://raw.githubusercontent.com/MadSwell-dev/newslettar/main/install.sh | bash
 
 set -e
 
@@ -36,8 +36,8 @@ echo -e "${BLUE}Detected Debian version: ${DEBIAN_VERSION}${NC}"
 echo ""
 
 INSTALL_DIR="/opt/newslettar"
-REPO_URL="https://raw.githubusercontent.com/agencefanfare/newslettar/main"
-GITHUB_REPO="https://github.com/agencefanfare/newslettar"
+REPO_URL="https://raw.githubusercontent.com/MadSwell-dev/newslettar/main"
+GITHUB_REPO="https://github.com/MadSwell-dev/newslettar"
 
 # Check if installation already exists and offer to clean it
 if [ -d "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/cmd/newslettar/main.go" ]; then
@@ -94,7 +94,7 @@ rm -rf /tmp/temp_clone temp_clone 2>/dev/null || true
 # Clone into a temporary directory, then copy files
 TEMP_CLONE=$(mktemp -d)
 echo -e "${BLUE}  Temp directory: $TEMP_CLONE${NC}"
-git clone --depth 1 --branch main "https://github.com/agencefanfare/newslettar.git" "$TEMP_CLONE" 2>&1
+git clone --depth 1 --branch main "https://github.com/MadSwell-dev/newslettar.git" "$TEMP_CLONE" 2>&1
 CLONE_EXIT=$?
 echo -e "${BLUE}  Git clone exit code: $CLONE_EXIT${NC}"
 
@@ -151,7 +151,7 @@ if [ ! -f "$INSTALL_DIR/cmd/newslettar/main.go" ]; then
     echo -e "${BLUE}    Downloading latest release...${NC}"
 
     # Download the repository as a tar.gz archive
-    wget -q -O /tmp/newslettar.tar.gz "https://github.com/agencefanfare/newslettar/archive/refs/heads/main.tar.gz" || {
+    wget -q -O /tmp/newslettar.tar.gz "https://github.com/MadSwell-dev/newslettar/archive/refs/heads/main.tar.gz" || {
         echo -e "${RED}Failed to download repository${NC}"
         exit 1
     }

@@ -81,7 +81,7 @@ Version: $VERSION
 Section: web
 Priority: optional
 Architecture: $ARCH
-Maintainer: Agency Fanfare <hello@agencefanfare.com>
+Maintainer: MadSwell <madswell.dev@gmail.com>
 Description: Automated newsletter generator for Sonarr and Radarr
  Newslettar automatically generates beautiful email newsletters
  summarizing new content from your Sonarr (TV) and Radarr (Movie)
@@ -91,7 +91,7 @@ Description: Automated newsletter generator for Sonarr and Radarr
   - Web UI for configuration
   - Trakt.tv integration for trending content
   - Low resource usage (~12MB RAM)
-Homepage: https://github.com/agencefanfare/newslettar
+Homepage: https://github.com/MadSwell-dev/newslettar
 Depends: systemd
 EOF
 

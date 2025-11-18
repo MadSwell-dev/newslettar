@@ -7,7 +7,7 @@
 # Downloads pre-built binary (~13MB) instead of compiling from source
 #
 # INSTALLATION:
-#   curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install-binary.sh | sudo bash
+#   curl -sSL https://raw.githubusercontent.com/MadSwell-dev/newslettar/main/install-binary.sh | sudo bash
 #
 # After install, configure via web UI at: http://your-server-ip:8080
 
@@ -43,7 +43,7 @@ echo -e "${BLUE}Detected Debian version: ${DEBIAN_VERSION}${NC}"
 echo ""
 
 INSTALL_DIR="/opt/newslettar"
-GITHUB_REPO="agencefanfare/newslettar"
+GITHUB_REPO="MadSwell-dev/newslettar"
 
 # Detect architecture
 ARCH=$(dpkg --print-architecture)
@@ -224,7 +224,7 @@ case "$1" in
         ;;
     update)
         echo -e "${YELLOW}Updating Newslettar...${NC}"
-        curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install-binary.sh | bash
+        curl -sSL https://raw.githubusercontent.com/MadSwell-dev/newslettar/main/install-binary.sh | bash
         ;;
     memory)
         echo -e "${BLUE}Memory Usage:${NC}"

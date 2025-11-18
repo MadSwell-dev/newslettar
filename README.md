@@ -6,7 +6,7 @@ Generate beautiful, scheduled email newsletters summarizing new TV shows and mov
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.23-00ADD8?logo=go)](https://golang.org/)
-[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://hub.docker.com/r/agencefanfare/newslettar)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://hub.docker.com/r/madswell/newslettar)
 
 ## Features
 
@@ -31,7 +31,7 @@ Generate beautiful, scheduled email newsletters summarizing new TV shows and mov
 ```yaml
 services:
   newslettar:
-    image: agencefanfare/newslettar:latest
+    image: madswell/newslettar:latest
     container_name: newslettar
     ports:
       - 8080:8080
@@ -56,7 +56,7 @@ After deployment, access the web UI at http://localhost:8080 to configure and te
 
 **Alternative:** Download standalone compose file with inline configuration:
 ```bash
-wget https://raw.githubusercontent.com/agencefanfare/newslettar/main/docker-compose.simple.yml
+wget https://raw.githubusercontent.com/MadSwell-dev/newslettar/main/docker-compose.simple.yml
 nano docker-compose.simple.yml  # Edit your settings
 docker compose -f docker-compose.simple.yml up -d
 ```
@@ -66,7 +66,7 @@ docker compose -f docker-compose.simple.yml up -d
 One-command installation for Debian/Ubuntu servers and Proxmox LXC containers:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/agencefanfare/newslettar/main/install-binary.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/MadSwell-dev/newslettar/main/install-binary.sh | sudo bash
 ```
 
 The installer downloads a pre-built binary (~13MB), installs it to `/opt/newslettar`, creates a systemd service, and starts it automatically.
@@ -102,7 +102,7 @@ Get API keys:
 
 ## Documentation
 
-For detailed installation instructions, configuration options, troubleshooting, and development guides, see the [full documentation](https://github.com/agencefanfare/newslettar).
+For detailed installation instructions, configuration options, troubleshooting, and development guides, see the [full documentation](https://github.com/MadSwell-dev/newslettar).
 
 ## Contributing
 
@@ -112,8 +112,8 @@ Contributions are welcome! Please open an issue or pull request on GitHub.
 
 This project is licensed under the MIT License.
 
-Copyright (c) 2025 Agency Fanfare
+Copyright (c) 2025 MadSwell
 
 ---
 
-Made by [Agency Fanfare](https://agencefanfare.com)
+Made by [MadSwell](https://github.com/MadSwell-dev)
