@@ -343,57 +343,72 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		// Masked placeholder - don't update if this value is sent back
 		const maskedPlaceholder = "••••••••"
 
-		// Update configuration fields
-		// For sensitive fields (API keys, passwords): update if not masked, allowing empty values to clear them
-		// For other fields: only update if provided (not empty)
-		// Masked placeholder (••••••••) indicates the field wasn't changed by the user
-		if webCfg.SonarrURL != "" {
-			envMap["SONARR_URL"] = webCfg.SonarrURL
-		}
-		// Allow clearing API keys - update if not masked (even if empty)
-		if webCfg.SonarrAPIKey != maskedPlaceholder {
-			envMap["SONARR_API_KEY"] = webCfg.SonarrAPIKey
-		}
-		if webCfg.RadarrURL != "" {
-			envMap["RADARR_URL"] = webCfg.RadarrURL
-		}
-		// Allow clearing API keys - update if not masked (even if empty)
-		if webCfg.RadarrAPIKey != maskedPlaceholder {
-			envMap["RADARR_API_KEY"] = webCfg.RadarrAPIKey
-		}
-		// Allow clearing Trakt Client ID - update if not masked (even if empty)
-		if webCfg.TraktClientID != maskedPlaceholder {
-			envMap["TRAKT_CLIENT_ID"] = webCfg.TraktClientID
-		}
-		if webCfg.SMTPHost != "" {
-			envMap["SMTP_HOST"] = webCfg.SMTPHost
-		}
-		if webCfg.SMTPPort != "" {
-			envMap["SMTP_PORT"] = webCfg.SMTPPort
-		}
-		if webCfg.SMTPUser != "" {
-			envMap["SMTP_USER"] = webCfg.SMTPUser
-		}
-		// Allow clearing password - update if not masked (even if empty)
-		if webCfg.SMTPPass != maskedPlaceholder {
-			envMap["SMTP_PASS"] = webCfg.SMTPPass
-		}
-		if webCfg.FromEmail != "" {
-			envMap["FROM_EMAIL"] = webCfg.FromEmail
-		}
-		if webCfg.FromName != "" {
-			envMap["FROM_NAME"] = webCfg.FromName
-		}
-		// Always update TO_EMAILS, even if empty (allows clearing all recipients)
-		envMap["TO_EMAILS"] = webCfg.ToEmails
-		if webCfg.Timezone != "" {
-			envMap["TIMEZONE"] = webCfg.Timezone
-		}
-		if webCfg.ScheduleDay != "" {
-			envMap["SCHEDULE_DAY"] = webCfg.ScheduleDay
-		}
-		if webCfg.ScheduleTime != "" {
-			envMap["SCHEDULE_TIME"] = webCfg.ScheduleTime
+		// Detect if this is a main config form submission (has API/connection fields)
+		// vs template settings submission (only has toggle fields)
+		// This prevents template settings from clearing API keys
+		hasMainConfigFields := webCfg.SonarrURL != "" || webCfg.SonarrAPIKey != "" ||
+			webCfg.RadarrURL != "" || webCfg.RadarrAPIKey != "" ||
+			webCfg.TraktClientID != "" || webCfg.SMTPHost != "" ||
+			webCfg.SMTPPort != "" || webCfg.SMTPUser != "" ||
+			webCfg.SMTPPass != "" || webCfg.FromEmail != "" ||
+			webCfg.FromName != "" || webCfg.ToEmails != "" ||
+			webCfg.Timezone != "" || webCfg.ScheduleDay != "" ||
+			webCfg.ScheduleTime != "" ||
+			webCfg.SonarrAPIKey == maskedPlaceholder ||
+			webCfg.RadarrAPIKey == maskedPlaceholder ||
+			webCfg.TraktClientID == maskedPlaceholder ||
+			webCfg.SMTPPass == maskedPlaceholder
+
+		// Only update main config fields if they're being submitted
+		if hasMainConfigFields {
+			if webCfg.SonarrURL != "" {
+				envMap["SONARR_URL"] = webCfg.SonarrURL
+			}
+			// Allow clearing API keys - update if not masked (even if empty)
+			if webCfg.SonarrAPIKey != maskedPlaceholder {
+				envMap["SONARR_API_KEY"] = webCfg.SonarrAPIKey
+			}
+			if webCfg.RadarrURL != "" {
+				envMap["RADARR_URL"] = webCfg.RadarrURL
+			}
+			// Allow clearing API keys - update if not masked (even if empty)
+			if webCfg.RadarrAPIKey != maskedPlaceholder {
+				envMap["RADARR_API_KEY"] = webCfg.RadarrAPIKey
+			}
+			// Allow clearing Trakt Client ID - update if not masked (even if empty)
+			if webCfg.TraktClientID != maskedPlaceholder {
+				envMap["TRAKT_CLIENT_ID"] = webCfg.TraktClientID
+			}
+			if webCfg.SMTPHost != "" {
+				envMap["SMTP_HOST"] = webCfg.SMTPHost
+			}
+			if webCfg.SMTPPort != "" {
+				envMap["SMTP_PORT"] = webCfg.SMTPPort
+			}
+			if webCfg.SMTPUser != "" {
+				envMap["SMTP_USER"] = webCfg.SMTPUser
+			}
+			// Allow clearing password - update if not masked (even if empty)
+			if webCfg.SMTPPass != maskedPlaceholder {
+				envMap["SMTP_PASS"] = webCfg.SMTPPass
+			}
+			if webCfg.FromEmail != "" {
+				envMap["FROM_EMAIL"] = webCfg.FromEmail
+			}
+			if webCfg.FromName != "" {
+				envMap["FROM_NAME"] = webCfg.FromName
+			}
+			// Always update TO_EMAILS, even if empty (allows clearing all recipients)
+			envMap["TO_EMAILS"] = webCfg.ToEmails
+			if webCfg.Timezone != "" {
+				envMap["TIMEZONE"] = webCfg.Timezone
+			}
+			if webCfg.ScheduleDay != "" {
+				envMap["SCHEDULE_DAY"] = webCfg.ScheduleDay
+			}
+			if webCfg.ScheduleTime != "" {
+				envMap["SCHEDULE_TIME"] = webCfg.ScheduleTime
+			}
 		}
 		if webCfg.ShowPosters != "" {
 			envMap["SHOW_POSTERS"] = webCfg.ShowPosters
