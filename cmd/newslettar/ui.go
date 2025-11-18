@@ -541,7 +541,21 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
+
+        /* Lucide icon styling */
+        .lucide {
+            width: 18px;
+            height: 18px;
+            vertical-align: -3px;
+            margin-right: 6px;
+        }
+        .dashboard-icon .lucide {
+            width: 24px;
+            height: 24px;
+            margin-right: 0;
+        }
     </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <div class="container">
@@ -553,10 +567,10 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         </div>
 
         <div class="tabs" role="tablist">
-            <button class="tab active" role="tab" aria-selected="true" aria-controls="dashboard-tab" onclick="showTab('dashboard')">📊 Dashboard</button>
-            <button class="tab" role="tab" aria-selected="false" aria-controls="config-tab" onclick="showTab('config')">⚙️ Configuration</button>
-            <button class="tab" role="tab" aria-selected="false" aria-controls="template-tab" onclick="showTab('template')">📝 Email Template</button>
-            <button class="tab" id="update-tab-button" role="tab" aria-selected="false" aria-controls="update-tab" onclick="showTab('update')" style="display: none;">🔄 Update</button>
+            <button class="tab active" role="tab" aria-selected="true" aria-controls="dashboard-tab" onclick="showTab('dashboard')"><i data-lucide="layout-dashboard"></i> Dashboard</button>
+            <button class="tab" role="tab" aria-selected="false" aria-controls="config-tab" onclick="showTab('config')"><i data-lucide="settings"></i> Configuration</button>
+            <button class="tab" role="tab" aria-selected="false" aria-controls="template-tab" onclick="showTab('template')"><i data-lucide="mail"></i> Email Template</button>
+            <button class="tab" id="update-tab-button" role="tab" aria-selected="false" aria-controls="update-tab" onclick="showTab('update')" style="display: none;"><i data-lucide="refresh-cw"></i> Update</button>
         </div>
 
         <div id="dashboard-tab" class="tab-content active" role="tabpanel">
@@ -565,7 +579,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             <div class="dashboard-grid">
                 <div class="dashboard-card">
                     <div class="dashboard-card-header">
-                        <span class="dashboard-icon">🖥️</span>
+                        <span class="dashboard-icon"><i data-lucide="monitor"></i></span>
                         <h4>System Stats</h4>
                     </div>
                     <div class="dashboard-card-content">
@@ -590,7 +604,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
                 <div class="dashboard-card">
                     <div class="dashboard-card-header">
-                        <span class="dashboard-icon">📧</span>
+                        <span class="dashboard-icon"><i data-lucide="mail"></i></span>
                         <h4>Newsletter Stats</h4>
                     </div>
                     <div class="dashboard-card-content">
@@ -615,7 +629,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
                 <div class="dashboard-card">
                     <div class="dashboard-card-header">
-                        <span class="dashboard-icon">🔌</span>
+                        <span class="dashboard-icon"><i data-lucide="activity"></i></span>
                         <h4>Service Status</h4>
                     </div>
                     <div class="dashboard-card-content">
@@ -640,7 +654,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
                 <div class="dashboard-card dashboard-logs">
                     <div class="dashboard-card-header">
-                        <span class="dashboard-icon">📋</span>
+                        <span class="dashboard-icon"><i data-lucide="clipboard-list"></i></span>
                         <h4>Recent Logs</h4>
                     </div>
                     <div class="dashboard-card-content">
@@ -653,13 +667,13 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
             <div class="action-buttons" style="margin-top: 30px;">
                 <button class="btn" onclick="previewNewsletter()" aria-label="Generate newsletter preview">
-                    <span>👁️ Preview Newsletter</span>
+                    <span><i data-lucide="eye"></i> Preview Newsletter</span>
                 </button>
                 <button class="btn" onclick="sendNow()" aria-label="Send newsletter immediately">
-                    <span>📤 Send Now</span>
+                    <span><i data-lucide="send"></i> Send Now</span>
                 </button>
                 <button class="btn btn-secondary" onclick="showTab('config')" aria-label="Go to configuration">
-                    <span>⚙️ Configuration</span>
+                    <span><i data-lucide="settings"></i> Configuration</span>
                 </button>
             </div>
         </div>
@@ -745,7 +759,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 <h3 style="margin-bottom: 15px; color: #667eea;">Trakt Settings (Optional)</h3>
                 <div class="info-banner" style="margin-bottom: 20px;">
                     <p style="font-size: 0.9em;">
-                        ℹ️ Trakt integration enables trending content sections in your newsletter.
+                        <i data-lucide="info"></i> Trakt integration enables trending content sections in your newsletter.
                         <a href="https://trakt.tv/oauth/applications" target="_blank" style="color: #667eea; text-decoration: underline;">Create an app</a>
                         and copy your <strong>Client ID</strong> (Client Secret is not needed).
                     </p>
@@ -763,7 +777,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 <h3 style="margin-bottom: 15px; color: #667eea;">Email Settings</h3>
 
                 <div class="email-section">
-                    <h3>📧 Email Recipients</h3>
+                    <h3><i data-lucide="mail"></i> Email Recipients</h3>
                     <p style="color: #8899aa; font-size: 0.9em; margin-bottom: 15px;">Add email addresses to receive the newsletter. Type an email and press comma or Enter to add it.</p>
                     <div class="form-group">
                         <label for="email-tag-input">Recipient Email Addresses</label>
@@ -819,12 +833,12 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
             <div class="info-banner" style="margin-bottom: 20px;">
                 <p style="font-size: 0.9em;">
-                    ℹ️ Customize all static text in your newsletter, including headings, messages, and the footer. Perfect for translating your newsletter to other languages or personalizing the content.
+                    <i data-lucide="info"></i> Customize all static text in your newsletter, including headings, messages, and the footer. Perfect for translating your newsletter to other languages or personalizing the content.
                 </p>
             </div>
 
             <button class="btn" onclick="openEditStringsModal()" aria-label="Edit email strings">
-                <span>✏️ Edit Email Strings</span>
+                <span><i data-lucide="edit"></i> Edit Email Strings</span>
             </button>
 
             <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
@@ -927,7 +941,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             <h3 style="margin-bottom: 15px;">Trakt Trending Sections</h3>
             <div class="info-banner" style="margin-bottom: 20px;">
                 <p style="font-size: 0.9em;">
-                    ℹ️ Requires Trakt Client ID in Configuration tab. Toggles work only when Client ID is configured.
+                    <i data-lucide="info"></i> Requires Trakt Client ID in Configuration tab. Toggles work only when Client ID is configured.
                 </p>
             </div>
 
@@ -1016,7 +1030,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
             </div>
 
             <p style="margin-top: 20px; color: #8899aa; font-size: 0.9em;">
-                ℹ️ Changes are saved automatically when you toggle switches.
+                <i data-lucide="info"></i> Changes are saved automatically when you toggle switches.
             </p>
 
             <hr style="margin: 30px 0; border: none; border-top: 2px solid #2a3444;">
@@ -1025,10 +1039,10 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
             <div class="action-buttons">
                 <button class="btn btn-secondary" onclick="previewNewsletter()" aria-label="Preview newsletter">
-                    <span>👁️ Preview Newsletter</span>
+                    <span><i data-lucide="eye"></i> Preview Newsletter</span>
                 </button>
                 <button class="btn btn-success" onclick="sendNow()" aria-label="Send newsletter now">
-                    <span>📧 Send Newsletter Now</span>
+                    <span><i data-lucide="send"></i> Send Newsletter Now</span>
                 </button>
             </div>
 
@@ -1038,17 +1052,17 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         </div>
 
         <div id="update-tab" class="tab-content" role="tabpanel">
-            <h3 style="margin-bottom: 20px;">🔄 Update Newslettar</h3>
+            <h3 style="margin-bottom: 20px;"><i data-lucide="refresh-cw"></i> Update Newslettar</h3>
             
             <div id="version-info" aria-live="polite">
                 <p>Checking for updates...</p>
             </div>
 
             <button class="btn" onclick="checkUpdates()" style="margin-right: 10px;" aria-label="Check for updates">
-                <span>🔍 Check for Updates</span>
+                <span><i data-lucide="search"></i> Check for Updates</span>
             </button>
             <button class="btn btn-success" id="update-btn" onclick="performUpdate()" style="display: none;" aria-label="Update now">
-                <span>⬇️ Update Now</span>
+                <span><i data-lucide="download"></i> Update Now</span>
             </button>
         </div>
     </div>
@@ -1070,7 +1084,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
     <div id="edit-strings-modal" class="modal" role="dialog" aria-labelledby="edit-strings-title" aria-modal="true">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="edit-strings-title">✏️ Edit Email Strings</h2>
+                <h2 id="edit-strings-title"><i data-lucide="edit"></i> Edit Email Strings</h2>
                 <button class="modal-close" onclick="closeEditStringsModal()" aria-label="Close edit strings">&times;</button>
             </div>
             <div class="modal-body" style="max-height: calc(90vh - 140px); overflow-y: auto;">
@@ -1083,7 +1097,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
                 <form id="edit-strings-form">
                     <div class="form-group">
                         <label for="email-title">Email Title</label>
-                        <input type="text" id="email-title" name="email_title" placeholder="e.g., 📺 Your Weekly Newslettar">
+                        <input type="text" id="email-title" name="email_title" placeholder="e.g., Your Weekly Newslettar">
                     </div>
 
                     <div class="form-group">
@@ -1102,7 +1116,7 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
                     <div class="form-group">
                         <label for="coming-this-week-heading">Coming This Week Heading</label>
-                        <input type="text" id="coming-this-week-heading" name="coming_this_week_heading" placeholder="e.g., 📅 Coming This Week">
+                        <input type="text" id="coming-this-week-heading" name="coming_this_week_heading" placeholder="e.g., Coming This Week">
                     </div>
 
                     <div class="form-group">
@@ -1117,12 +1131,12 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
                     <div class="form-group">
                         <label for="downloaded-section-heading">Downloaded Section Heading</label>
-                        <input type="text" id="downloaded-section-heading" name="downloaded_section_heading" placeholder="e.g., 📥 Downloaded Last Week">
+                        <input type="text" id="downloaded-section-heading" name="downloaded_section_heading" placeholder="e.g., Downloaded Last Week">
                     </div>
 
                     <div class="form-group">
                         <label for="trending-section-heading">Trending Section Heading</label>
-                        <input type="text" id="trending-section-heading" name="trending_section_heading" placeholder="e.g., 🔥 Trending">
+                        <input type="text" id="trending-section-heading" name="trending_section_heading" placeholder="e.g., Trending">
                     </div>
 
                     <hr style="margin: 25px 0; border: none; border-top: 1px solid #2a3444;">
@@ -1181,13 +1195,13 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
                     <div style="display: flex; gap: 10px; margin-top: 30px;">
                         <button type="button" class="btn btn-success" onclick="saveEmailStrings()" style="flex: 1;" aria-label="Save email strings">
-                            <span>💾 Save Changes</span>
+                            <span><i data-lucide="save"></i> Save Changes</span>
                         </button>
                         <button type="button" class="btn btn-secondary" onclick="resetEmailStrings()" style="flex: 1;" aria-label="Reset to defaults">
-                            <span>↩️ Reset to Defaults</span>
+                            <span><i data-lucide="rotate-ccw"></i> Reset to Defaults</span>
                         </button>
                         <button type="button" class="btn btn-secondary" onclick="closeEditStringsModal()" aria-label="Cancel">
-                            <span>✖️ Cancel</span>
+                            <span><i data-lucide="x"></i> Cancel</span>
                         </button>
                     </div>
                 </form>
@@ -1752,6 +1766,11 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
                 // Show modal
                 document.getElementById('edit-strings-modal').classList.add('show');
+
+                // Re-initialize Lucide icons in modal
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
             } catch (error) {
                 console.error('Failed to load config:', error);
                 showNotification('Failed to load current configuration', 'error');
@@ -1827,18 +1846,18 @@ func getUIHTML(version string, nextRun string, timezone string) string {
 
             try {
                 // Set default values (from constants.go)
-                document.getElementById('email-title').value = '📺 Your Weekly Newslettar';
+                document.getElementById('email-title').value = 'Your Weekly Newslettar';
                 document.getElementById('email-intro').value = '';
                 document.getElementById('week-range-prefix').value = 'Week of';
-                document.getElementById('coming-this-week-heading').value = '📅 Coming This Week';
+                document.getElementById('coming-this-week-heading').value = 'Coming This Week';
                 document.getElementById('tv-shows-heading').value = 'TV Shows';
                 document.getElementById('movies-heading').value = 'Movies';
                 document.getElementById('no-shows-message').value = 'No shows scheduled for this week';
                 document.getElementById('no-movies-message').value = 'No movies scheduled for this week';
-                document.getElementById('downloaded-section-heading').value = '📥 Downloaded Last Week';
+                document.getElementById('downloaded-section-heading').value = 'Downloaded Last Week';
                 document.getElementById('no-downloaded-shows-message').value = 'No shows downloaded this week';
                 document.getElementById('no-downloaded-movies-message').value = 'No movies downloaded this week';
-                document.getElementById('trending-section-heading').value = '🔥 Trending';
+                document.getElementById('trending-section-heading').value = 'Trending';
                 document.getElementById('anticipated-series-heading').value = 'Most Anticipated Series (Next Week)';
                 document.getElementById('watched-series-heading').value = 'Most Watched Series (Last Week)';
                 document.getElementById('anticipated-movies-heading').value = 'Most Anticipated Movies (Next Week)';
@@ -2061,6 +2080,11 @@ func getUIHTML(version string, nextRun string, timezone string) string {
         loadConfig();
         loadDashboard(); // Load dashboard data immediately
         checkUpdates();
+
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     </script>
 </body>
 </html>`
