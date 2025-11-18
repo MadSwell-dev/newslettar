@@ -1,12 +1,11 @@
 {
-  "version": "0.8.1",
+  "version": "0.8.2",
   "released": "2025-11-18",
   "changelog": [
-    "DOCKER: Simplified docker-compose configuration - removed unnecessary security settings",
-    "DOCKER: No more privileged mode or special security options required",
-    "DOCKER: Works on all Docker environments without sysctl permission errors",
-    "DOCS: Streamlined README to focus on quick installation",
-    "DOCS: Removed excessive emojis and unnecessary documentation from README",
-    "DOCS: Clear Docker and native installation sections"
+    "DOCKER: Removed healthcheck from Dockerfile to fix permission errors",
+    "DOCKER: Removed curl dependency to minimize image size and complexity",
+    "DOCKER: Simplified docker-compose.simple.yml for easier installation",
+    "DOCKER: Fixed sysctl permission denied error on certain Docker hosts",
+    "DOCKER: Ultra-simple installation similar to Profilarr"
   ]
 }
