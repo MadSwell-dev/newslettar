@@ -190,8 +190,18 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 	var traktAnticipatedSeries, traktWatchedSeries []TraktShow
 	var traktAnticipatedMovies, traktWatchedMovies []TraktMovie
 
-	// Count API calls (4 for Sonarr/Radarr + up to 4 for Trakt if enabled)
-	apiCalls := 4
+	// Check which services are configured
+	hasSonarr := cfg.SonarrURL != "" && cfg.SonarrAPIKey != ""
+	hasRadarr := cfg.RadarrURL != "" && cfg.RadarrAPIKey != ""
+
+	// Count API calls (only for configured services + Trakt if enabled)
+	apiCalls := 0
+	if hasSonarr {
+		apiCalls += 2 // history + calendar
+	}
+	if hasRadarr {
+		apiCalls += 2 // history + calendar
+	}
 	if cfg.ShowTraktAnticipatedSeries {
 		apiCalls++
 	}
@@ -207,25 +217,31 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 
 	wg.Add(apiCalls)
 
-	go func() {
-		defer wg.Done()
-		downloadedEpisodes, _ = fetchSonarrHistoryWithRetry(ctx, cfg, weekStart, cfg.PreviewRetries)
-	}()
+	// Only fetch from Sonarr if configured
+	if hasSonarr {
+		go func() {
+			defer wg.Done()
+			downloadedEpisodes, _ = fetchSonarrHistoryWithRetry(ctx, cfg, weekStart, cfg.PreviewRetries)
+		}()
 
-	go func() {
-		defer wg.Done()
-		upcomingEpisodes, _ = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.PreviewRetries)
-	}()
+		go func() {
+			defer wg.Done()
+			upcomingEpisodes, _ = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.PreviewRetries)
+		}()
+	}
 
-	go func() {
-		defer wg.Done()
-		downloadedMovies, _ = fetchRadarrHistoryWithRetry(ctx, cfg, weekStart, cfg.PreviewRetries)
-	}()
+	// Only fetch from Radarr if configured
+	if hasRadarr {
+		go func() {
+			defer wg.Done()
+			downloadedMovies, _ = fetchRadarrHistoryWithRetry(ctx, cfg, weekStart, cfg.PreviewRetries)
+		}()
 
-	go func() {
-		defer wg.Done()
-		upcomingMovies, _ = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.PreviewRetries)
-	}()
+		go func() {
+			defer wg.Done()
+			upcomingMovies, _ = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.PreviewRetries)
+		}()
+	}
 
 	// Fetch Trakt data if enabled
 	if cfg.ShowTraktAnticipatedSeries {
@@ -362,16 +378,14 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Only update main config fields if they're being submitted
 		if hasMainConfigFields {
-			if webCfg.SonarrURL != "" {
-				envMap["SONARR_URL"] = webCfg.SonarrURL
-			}
+			// Allow clearing URLs - update even if empty (same as API keys)
+			envMap["SONARR_URL"] = webCfg.SonarrURL
 			// Allow clearing API keys - update if not masked (even if empty)
 			if webCfg.SonarrAPIKey != maskedPlaceholder {
 				envMap["SONARR_API_KEY"] = webCfg.SonarrAPIKey
 			}
-			if webCfg.RadarrURL != "" {
-				envMap["RADARR_URL"] = webCfg.RadarrURL
-			}
+			// Allow clearing URLs - update even if empty (same as API keys)
+			envMap["RADARR_URL"] = webCfg.RadarrURL
 			// Allow clearing API keys - update if not masked (even if empty)
 			if webCfg.RadarrAPIKey != maskedPlaceholder {
 				envMap["RADARR_API_KEY"] = webCfg.RadarrAPIKey
