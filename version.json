@@ -1,8 +1,7 @@
 {
-  "version": "0.9.5",
+  "version": "0.9.6",
   "released": "2025-11-19",
   "changelog": [
-    "FIX: Restore .env backup after successful update to prevent config loss",
-    "DOCS: Replace example IPs with generic placeholders"
+    "SECURITY: Fix email header injection vulnerability by sanitizing CRLF characters"
   ]
 }
