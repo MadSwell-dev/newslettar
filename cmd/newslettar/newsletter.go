@@ -363,6 +363,11 @@ func sendEmail(cfg *Config, subject, htmlBody string) error {
 	return nil
 }
 
+// sanitizeHeader removes CRLF characters to prevent email header injection
+func sanitizeHeader(value string) string {
+	return strings.NewReplacer("\r", "", "\n", "").Replace(value)
+}
+
 // Send email to a single batch of recipients
 func sendEmailBatch(cfg *Config, subject, htmlBody string, recipients []string) error {
 	from := cfg.FromEmail
@@ -371,9 +376,9 @@ func sendEmailBatch(cfg *Config, subject, htmlBody string, recipients []string) 
 	}
 
 	headers := make(map[string]string)
-	headers["From"] = from
-	headers["To"] = strings.Join(recipients, ", ")
-	headers["Subject"] = subject
+	headers["From"] = sanitizeHeader(from)
+	headers["To"] = sanitizeHeader(strings.Join(recipients, ", "))
+	headers["Subject"] = sanitizeHeader(subject)
 	headers["MIME-Version"] = "1.0"
 	headers["Content-Type"] = "text/html; charset=UTF-8"
 
