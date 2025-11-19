@@ -29,11 +29,11 @@ services:
 
     environment:
       # === REQUIRED: Sonarr Configuration ===
-      SONARR_URL: "http://192.168.1.100:8989"
+      SONARR_URL: "http://YOUR-SERVER-IP:8989"
       SONARR_API_KEY: "your-sonarr-api-key-here"
 
       # === REQUIRED: Radarr Configuration ===
-      RADARR_URL: "http://192.168.1.100:7878"
+      RADARR_URL: "http://YOUR-SERVER-IP:7878"
       RADARR_API_KEY: "your-radarr-api-key-here"
 
       # === REQUIRED: Email Configuration ===
@@ -81,7 +81,7 @@ services:
 # When Newslettar runs in Docker and needs to access Sonarr/Radarr on the host:
 #
 # Linux:    Use host IP (usually 192.168.x.x or your LAN IP)
-#           Example: SONARR_URL: "http://192.168.1.100:8989"
+#           Example: SONARR_URL: "http://YOUR-SERVER-IP:8989"
 #
 # Mac:      Use: host.docker.internal
 #           Example: SONARR_URL: "http://host.docker.internal:8989"
@@ -122,7 +122,7 @@ services:
 #   - Remove and recreate: docker rm -f newslettar && docker compose -f docker-compose.simple.yml up -d
 #
 # Can't access Sonarr/Radarr:
-#   - Linux: Use your host's LAN IP (e.g., 192.168.1.100)
+#   - Linux: Use your host's LAN IP (e.g., 192.168.x.x)
 #   - Mac/Windows: Use host.docker.internal instead of localhost
 #
 # Email not sending:
