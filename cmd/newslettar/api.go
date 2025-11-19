@@ -82,98 +82,121 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 		return cached.([]Episode), nil
 	}
 
-	url := fmt.Sprintf("%s/api/v3/history?pageSize=%d&sortKey=date&sortDirection=descending&includeEpisode=true&includeSeries=true", cfg.SonarrURL, cfg.APIPageSize)
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("X-Api-Key", cfg.SonarrAPIKey)
-
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return nil, fmt.Errorf("HTTP %d (failed to read error body: %v)", resp.StatusCode, err)
-		}
-		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
-	}
-
-	// Stream JSON decoding (faster, less memory)
-	var result struct {
-		Records []struct {
-			Date      time.Time `json:"date"`
-			EventType string    `json:"eventType"`
-			Series    struct {
-				Title     string `json:"title"`
-				TvdbID    int    `json:"tvdbId"`
-				ImdbID    string `json:"imdbId"`
-				Overview  string `json:"overview"`
-				Monitored bool   `json:"monitored"`
-				Images    []struct {
-					CoverType string `json:"coverType"`
-					RemoteURL string `json:"remoteUrl"`
-				} `json:"images"`
-				Ratings struct {
-					Value float64 `json:"value"`
-				} `json:"ratings"`
-			} `json:"series"`
-			Episode struct {
-				SeasonNumber  int    `json:"seasonNumber"`
-				EpisodeNumber int    `json:"episodeNumber"`
-				Title         string `json:"title"`
-				AirDate       string `json:"airDate"`
-				Overview      string `json:"overview"`
-			} `json:"episode"`
-		} `json:"records"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
-	}
-
 	episodes := []Episode{}
-	for _, record := range result.Records {
-		// Only include download events
-		if record.EventType != "downloadFolderImported" && record.EventType != "downloadImported" {
-			continue
+	page := 1
+
+	for {
+		url := fmt.Sprintf("%s/api/v3/history?page=%d&pageSize=%d&sortKey=date&sortDirection=descending&includeEpisode=true&includeSeries=true", cfg.SonarrURL, page, cfg.APIPageSize)
+		req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("X-Api-Key", cfg.SonarrAPIKey)
+
+		resp, err := httpClient.Do(req)
+		if err != nil {
+			return nil, err
 		}
 
-		// Filter by date
-		if record.Date.Before(since) {
-			continue
-		}
-
-		posterURL := ""
-		for _, img := range record.Series.Images {
-			if img.CoverType == "poster" {
-				posterURL = img.RemoteURL
-				break
+		if resp.StatusCode != 200 {
+			body, err := io.ReadAll(resp.Body)
+			resp.Body.Close()
+			if err != nil {
+				return nil, fmt.Errorf("HTTP %d (failed to read error body: %v)", resp.StatusCode, err)
 			}
+			return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
 		}
 
-		episodes = append(episodes, Episode{
-			SeriesTitle:    record.Series.Title,
-			SeasonNum:      record.Episode.SeasonNumber,
-			EpisodeNum:     record.Episode.EpisodeNumber,
-			Title:          record.Episode.Title,
-			AirDate:        record.Episode.AirDate,
-			Downloaded:     true,
-			PosterURL:      posterURL,
-			IMDBID:         record.Series.ImdbID,
-			TvdbID:         record.Series.TvdbID,
-			Overview:       record.Episode.Overview,
-			SeriesOverview: record.Series.Overview,
-			Monitored:      record.Series.Monitored,
-			Rating:         record.Series.Ratings.Value,
-		})
+		var result struct {
+			Page         int `json:"page"`
+			PageSize     int `json:"pageSize"`
+			TotalRecords int `json:"totalRecords"`
+			Records      []struct {
+				Date      time.Time `json:"date"`
+				EventType string    `json:"eventType"`
+				Series    struct {
+					Title     string `json:"title"`
+					TvdbID    int    `json:"tvdbId"`
+					ImdbID    string `json:"imdbId"`
+					Overview  string `json:"overview"`
+					Monitored bool   `json:"monitored"`
+					Images    []struct {
+						CoverType string `json:"coverType"`
+						RemoteURL string `json:"remoteUrl"`
+					} `json:"images"`
+					Ratings struct {
+						Value float64 `json:"value"`
+					} `json:"ratings"`
+				} `json:"series"`
+				Episode struct {
+					SeasonNumber  int    `json:"seasonNumber"`
+					EpisodeNumber int    `json:"episodeNumber"`
+					Title         string `json:"title"`
+					AirDate       string `json:"airDate"`
+					Overview      string `json:"overview"`
+				} `json:"episode"`
+			} `json:"records"`
+		}
+
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			resp.Body.Close()
+			return nil, err
+		}
+		resp.Body.Close()
+
+		// Track if we found any records older than our date range
+		foundOldRecords := false
+
+		for _, record := range result.Records {
+			// Only include download events
+			if record.EventType != "downloadFolderImported" && record.EventType != "downloadImported" {
+				continue
+			}
+
+			// Filter by date - if record is before our range, mark it but continue
+			// (there might be newer records mixed in due to sorting edge cases)
+			if record.Date.Before(since) {
+				foundOldRecords = true
+				continue
+			}
+
+			posterURL := ""
+			for _, img := range record.Series.Images {
+				if img.CoverType == "poster" {
+					posterURL = img.RemoteURL
+					break
+				}
+			}
+
+			episodes = append(episodes, Episode{
+				SeriesTitle:    record.Series.Title,
+				SeasonNum:      record.Episode.SeasonNumber,
+				EpisodeNum:     record.Episode.EpisodeNumber,
+				Title:          record.Episode.Title,
+				AirDate:        record.Episode.AirDate,
+				Downloaded:     true,
+				PosterURL:      posterURL,
+				IMDBID:         record.Series.ImdbID,
+				TvdbID:         record.Series.TvdbID,
+				Overview:       record.Episode.Overview,
+				SeriesOverview: record.Series.Overview,
+				Monitored:      record.Series.Monitored,
+				Rating:         record.Series.Ratings.Value,
+			})
+		}
+
+		// Stop pagination if:
+		// 1. We've fetched all records, OR
+		// 2. We found records older than our date range (no need to fetch older pages)
+		if len(result.Records) == 0 || page*result.PageSize >= result.TotalRecords || foundOldRecords {
+			break
+		}
+
+		page++
+		log.Printf("📄 Fetching Sonarr history page %d...", page)
 	}
 
-	// Store in cache (reuse the cacheKey variable from above)
+	// Store in cache
 	apiCache.Set(cacheKey, episodes, cacheTTL)
 
 	return episodes, nil
@@ -272,99 +295,122 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 		return cached.([]Movie), nil
 	}
 
-	url := fmt.Sprintf("%s/api/v3/history?pageSize=%d&sortKey=date&sortDirection=descending&includeMovie=true", cfg.RadarrURL, cfg.APIPageSize)
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("X-Api-Key", cfg.RadarrAPIKey)
-
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return nil, fmt.Errorf("HTTP %d (failed to read error body: %v)", resp.StatusCode, err)
-		}
-		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
-	}
-
-	var result struct {
-		Records []struct {
-			Date      time.Time `json:"date"`
-			EventType string    `json:"eventType"`
-			Movie     struct {
-				Title     string `json:"title"`
-				Year      int    `json:"year"`
-				TmdbID    int    `json:"tmdbId"`
-				ImdbID    string `json:"imdbId"`
-				InCinemas string `json:"inCinemas"`
-				Overview  string `json:"overview"`
-				Monitored bool   `json:"monitored"`
-				Images    []struct {
-					CoverType string `json:"coverType"`
-					RemoteURL string `json:"remoteUrl"`
-				} `json:"images"`
-				Ratings struct {
-					Imdb struct {
-						Value float64 `json:"value"`
-					} `json:"imdb"`
-					Tmdb struct {
-						Value float64 `json:"value"`
-					} `json:"tmdb"`
-				} `json:"ratings"`
-			} `json:"movie"`
-		} `json:"records"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
-	}
-
 	movies := []Movie{}
-	for _, record := range result.Records {
-		// Only include download events
-		if record.EventType != "downloadFolderImported" && record.EventType != "downloadImported" {
-			continue
+	page := 1
+
+	for {
+		url := fmt.Sprintf("%s/api/v3/history?page=%d&pageSize=%d&sortKey=date&sortDirection=descending&includeMovie=true", cfg.RadarrURL, page, cfg.APIPageSize)
+		req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("X-Api-Key", cfg.RadarrAPIKey)
+
+		resp, err := httpClient.Do(req)
+		if err != nil {
+			return nil, err
 		}
 
-		// Filter by date
-		if record.Date.Before(since) {
-			continue
-		}
-
-		posterURL := ""
-		for _, img := range record.Movie.Images {
-			if img.CoverType == "poster" {
-				posterURL = img.RemoteURL
-				break
+		if resp.StatusCode != 200 {
+			body, err := io.ReadAll(resp.Body)
+			resp.Body.Close()
+			if err != nil {
+				return nil, fmt.Errorf("HTTP %d (failed to read error body: %v)", resp.StatusCode, err)
 			}
+			return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
 		}
 
-		rating := record.Movie.Ratings.Imdb.Value
-		if rating == 0 {
-			rating = record.Movie.Ratings.Tmdb.Value
+		var result struct {
+			Page         int `json:"page"`
+			PageSize     int `json:"pageSize"`
+			TotalRecords int `json:"totalRecords"`
+			Records      []struct {
+				Date      time.Time `json:"date"`
+				EventType string    `json:"eventType"`
+				Movie     struct {
+					Title     string `json:"title"`
+					Year      int    `json:"year"`
+					TmdbID    int    `json:"tmdbId"`
+					ImdbID    string `json:"imdbId"`
+					InCinemas string `json:"inCinemas"`
+					Overview  string `json:"overview"`
+					Monitored bool   `json:"monitored"`
+					Images    []struct {
+						CoverType string `json:"coverType"`
+						RemoteURL string `json:"remoteUrl"`
+					} `json:"images"`
+					Ratings struct {
+						Imdb struct {
+							Value float64 `json:"value"`
+						} `json:"imdb"`
+						Tmdb struct {
+							Value float64 `json:"value"`
+						} `json:"tmdb"`
+					} `json:"ratings"`
+				} `json:"movie"`
+			} `json:"records"`
 		}
 
-		movies = append(movies, Movie{
-			Title:       record.Movie.Title,
-			Year:        record.Movie.Year,
-			ReleaseDate: record.Movie.InCinemas,
-			Downloaded:  true,
-			PosterURL:   posterURL,
-			IMDBID:      record.Movie.ImdbID,
-			TmdbID:      record.Movie.TmdbID,
-			Overview:    record.Movie.Overview,
-			Monitored:   record.Movie.Monitored,
-			Rating:      rating,
-		})
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			resp.Body.Close()
+			return nil, err
+		}
+		resp.Body.Close()
+
+		// Track if we found any records older than our date range
+		foundOldRecords := false
+
+		for _, record := range result.Records {
+			// Only include download events
+			if record.EventType != "downloadFolderImported" && record.EventType != "downloadImported" {
+				continue
+			}
+
+			// Filter by date - if record is before our range, mark it but continue
+			if record.Date.Before(since) {
+				foundOldRecords = true
+				continue
+			}
+
+			posterURL := ""
+			for _, img := range record.Movie.Images {
+				if img.CoverType == "poster" {
+					posterURL = img.RemoteURL
+					break
+				}
+			}
+
+			rating := record.Movie.Ratings.Imdb.Value
+			if rating == 0 {
+				rating = record.Movie.Ratings.Tmdb.Value
+			}
+
+			movies = append(movies, Movie{
+				Title:       record.Movie.Title,
+				Year:        record.Movie.Year,
+				ReleaseDate: record.Movie.InCinemas,
+				Downloaded:  true,
+				PosterURL:   posterURL,
+				IMDBID:      record.Movie.ImdbID,
+				TmdbID:      record.Movie.TmdbID,
+				Overview:    record.Movie.Overview,
+				Monitored:   record.Movie.Monitored,
+				Rating:      rating,
+			})
+		}
+
+		// Stop pagination if:
+		// 1. We've fetched all records, OR
+		// 2. We found records older than our date range (no need to fetch older pages)
+		if len(result.Records) == 0 || page*result.PageSize >= result.TotalRecords || foundOldRecords {
+			break
+		}
+
+		page++
+		log.Printf("📄 Fetching Radarr history page %d...", page)
 	}
 
-	// Store in cache (reuse the cacheKey variable from above)
+	// Store in cache
 	apiCache.Set(cacheKey, movies, cacheTTL)
 
 	return movies, nil
