@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"html/template"
 	"log"
@@ -368,7 +369,7 @@ func sanitizeHeader(value string) string {
 	return strings.NewReplacer("\r", "", "\n", "").Replace(value)
 }
 
-// Send email to a single batch of recipients
+// Send email to a single batch of recipients with TLS enforcement
 func sendEmailBatch(cfg *Config, subject, htmlBody string, recipients []string) error {
 	from := cfg.FromEmail
 	if cfg.FromName != "" {
@@ -388,10 +389,71 @@ func sendEmailBatch(cfg *Config, subject, htmlBody string, recipients []string) 
 	}
 	message += "\r\n" + htmlBody
 
-	auth := smtp.PlainAuth("", cfg.SMTPUser, cfg.SMTPPass, cfg.SMTPHost)
 	addr := fmt.Sprintf("%s:%s", cfg.SMTPHost, cfg.SMTPPort)
 
-	return smtp.SendMail(addr, auth, cfg.FromEmail, recipients, []byte(message))
+	// Connect to SMTP server
+	client, err := smtp.Dial(addr)
+	if err != nil {
+		return fmt.Errorf("failed to connect to SMTP server: %w", err)
+	}
+	defer client.Close()
+
+	// Send EHLO
+	if err = client.Hello("localhost"); err != nil {
+		return fmt.Errorf("EHLO failed: %w", err)
+	}
+
+	// Try STARTTLS if available (with secure TLS configuration)
+	if ok, _ := client.Extension("STARTTLS"); ok {
+		tlsConfig := &tls.Config{
+			ServerName: cfg.SMTPHost,
+			MinVersion: tls.VersionTLS12,
+			CipherSuites: []uint16{
+				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+				tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+			},
+		}
+		if err = client.StartTLS(tlsConfig); err != nil {
+			return fmt.Errorf("STARTTLS failed: %w", err)
+		}
+	}
+
+	// Authenticate
+	auth := smtp.PlainAuth("", cfg.SMTPUser, cfg.SMTPPass, cfg.SMTPHost)
+	if err = client.Auth(auth); err != nil {
+		return fmt.Errorf("authentication failed: %w", err)
+	}
+
+	// Set sender
+	if err = client.Mail(cfg.FromEmail); err != nil {
+		return fmt.Errorf("failed to set sender: %w", err)
+	}
+
+	// Set recipients
+	for _, recipient := range recipients {
+		if err = client.Rcpt(recipient); err != nil {
+			return fmt.Errorf("failed to set recipient %s: %w", recipient, err)
+		}
+	}
+
+	// Send message body
+	w, err := client.Data()
+	if err != nil {
+		return fmt.Errorf("failed to open data writer: %w", err)
+	}
+
+	_, err = w.Write([]byte(message))
+	if err != nil {
+		return fmt.Errorf("failed to write message: %w", err)
+	}
+
+	if err = w.Close(); err != nil {
+		return fmt.Errorf("failed to close data writer: %w", err)
+	}
+
+	return client.Quit()
 }
 
 // Precompile template with custom functions
