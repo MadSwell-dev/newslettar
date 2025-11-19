@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/smtp"
 	"os"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -871,12 +872,9 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		int(uptime.Hours())%24,
 		int(uptime.Minutes())%60)
 
-	// Get memory usage (approximate)
-	var m struct {
-		Alloc uint64
-	}
-	// Simple memory estimate (actual usage may vary)
-	m.Alloc = 12 * 1024 * 1024 // Approximate 12MB baseline
+	// Get actual memory usage
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
 	memoryMB := float64(m.Alloc) / 1024 / 1024
 
 	// Get statistics

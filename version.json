@@ -1,7 +1,8 @@
 {
-  "version": "0.9.6",
+  "version": "0.9.7",
   "released": "2025-11-19",
   "changelog": [
-    "SECURITY: Fix email header injection vulnerability by sanitizing CRLF characters"
+    "SECURITY: Fix email header injection vulnerability by sanitizing CRLF characters",
+    "FIX: Show actual memory usage on dashboard instead of static estimate"
   ]
 }
