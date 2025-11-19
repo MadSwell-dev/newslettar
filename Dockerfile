@@ -13,6 +13,7 @@ COPY go.mod go.sum version.json ./
 # Build the application with optimizations
 RUN go mod tidy && \
     VERSION=$(grep '"version"' version.json | cut -d'"' -f4) && \
+    echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$' || { echo "Invalid version format"; exit 1; } && \
     CGO_ENABLED=0 GOOS=linux go build \
     -ldflags="-s -w -X main.version=${VERSION}" \
     -trimpath \

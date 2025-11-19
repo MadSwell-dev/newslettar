@@ -200,6 +200,11 @@ echo -e "${GREEN}✓ Dependencies installed${NC}"
 
 echo -e "${YELLOW}[6/8] Building Newslettar with optimizations...${NC}"
 VERSION=$(grep '"version"' version.json | cut -d'"' -f4)
+# Validate version format (semver-like pattern only)
+if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$'; then
+    echo -e "${RED}Invalid version format in version.json${NC}"
+    exit 1
+fi
 echo -e "${BLUE}  Using build flags: -ldflags=\"-s -w -X main.version=${VERSION}\" -trimpath${NC}"
 /usr/local/go/bin/go build -ldflags="-s -w -X main.version=${VERSION}" -trimpath -o newslettar ./cmd/newslettar
 chmod +x newslettar
@@ -325,6 +330,12 @@ case "$1" in
         
         /usr/local/go/bin/go mod tidy
         VERSION=$(grep '"version"' version.json | cut -d'"' -f4)
+        # Validate version format
+        if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$'; then
+            echo -e "${RED}Invalid version format in version.json${NC}"
+            mv .env.backup .env
+            exit 1
+        fi
         /usr/local/go/bin/go build -ldflags="-s -w -X main.version=${VERSION}" -trimpath -o newslettar ./cmd/newslettar
         if [ $? -ne 0 ]; then
             echo -e "${RED}Build failed!${NC}"
