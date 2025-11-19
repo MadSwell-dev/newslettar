@@ -12,8 +12,9 @@ COPY go.mod go.sum version.json ./
 
 # Build the application with optimizations
 RUN go mod tidy && \
+    VERSION=$(grep '"version"' version.json | cut -d'"' -f4) && \
     CGO_ENABLED=0 GOOS=linux go build \
-    -ldflags="-s -w" \
+    -ldflags="-s -w -X main.version=${VERSION}" \
     -trimpath \
     -o newslettar ./cmd/newslettar
 

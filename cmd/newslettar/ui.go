@@ -89,12 +89,12 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
         .version-info i {
             width: 14px;
             height: 14px;
-            color: #f59e0b;
-            opacity: 0.9;
+            color: #ef4444;
+            opacity: 1;
         }
         .version-info:hover i {
             opacity: 1;
-            color: #fbbf24;
+            color: #f87171;
         }
         .version-info .tooltip {
             visibility: hidden;
@@ -102,14 +102,14 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
             position: absolute;
             bottom: 125%;
             right: 0;
-            background: #252f3f;
-            color: #e8e8e8;
+            background: #1a1a1a;
+            color: #ffffff;
             padding: 12px 15px;
             border-radius: 8px;
             font-size: 12px;
             white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            border: 1px solid #3a4a5f;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #444444;
             transition: opacity 0.2s, visibility 0.2s;
             z-index: 1000;
         }
@@ -120,7 +120,7 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
             right: 15px;
             border-width: 6px;
             border-style: solid;
-            border-color: #3a4a5f transparent transparent transparent;
+            border-color: #444444 transparent transparent transparent;
         }
         .version-info:hover .tooltip {
             visibility: visible;

@@ -17,7 +17,8 @@ var templateFS embed.FS
 //go:embed assets/*
 var assetsFS embed.FS
 
-const version = "0.9.4"
+// version is set at build time via ldflags from version.json
+var version = "dev"
 
 // Track server start time for uptime monitoring
 var startTime = time.Now()
