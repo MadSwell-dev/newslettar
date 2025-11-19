@@ -110,6 +110,21 @@ newslettar-ctl web        # Show Web UI URL
 newslettar-ctl update     # Update to latest version
 ```
 
+## Security
+
+This is a self-hosted application designed to run on your own infrastructure.
+
+**Important considerations:**
+
+- **Web UI Authentication**: The web UI does not include built-in authentication. For secure access:
+  - Run locally only (recommended for home servers)
+  - Place behind a reverse proxy with authentication (e.g., Nginx with basic auth, Authelia, Authentik)
+  - Use firewall rules to restrict access to trusted networks
+
+- **Secrets Management**: All sensitive data (API keys, SMTP passwords) are stored in the `.env` file and never committed to version control
+
+- **Network Exposure**: If exposing to the internet, always use HTTPS and proper authentication
+
 ## Configuration
 
 All configuration can be done through the web UI at http://localhost:8080, or via environment variables for Docker deployments.
