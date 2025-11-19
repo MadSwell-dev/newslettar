@@ -72,7 +72,7 @@ func fetchRadarrCalendarWithRetry(ctx context.Context, cfg *Config, start, end t
 
 func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Episode, error) {
 	if cfg.SonarrURL == "" || cfg.SonarrAPIKey == "" {
-		return nil, fmt.Errorf("Sonarr not configured")
+		return nil, fmt.Errorf("sonarr not configured")
 	}
 
 	// Check cache first
@@ -285,7 +285,7 @@ func fetchSonarrCalendar(ctx context.Context, cfg *Config, start, end time.Time)
 
 func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Movie, error) {
 	if cfg.RadarrURL == "" || cfg.RadarrAPIKey == "" {
-		return nil, fmt.Errorf("Radarr not configured")
+		return nil, fmt.Errorf("radarr not configured")
 	}
 
 	// Check cache first

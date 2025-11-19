@@ -18,52 +18,6 @@ var (
 	maxLogLines = DefaultMaxLogLines
 )
 
-// Log level priorities
-var logLevels = map[string]int{
-	"debug": 0,
-	"info":  1,
-	"warn":  2,
-	"error": 3,
-}
-
-// Check if a message should be logged based on current log level
-func shouldLog(messageLevel string) bool {
-	cfg := getConfig()
-	if cfg == nil {
-		return true // Log everything if config not available
-	}
-
-	currentLevel := logLevels[strings.ToLower(cfg.LogLevel)]
-	msgLevel := logLevels[strings.ToLower(messageLevel)]
-
-	return msgLevel >= currentLevel
-}
-
-// Helper functions for different log levels
-func logDebug(format string, v ...interface{}) {
-	if shouldLog("debug") {
-		log.Printf("[DEBUG] "+format, v...)
-	}
-}
-
-func logInfo(format string, v ...interface{}) {
-	if shouldLog("info") {
-		log.Printf(format, v...)
-	}
-}
-
-func logWarn(format string, v ...interface{}) {
-	if shouldLog("warn") {
-		log.Printf("⚠️  "+format, v...)
-	}
-}
-
-func logError(format string, v ...interface{}) {
-	if shouldLog("error") {
-		log.Printf("❌ "+format, v...)
-	}
-}
-
 // Custom log writer that maintains ring buffer
 type logWriter struct{}
 
@@ -309,5 +263,5 @@ func saveStats() error {
 		return err
 	}
 
-	return os.WriteFile(statsFile, data, 0644)
+	return os.WriteFile(statsFile, data, 0600)
 }
