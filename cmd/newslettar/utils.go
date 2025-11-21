@@ -143,7 +143,7 @@ func truncateString(s string, maxLength int) string {
 }
 
 // Convert day/time to cron expression
-func convertToCronExpression(day, timeStr string) string {
+func convertToCronExpression(day, timeStr, scheduleType string, dayOfMonth int) string {
 	// Parse time (HH:MM)
 	parts := strings.Split(timeStr, ":")
 	hour := "9"
@@ -153,6 +153,17 @@ func convertToCronExpression(day, timeStr string) string {
 		minute = parts[1]
 	}
 
+	// Handle monthly schedules
+	if scheduleType == "monthly" {
+		// Validate day of month (1-31)
+		if dayOfMonth < 1 || dayOfMonth > 31 {
+			dayOfMonth = 1
+		}
+		// Cron format for monthly: minute hour dayOfMonth * *
+		return fmt.Sprintf("%s %s %d * *", minute, hour, dayOfMonth)
+	}
+
+	// Weekly schedule (default)
 	// Convert day to cron weekday (0 = Sunday, 6 = Saturday)
 	dayMap := map[string]string{
 		"Sun": "0",

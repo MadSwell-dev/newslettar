@@ -92,6 +92,8 @@ type Config struct {
 	Timezone                    string
 	ScheduleDay                 string
 	ScheduleTime                string
+	ScheduleType                string // "weekly" or "monthly"
+	ScheduleDayOfMonth          int    // Day of month (1-31) for monthly schedules
 	ShowPosters                 bool
 	ShowDownloaded              bool
 	ShowSeriesOverview          bool
@@ -305,6 +307,8 @@ type WebConfig struct {
 	Timezone                    string `json:"timezone"`
 	ScheduleDay                 string `json:"schedule_day"`
 	ScheduleTime                string `json:"schedule_time"`
+	ScheduleType                string `json:"schedule_type"`
+	ScheduleDayOfMonth          string `json:"schedule_day_of_month"`
 	ShowPosters                 string `json:"show_posters"`
 	ShowDownloaded              string `json:"show_downloaded"`
 	ShowSeriesOverview          string `json:"show_series_overview"`

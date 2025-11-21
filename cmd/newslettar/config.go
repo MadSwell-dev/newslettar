@@ -77,6 +77,8 @@ func loadConfig() *Config {
 		Timezone:                    getEnvFromFile(envMap, "TIMEZONE", DefaultTimezone),
 		ScheduleDay:                 getEnvFromFile(envMap, "SCHEDULE_DAY", DefaultScheduleDay),
 		ScheduleTime:                getEnvFromFile(envMap, "SCHEDULE_TIME", DefaultScheduleTime),
+		ScheduleType:                getEnvFromFile(envMap, "SCHEDULE_TYPE", DefaultScheduleType),
+		ScheduleDayOfMonth:          getEnvIntFromFile(envMap, "SCHEDULE_DAY_OF_MONTH", DefaultScheduleDayOfMonth),
 		ShowPosters:                 getEnvFromFile(envMap, "SHOW_POSTERS", DefaultShowPosters) != "false",
 		ShowDownloaded:              getEnvFromFile(envMap, "SHOW_DOWNLOADED", DefaultShowDownloaded) != "false",
 		ShowSeriesOverview:          getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", DefaultShowSeriesOverview) != "false",

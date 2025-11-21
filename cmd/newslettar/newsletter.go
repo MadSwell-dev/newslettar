@@ -20,13 +20,30 @@ func runNewsletter() {
 	loc := getTimezone(cfg.Timezone)
 	now := time.Now().In(loc)
 
-	log.Println("🚀 Starting Newslettar - Weekly newsletter generation...")
+	scheduleTypeDesc := "Weekly"
+	if cfg.ScheduleType == "monthly" {
+		scheduleTypeDesc = "Monthly"
+	}
+	log.Printf("🚀 Starting Newslettar - %s newsletter generation...", scheduleTypeDesc)
 	log.Printf("⏰ Current time: %s (%s)", now.Format("2006-01-02 15:04:05"), cfg.Timezone)
 
-	weekStart := now.AddDate(0, 0, -7)
-	weekEnd := now
+	// Calculate timeframe based on schedule type
+	var weekStart, weekEnd time.Time
+	if cfg.ScheduleType == "monthly" {
+		// Monthly: previous month and current month
+		weekStart = time.Date(now.Year(), now.Month()-1, 1, 0, 0, 0, 0, loc)
+		weekEnd = now
+	} else {
+		// Weekly: last 7 days
+		weekStart = now.AddDate(0, 0, -7)
+		weekEnd = now
+	}
 
-	log.Printf("📅 Week range: %s to %s", weekStart.Format("2006-01-02"), weekEnd.Format("2006-01-02"))
+	rangeLabel := "Week"
+	if cfg.ScheduleType == "monthly" {
+		rangeLabel = "Month"
+	}
+	log.Printf("📅 %s range: %s to %s", rangeLabel, weekStart.Format("2006-01-02"), weekEnd.Format("2006-01-02"))
 
 	// Use a cancellable context for all fetches
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.APITimeout)*time.Second)
@@ -86,7 +103,14 @@ func runNewsletter() {
 		go func() {
 			defer wg.Done()
 			log.Println("📺 Fetching Sonarr calendar...")
-			upcomingEpisodes, errSonarrCalendar = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.MaxRetries)
+			// Calculate upcoming period based on schedule type
+			var upcomingEnd time.Time
+			if cfg.ScheduleType == "monthly" {
+				upcomingEnd = weekEnd.AddDate(0, 1, 0) // Next month
+			} else {
+				upcomingEnd = weekEnd.AddDate(0, 0, 7) // Next 7 days
+			}
+			upcomingEpisodes, errSonarrCalendar = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, upcomingEnd, cfg.MaxRetries)
 			if errSonarrCalendar != nil {
 				log.Printf("⚠️  Sonarr calendar error: %v", errSonarrCalendar)
 			} else {
@@ -113,7 +137,14 @@ func runNewsletter() {
 		go func() {
 			defer wg.Done()
 			log.Println("🎬 Fetching Radarr calendar...")
-			upcomingMovies, errRadarrCalendar = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.MaxRetries)
+			// Calculate upcoming period based on schedule type
+			var upcomingEnd time.Time
+			if cfg.ScheduleType == "monthly" {
+				upcomingEnd = weekEnd.AddDate(0, 1, 0) // Next month
+			} else {
+				upcomingEnd = weekEnd.AddDate(0, 0, 7) // Next 7 days
+			}
+			upcomingMovies, errRadarrCalendar = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, upcomingEnd, cfg.MaxRetries)
 			if errRadarrCalendar != nil {
 				log.Printf("⚠️  Radarr calendar error: %v", errRadarrCalendar)
 			} else {
@@ -465,7 +496,7 @@ func initEmailTemplate() (*template.Template, error) {
 }
 
 // Wrapper to get next scheduled run
-func getNextScheduledRun(day, timeStr string, loc *time.Location) string {
+func getNextScheduledRun(day, timeStr, scheduleType string, dayOfMonth int, loc *time.Location) string {
 	now := time.Now().In(loc)
 
 	// Parse schedule time
@@ -476,6 +507,25 @@ func getNextScheduledRun(day, timeStr string, loc *time.Location) string {
 		fmt.Sscanf(parts[1], "%d", &minute)
 	}
 
+	// Handle monthly schedules
+	if scheduleType == "monthly" {
+		// Validate day of month
+		if dayOfMonth < 1 || dayOfMonth > 31 {
+			dayOfMonth = 1
+		}
+
+		// Calculate next occurrence of dayOfMonth
+		nextRun := time.Date(now.Year(), now.Month(), dayOfMonth, hour, minute, 0, 0, loc)
+
+		// If the scheduled time has already passed this month, move to next month
+		if now.After(nextRun) {
+			nextRun = time.Date(now.Year(), now.Month()+1, dayOfMonth, hour, minute, 0, 0, loc)
+		}
+
+		return nextRun.Format("2006-01-02 15:04:05 MST")
+	}
+
+	// Weekly schedule (default)
 	// Map day to weekday
 	dayMap := map[string]time.Weekday{
 		"Mon": time.Monday,
