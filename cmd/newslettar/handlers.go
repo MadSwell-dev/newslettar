@@ -344,9 +344,10 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 	// Format dates based on schedule type
 	var weekStartStr, weekEndStr string
 	if cfg.ScheduleType == "monthly" {
-		// For monthly, just show the month name and year
-		weekStartStr = weekStart.Format("January 2006")
-		weekEndStr = weekEnd.Format("January 2006")
+		// For monthly, just show the current month name and year
+		currentMonth := weekEnd.Format("January 2006")
+		weekStartStr = currentMonth
+		weekEndStr = currentMonth
 	} else {
 		// For weekly, show full dates
 		weekStartStr = weekStart.Format("January 2, 2006")
