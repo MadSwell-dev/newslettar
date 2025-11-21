@@ -178,8 +178,17 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 	loc := getTimezone(cfg.Timezone)
 	now := time.Now().In(loc)
 
-	weekStart := now.AddDate(0, 0, -7)
-	weekEnd := now
+	// Calculate timeframe based on schedule type
+	var weekStart, weekEnd time.Time
+	if cfg.ScheduleType == "monthly" {
+		// Monthly: previous month and current month
+		weekStart = time.Date(now.Year(), now.Month()-1, 1, 0, 0, 0, 0, loc)
+		weekEnd = now
+	} else {
+		// Weekly: last 7 days
+		weekStart = now.AddDate(0, 0, -7)
+		weekEnd = now
+	}
 
 	// Parallel API calls with context
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.APITimeout)*time.Second)
@@ -218,6 +227,14 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 
 	wg.Add(apiCalls)
 
+	// Calculate upcoming period based on schedule type
+	var upcomingEnd time.Time
+	if cfg.ScheduleType == "monthly" {
+		upcomingEnd = weekEnd.AddDate(0, 1, 0) // Next month
+	} else {
+		upcomingEnd = weekEnd.AddDate(0, 0, 7) // Next 7 days
+	}
+
 	// Only fetch from Sonarr if configured
 	if hasSonarr {
 		go func() {
@@ -227,7 +244,7 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 
 		go func() {
 			defer wg.Done()
-			upcomingEpisodes, _ = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.PreviewRetries)
+			upcomingEpisodes, _ = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, upcomingEnd, cfg.PreviewRetries)
 		}()
 	}
 
@@ -240,7 +257,7 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 
 		go func() {
 			defer wg.Done()
-			upcomingMovies, _ = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, weekEnd.AddDate(0, 0, 7), cfg.PreviewRetries)
+			upcomingMovies, _ = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, upcomingEnd, cfg.PreviewRetries)
 		}()
 	}
 
@@ -289,6 +306,41 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 		return downloadedMovies[i].ReleaseDate < downloadedMovies[j].ReleaseDate
 	})
 
+	// Select appropriate strings based on schedule type
+	var emailTitle, weekRangePrefix, comingThisWeekHeading string
+	var noShowsMessage, noMoviesMessage string
+	var downloadedSectionHeading, noDownloadedShowsMessage, noDownloadedMoviesMessage string
+	var anticipatedSeriesHeading, watchedSeriesHeading string
+	var anticipatedMoviesHeading, watchedMoviesHeading string
+
+	if cfg.ScheduleType == "monthly" {
+		emailTitle = cfg.MonthlyEmailTitle
+		weekRangePrefix = cfg.MonthlyWeekRangePrefix
+		comingThisWeekHeading = cfg.MonthlyComingThisWeekHeading
+		noShowsMessage = cfg.MonthlyNoShowsMessage
+		noMoviesMessage = cfg.MonthlyNoMoviesMessage
+		downloadedSectionHeading = cfg.MonthlyDownloadedSectionHeading
+		noDownloadedShowsMessage = cfg.MonthlyNoDownloadedShowsMessage
+		noDownloadedMoviesMessage = cfg.MonthlyNoDownloadedMoviesMessage
+		anticipatedSeriesHeading = cfg.MonthlyAnticipatedSeriesHeading
+		watchedSeriesHeading = cfg.MonthlyWatchedSeriesHeading
+		anticipatedMoviesHeading = cfg.MonthlyAnticipatedMoviesHeading
+		watchedMoviesHeading = cfg.MonthlyWatchedMoviesHeading
+	} else {
+		emailTitle = cfg.EmailTitle
+		weekRangePrefix = cfg.WeekRangePrefix
+		comingThisWeekHeading = cfg.ComingThisWeekHeading
+		noShowsMessage = cfg.NoShowsMessage
+		noMoviesMessage = cfg.NoMoviesMessage
+		downloadedSectionHeading = cfg.DownloadedSectionHeading
+		noDownloadedShowsMessage = cfg.NoDownloadedShowsMessage
+		noDownloadedMoviesMessage = cfg.NoDownloadedMoviesMessage
+		anticipatedSeriesHeading = cfg.AnticipatedSeriesHeading
+		watchedSeriesHeading = cfg.WatchedSeriesHeading
+		anticipatedMoviesHeading = cfg.AnticipatedMoviesHeading
+		watchedMoviesHeading = cfg.WatchedMoviesHeading
+	}
+
 	data := NewsletterData{
 		WeekStart:              weekStart.Format("January 2, 2006"),
 		WeekEnd:                weekEnd.Format("January 2, 2006"),
@@ -300,23 +352,23 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 		TraktWatchedSeries:     traktWatchedSeries,
 		TraktAnticipatedMovies: traktAnticipatedMovies,
 		TraktWatchedMovies:     traktWatchedMovies,
-		// Customizable strings
-		EmailTitle:                cfg.EmailTitle,
+		// Customizable strings (schedule-aware)
+		EmailTitle:                emailTitle,
 		EmailIntro:                cfg.EmailIntro,
-		WeekRangePrefix:           cfg.WeekRangePrefix,
-		ComingThisWeekHeading:     cfg.ComingThisWeekHeading,
+		WeekRangePrefix:           weekRangePrefix,
+		ComingThisWeekHeading:     comingThisWeekHeading,
 		TVShowsHeading:            cfg.TVShowsHeading,
 		MoviesHeading:             cfg.MoviesHeading,
-		NoShowsMessage:            cfg.NoShowsMessage,
-		NoMoviesMessage:           cfg.NoMoviesMessage,
-		DownloadedSectionHeading:  cfg.DownloadedSectionHeading,
-		NoDownloadedShowsMessage:  cfg.NoDownloadedShowsMessage,
-		NoDownloadedMoviesMessage: cfg.NoDownloadedMoviesMessage,
+		NoShowsMessage:            noShowsMessage,
+		NoMoviesMessage:           noMoviesMessage,
+		DownloadedSectionHeading:  downloadedSectionHeading,
+		NoDownloadedShowsMessage:  noDownloadedShowsMessage,
+		NoDownloadedMoviesMessage: noDownloadedMoviesMessage,
 		TrendingSectionHeading:    cfg.TrendingSectionHeading,
-		AnticipatedSeriesHeading:  cfg.AnticipatedSeriesHeading,
-		WatchedSeriesHeading:      cfg.WatchedSeriesHeading,
-		AnticipatedMoviesHeading:  cfg.AnticipatedMoviesHeading,
-		WatchedMoviesHeading:      cfg.WatchedMoviesHeading,
+		AnticipatedSeriesHeading:  anticipatedSeriesHeading,
+		WatchedSeriesHeading:      watchedSeriesHeading,
+		AnticipatedMoviesHeading:  anticipatedMoviesHeading,
+		WatchedMoviesHeading:      watchedMoviesHeading,
 		FooterText:                cfg.FooterText,
 		// Display options
 		ShowPosters:                cfg.ShowPosters,
