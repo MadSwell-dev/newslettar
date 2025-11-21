@@ -45,6 +45,14 @@ func runNewsletter() {
 	}
 	log.Printf("📅 %s range: %s to %s", rangeLabel, weekStart.Format("2006-01-02"), weekEnd.Format("2006-01-02"))
 
+	// Calculate upcoming period based on schedule type
+	var upcomingEnd time.Time
+	if cfg.ScheduleType == "monthly" {
+		upcomingEnd = weekEnd.AddDate(0, 1, 0) // Next month
+	} else {
+		upcomingEnd = weekEnd.AddDate(0, 0, 7) // Next 7 days
+	}
+
 	// Use a cancellable context for all fetches
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.APITimeout)*time.Second)
 	defer cancel()
@@ -103,13 +111,6 @@ func runNewsletter() {
 		go func() {
 			defer wg.Done()
 			log.Println("📺 Fetching Sonarr calendar...")
-			// Calculate upcoming period based on schedule type
-			var upcomingEnd time.Time
-			if cfg.ScheduleType == "monthly" {
-				upcomingEnd = weekEnd.AddDate(0, 1, 0) // Next month
-			} else {
-				upcomingEnd = weekEnd.AddDate(0, 0, 7) // Next 7 days
-			}
 			upcomingEpisodes, errSonarrCalendar = fetchSonarrCalendarWithRetry(ctx, cfg, weekEnd, upcomingEnd, cfg.MaxRetries)
 			if errSonarrCalendar != nil {
 				log.Printf("⚠️  Sonarr calendar error: %v", errSonarrCalendar)
@@ -137,13 +138,6 @@ func runNewsletter() {
 		go func() {
 			defer wg.Done()
 			log.Println("🎬 Fetching Radarr calendar...")
-			// Calculate upcoming period based on schedule type
-			var upcomingEnd time.Time
-			if cfg.ScheduleType == "monthly" {
-				upcomingEnd = weekEnd.AddDate(0, 1, 0) // Next month
-			} else {
-				upcomingEnd = weekEnd.AddDate(0, 0, 7) // Next 7 days
-			}
 			upcomingMovies, errRadarrCalendar = fetchRadarrCalendarWithRetry(ctx, cfg, weekEnd, upcomingEnd, cfg.MaxRetries)
 			if errRadarrCalendar != nil {
 				log.Printf("⚠️  Radarr calendar error: %v", errRadarrCalendar)
@@ -304,16 +298,21 @@ func runNewsletter() {
 	}
 
 	// Format dates based on schedule type
-	var weekStartStr, weekEndStr string
+	var weekStartStr, weekEndStr, upcomingStartStr, upcomingEndStr string
 	if cfg.ScheduleType == "monthly" {
 		// For monthly, just show the current month name and year
 		currentMonth := weekEnd.Format("January 2006")
+		nextMonth := upcomingEnd.Format("January 2006")
 		weekStartStr = currentMonth
 		weekEndStr = currentMonth
+		upcomingStartStr = currentMonth
+		upcomingEndStr = nextMonth
 	} else {
 		// For weekly, show full dates
 		weekStartStr = weekStart.Format("January 2, 2006")
 		weekEndStr = weekEnd.Format("January 2, 2006")
+		upcomingStartStr = weekEnd.Format("January 2, 2006")
+		upcomingEndStr = upcomingEnd.Format("January 2, 2006")
 	}
 
 	// Deduplicate episodes and movies
@@ -325,6 +324,8 @@ func runNewsletter() {
 	data := NewsletterData{
 		WeekStart:              weekStartStr,
 		WeekEnd:                weekEndStr,
+		UpcomingStart:          upcomingStartStr,
+		UpcomingEnd:            upcomingEndStr,
 		UpcomingSeriesGroups:   groupEpisodesBySeries(upcomingEpisodes),
 		UpcomingMovies:         upcomingMovies,
 		DownloadedSeriesGroups: groupEpisodesBySeries(downloadedEpisodes),

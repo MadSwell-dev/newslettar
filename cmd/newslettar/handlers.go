@@ -342,16 +342,21 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Format dates based on schedule type
-	var weekStartStr, weekEndStr string
+	var weekStartStr, weekEndStr, upcomingStartStr, upcomingEndStr string
 	if cfg.ScheduleType == "monthly" {
 		// For monthly, just show the current month name and year
 		currentMonth := weekEnd.Format("January 2006")
+		nextMonth := upcomingEnd.Format("January 2006")
 		weekStartStr = currentMonth
 		weekEndStr = currentMonth
+		upcomingStartStr = currentMonth
+		upcomingEndStr = nextMonth
 	} else {
 		// For weekly, show full dates
 		weekStartStr = weekStart.Format("January 2, 2006")
 		weekEndStr = weekEnd.Format("January 2, 2006")
+		upcomingStartStr = weekEnd.Format("January 2, 2006")
+		upcomingEndStr = upcomingEnd.Format("January 2, 2006")
 	}
 
 	// Deduplicate episodes and movies
@@ -363,6 +368,8 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 	data := NewsletterData{
 		WeekStart:              weekStartStr,
 		WeekEnd:                weekEndStr,
+		UpcomingStart:          upcomingStartStr,
+		UpcomingEnd:            upcomingEndStr,
 		UpcomingSeriesGroups:   groupEpisodesBySeries(upcomingEpisodes),
 		UpcomingMovies:         upcomingMovies,
 		DownloadedSeriesGroups: groupEpisodesBySeries(downloadedEpisodes),

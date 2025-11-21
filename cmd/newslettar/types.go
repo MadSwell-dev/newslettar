@@ -263,8 +263,10 @@ type TraktMovie struct {
 }
 
 type NewsletterData struct {
-	WeekStart              string
-	WeekEnd                string
+	WeekStart              string // Historical period start (for downloaded section)
+	WeekEnd                string // Historical period end (for downloaded section)
+	UpcomingStart          string // Upcoming period start (for header display)
+	UpcomingEnd            string // Upcoming period end (for header display)
 	UpcomingSeriesGroups   []SeriesGroup
 	UpcomingMovies         []Movie
 	DownloadedSeriesGroups []SeriesGroup
