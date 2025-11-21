@@ -100,7 +100,7 @@
             <p class="email-header-subtitle">{{.EmailIntro}}</p>
             {{end}}
         </div>
-        <div class="date-range">{{.WeekRangePrefix}} {{.WeekStart}} - {{.WeekEnd}}</div>
+        <div class="date-range">{{.WeekRangePrefix}} {{if eq .WeekStart .WeekEnd}}{{.WeekStart}}{{else}}{{.WeekStart}} - {{.WeekEnd}}{{end}}</div>
 
         <div class="section">
             <h2>{{.ComingThisWeekHeading}}</h2>
