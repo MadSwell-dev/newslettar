@@ -303,9 +303,27 @@ func runNewsletter() {
 		watchedMoviesHeading = cfg.WatchedMoviesHeading
 	}
 
+	// Format dates based on schedule type
+	var weekStartStr, weekEndStr string
+	if cfg.ScheduleType == "monthly" {
+		// For monthly, just show the month name and year
+		weekStartStr = weekStart.Format("January 2006")
+		weekEndStr = weekEnd.Format("January 2006")
+	} else {
+		// For weekly, show full dates
+		weekStartStr = weekStart.Format("January 2, 2006")
+		weekEndStr = weekEnd.Format("January 2, 2006")
+	}
+
+	// Deduplicate episodes and movies
+	upcomingEpisodes = deduplicateEpisodes(upcomingEpisodes)
+	downloadedEpisodes = deduplicateEpisodes(downloadedEpisodes)
+	upcomingMovies = deduplicateMovies(upcomingMovies)
+	downloadedMovies = deduplicateMovies(downloadedMovies)
+
 	data := NewsletterData{
-		WeekStart:              weekStart.Format("January 2, 2006"),
-		WeekEnd:                weekEnd.Format("January 2, 2006"),
+		WeekStart:              weekStartStr,
+		WeekEnd:                weekEndStr,
 		UpcomingSeriesGroups:   groupEpisodesBySeries(upcomingEpisodes),
 		UpcomingMovies:         upcomingMovies,
 		DownloadedSeriesGroups: groupEpisodesBySeries(downloadedEpisodes),

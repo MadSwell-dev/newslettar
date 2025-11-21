@@ -116,6 +116,58 @@ func groupEpisodesBySeries(episodes []Episode) []SeriesGroup {
 	return groups
 }
 
+// Deduplicate episodes by series title, season, and episode number
+func deduplicateEpisodes(episodes []Episode) []Episode {
+	type episodeKey struct {
+		seriesTitle string
+		seasonNum   int
+		episodeNum  int
+	}
+
+	seen := make(map[episodeKey]bool)
+	result := make([]Episode, 0, len(episodes))
+
+	for _, ep := range episodes {
+		key := episodeKey{
+			seriesTitle: ep.SeriesTitle,
+			seasonNum:   ep.SeasonNum,
+			episodeNum:  ep.EpisodeNum,
+		}
+
+		if !seen[key] {
+			seen[key] = true
+			result = append(result, ep)
+		}
+	}
+
+	return result
+}
+
+// Deduplicate movies by title and year
+func deduplicateMovies(movies []Movie) []Movie {
+	type movieKey struct {
+		title string
+		year  int
+	}
+
+	seen := make(map[movieKey]bool)
+	result := make([]Movie, 0, len(movies))
+
+	for _, movie := range movies {
+		key := movieKey{
+			title: movie.Title,
+			year:  movie.Year,
+		}
+
+		if !seen[key] {
+			seen[key] = true
+			result = append(result, movie)
+		}
+	}
+
+	return result
+}
+
 func formatDateWithDay(dateStr string) string {
 	if dateStr == "" {
 		return "Date TBA"
