@@ -268,6 +268,41 @@ func runNewsletter() {
 		return downloadedMovies[i].ReleaseDate < downloadedMovies[j].ReleaseDate
 	})
 
+	// Select appropriate strings based on schedule type
+	var emailTitle, weekRangePrefix, comingThisWeekHeading string
+	var noShowsMessage, noMoviesMessage string
+	var downloadedSectionHeading, noDownloadedShowsMessage, noDownloadedMoviesMessage string
+	var anticipatedSeriesHeading, watchedSeriesHeading string
+	var anticipatedMoviesHeading, watchedMoviesHeading string
+
+	if cfg.ScheduleType == "monthly" {
+		emailTitle = cfg.MonthlyEmailTitle
+		weekRangePrefix = cfg.MonthlyWeekRangePrefix
+		comingThisWeekHeading = cfg.MonthlyComingThisWeekHeading
+		noShowsMessage = cfg.MonthlyNoShowsMessage
+		noMoviesMessage = cfg.MonthlyNoMoviesMessage
+		downloadedSectionHeading = cfg.MonthlyDownloadedSectionHeading
+		noDownloadedShowsMessage = cfg.MonthlyNoDownloadedShowsMessage
+		noDownloadedMoviesMessage = cfg.MonthlyNoDownloadedMoviesMessage
+		anticipatedSeriesHeading = cfg.MonthlyAnticipatedSeriesHeading
+		watchedSeriesHeading = cfg.MonthlyWatchedSeriesHeading
+		anticipatedMoviesHeading = cfg.MonthlyAnticipatedMoviesHeading
+		watchedMoviesHeading = cfg.MonthlyWatchedMoviesHeading
+	} else {
+		emailTitle = cfg.EmailTitle
+		weekRangePrefix = cfg.WeekRangePrefix
+		comingThisWeekHeading = cfg.ComingThisWeekHeading
+		noShowsMessage = cfg.NoShowsMessage
+		noMoviesMessage = cfg.NoMoviesMessage
+		downloadedSectionHeading = cfg.DownloadedSectionHeading
+		noDownloadedShowsMessage = cfg.NoDownloadedShowsMessage
+		noDownloadedMoviesMessage = cfg.NoDownloadedMoviesMessage
+		anticipatedSeriesHeading = cfg.AnticipatedSeriesHeading
+		watchedSeriesHeading = cfg.WatchedSeriesHeading
+		anticipatedMoviesHeading = cfg.AnticipatedMoviesHeading
+		watchedMoviesHeading = cfg.WatchedMoviesHeading
+	}
+
 	data := NewsletterData{
 		WeekStart:              weekStart.Format("January 2, 2006"),
 		WeekEnd:                weekEnd.Format("January 2, 2006"),
@@ -279,23 +314,23 @@ func runNewsletter() {
 		TraktWatchedSeries:     traktWatchedSeries,
 		TraktAnticipatedMovies: traktAnticipatedMovies,
 		TraktWatchedMovies:     traktWatchedMovies,
-		// Customizable strings
-		EmailTitle:                cfg.EmailTitle,
+		// Customizable strings (schedule-aware)
+		EmailTitle:                emailTitle,
 		EmailIntro:                cfg.EmailIntro,
-		WeekRangePrefix:           cfg.WeekRangePrefix,
-		ComingThisWeekHeading:     cfg.ComingThisWeekHeading,
+		WeekRangePrefix:           weekRangePrefix,
+		ComingThisWeekHeading:     comingThisWeekHeading,
 		TVShowsHeading:            cfg.TVShowsHeading,
 		MoviesHeading:             cfg.MoviesHeading,
-		NoShowsMessage:            cfg.NoShowsMessage,
-		NoMoviesMessage:           cfg.NoMoviesMessage,
-		DownloadedSectionHeading:  cfg.DownloadedSectionHeading,
-		NoDownloadedShowsMessage:  cfg.NoDownloadedShowsMessage,
-		NoDownloadedMoviesMessage: cfg.NoDownloadedMoviesMessage,
+		NoShowsMessage:            noShowsMessage,
+		NoMoviesMessage:           noMoviesMessage,
+		DownloadedSectionHeading:  downloadedSectionHeading,
+		NoDownloadedShowsMessage:  noDownloadedShowsMessage,
+		NoDownloadedMoviesMessage: noDownloadedMoviesMessage,
 		TrendingSectionHeading:    cfg.TrendingSectionHeading,
-		AnticipatedSeriesHeading:  cfg.AnticipatedSeriesHeading,
-		WatchedSeriesHeading:      cfg.WatchedSeriesHeading,
-		AnticipatedMoviesHeading:  cfg.AnticipatedMoviesHeading,
-		WatchedMoviesHeading:      cfg.WatchedMoviesHeading,
+		AnticipatedSeriesHeading:  anticipatedSeriesHeading,
+		WatchedSeriesHeading:      watchedSeriesHeading,
+		AnticipatedMoviesHeading:  anticipatedMoviesHeading,
+		WatchedMoviesHeading:      watchedMoviesHeading,
 		FooterText:                cfg.FooterText,
 		// Display options
 		ShowPosters:                cfg.ShowPosters,
@@ -316,7 +351,13 @@ func runNewsletter() {
 		log.Fatalf("❌ Failed to generate HTML: %v", err)
 	}
 
-	subject := fmt.Sprintf("📺 Your Weekly Newsletter - %s", weekEnd.Format("January 2, 2006"))
+	// Generate subject line based on schedule type
+	var subject string
+	if cfg.ScheduleType == "monthly" {
+		subject = fmt.Sprintf("📺 Your Monthly Newsletter - %s", weekEnd.Format("January 2006"))
+	} else {
+		subject = fmt.Sprintf("📺 Your Weekly Newsletter - %s", weekEnd.Format("January 2, 2006"))
+	}
 
 	log.Println("📧 Sending emails...")
 	if err := sendEmail(cfg, subject, html); err != nil {

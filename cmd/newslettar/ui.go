@@ -1150,34 +1150,171 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
             <div class="modal-body" style="max-height: calc(90vh - 140px); overflow-y: auto;">
                 <div style="margin-bottom: 20px; background: #252f3f; padding: 15px; border-radius: 8px; border-left: 3px solid #11998e;">
                     <p style="color: #a0b0c0; font-size: 0.9em; margin: 0;">
-                        💡 <strong style="color: #e8e8e8;">Tip:</strong> Leave fields empty to hide that section from your emails. Perfect for customization and translation!
+                        💡 <strong style="color: #e8e8e8;">Tip:</strong> Customize strings for both weekly and monthly schedules. Leave fields empty to hide that section from your emails. Perfect for customization and translation!
                     </p>
                 </div>
 
-                <form id="edit-strings-form">
-                    <div class="form-group">
-                        <label for="email-title">Email Title</label>
-                        <input type="text" id="email-title" name="email_title" placeholder="e.g., Your Weekly Newslettar">
-                    </div>
+                <!-- Tabs for Weekly/Monthly -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #2a3444;">
+                    <button type="button" id="weekly-strings-tab" class="string-tab active" onclick="switchStringTab('weekly')" style="flex: 1; padding: 12px; background: #667eea; border: none; border-radius: 8px 8px 0 0; color: white; font-weight: 600; cursor: pointer;">
+                        Weekly Schedule Strings
+                    </button>
+                    <button type="button" id="monthly-strings-tab" class="string-tab" onclick="switchStringTab('monthly')" style="flex: 1; padding: 12px; background: #252f3f; border: none; border-radius: 8px 8px 0 0; color: #a0b0c0; font-weight: 600; cursor: pointer;">
+                        Monthly Schedule Strings
+                    </button>
+                </div>
 
+                <form id="edit-strings-form">
+                    <!-- Common strings (used in both weekly and monthly) -->
                     <div class="form-group">
                         <label for="email-intro">Email Introduction (optional)</label>
                         <textarea id="email-intro" name="email_intro" rows="3" style="width: 100%; padding: 12px; background: #0f1419; border: 2px solid #2a3444; border-radius: 8px; color: #e8e8e8; font-size: 14px; font-family: inherit; resize: vertical;" placeholder="A brief introduction paragraph shown under the title (leave empty to hide)"></textarea>
                         <small style="color: #8899aa; font-size: 0.85em; display: block; margin-top: 5px;">This paragraph appears below the email title. Leave empty if you don't want an introduction.</small>
                     </div>
 
+                    <!-- Weekly schedule strings -->
+                    <div id="weekly-strings-container">
+                        <hr style="margin: 25px 0; border: none; border-top: 1px solid #2a3444;">
+                        <h4 style="color: #667eea; margin-bottom: 15px;">Weekly Schedule Strings</h4>
+
+                        <div class="form-group">
+                            <label for="email-title">Email Title</label>
+                            <input type="text" id="email-title" name="email_title" placeholder="e.g., Your Weekly Newslettar">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="week-range-prefix">Week Range Prefix</label>
+                            <input type="text" id="week-range-prefix" name="week_range_prefix" placeholder="e.g., Week of">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="coming-this-week-heading">Coming This Week Heading</label>
+                            <input type="text" id="coming-this-week-heading" name="coming_this_week_heading" placeholder="e.g., Coming This Week">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="downloaded-section-heading">Downloaded Section Heading</label>
+                            <input type="text" id="downloaded-section-heading" name="downloaded_section_heading" placeholder="e.g., Downloaded Last Week">
+                        </div>
+
+                        <h5 style="color: #667eea; margin: 20px 0 15px 0;">Empty State Messages</h5>
+
+                        <div class="form-group">
+                            <label for="no-shows-message">No Shows Message</label>
+                            <input type="text" id="no-shows-message" name="no_shows_message" placeholder="e.g., No shows scheduled for this week">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="no-movies-message">No Movies Message</label>
+                            <input type="text" id="no-movies-message" name="no_movies_message" placeholder="e.g., No movies scheduled for this week">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="no-downloaded-shows-message">No Downloaded Shows Message</label>
+                            <input type="text" id="no-downloaded-shows-message" name="no_downloaded_shows_message" placeholder="e.g., No shows downloaded this week">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="no-downloaded-movies-message">No Downloaded Movies Message</label>
+                            <input type="text" id="no-downloaded-movies-message" name="no_downloaded_movies_message" placeholder="e.g., No movies downloaded this week">
+                        </div>
+
+                        <h5 style="color: #667eea; margin: 20px 0 15px 0;">Trakt Trending Headings</h5>
+
+                        <div class="form-group">
+                            <label for="anticipated-series-heading">Anticipated Series Heading</label>
+                            <input type="text" id="anticipated-series-heading" name="anticipated_series_heading" placeholder="e.g., Most Anticipated Series (Next Week)">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="watched-series-heading">Watched Series Heading</label>
+                            <input type="text" id="watched-series-heading" name="watched_series_heading" placeholder="e.g., Most Watched Series (Last Week)">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="anticipated-movies-heading">Anticipated Movies Heading</label>
+                            <input type="text" id="anticipated-movies-heading" name="anticipated_movies_heading" placeholder="e.g., Most Anticipated Movies (Next Week)">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="watched-movies-heading">Watched Movies Heading</label>
+                            <input type="text" id="watched-movies-heading" name="watched_movies_heading" placeholder="e.g., Most Watched Movies (Last Week)">
+                        </div>
+                    </div>
+
+                    <!-- Monthly schedule strings -->
+                    <div id="monthly-strings-container" style="display: none;">
+                        <hr style="margin: 25px 0; border: none; border-top: 1px solid #2a3444;">
+                        <h4 style="color: #667eea; margin-bottom: 15px;">Monthly Schedule Strings</h4>
+
+                        <div class="form-group">
+                            <label for="monthly-email-title">Email Title</label>
+                            <input type="text" id="monthly-email-title" name="monthly_email_title" placeholder="e.g., Your Monthly Newslettar">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monthly-week-range-prefix">Month Range Prefix</label>
+                            <input type="text" id="monthly-week-range-prefix" name="monthly_week_range_prefix" placeholder="e.g., Month of">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monthly-coming-this-week-heading">Coming This Month Heading</label>
+                            <input type="text" id="monthly-coming-this-week-heading" name="monthly_coming_this_week_heading" placeholder="e.g., Coming This Month">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monthly-downloaded-section-heading">Downloaded Section Heading</label>
+                            <input type="text" id="monthly-downloaded-section-heading" name="monthly_downloaded_section_heading" placeholder="e.g., Downloaded Last Month">
+                        </div>
+
+                        <h5 style="color: #667eea; margin: 20px 0 15px 0;">Empty State Messages</h5>
+
+                        <div class="form-group">
+                            <label for="monthly-no-shows-message">No Shows Message</label>
+                            <input type="text" id="monthly-no-shows-message" name="monthly_no_shows_message" placeholder="e.g., No shows scheduled for this month">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monthly-no-movies-message">No Movies Message</label>
+                            <input type="text" id="monthly-no-movies-message" name="monthly_no_movies_message" placeholder="e.g., No movies scheduled for this month">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monthly-no-downloaded-shows-message">No Downloaded Shows Message</label>
+                            <input type="text" id="monthly-no-downloaded-shows-message" name="monthly_no_downloaded_shows_message" placeholder="e.g., No shows downloaded this month">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monthly-no-downloaded-movies-message">No Downloaded Movies Message</label>
+                            <input type="text" id="monthly-no-downloaded-movies-message" name="monthly_no_downloaded_movies_message" placeholder="e.g., No movies downloaded this month">
+                        </div>
+
+                        <h5 style="color: #667eea; margin: 20px 0 15px 0;">Trakt Trending Headings</h5>
+
+                        <div class="form-group">
+                            <label for="monthly-anticipated-series-heading">Anticipated Series Heading</label>
+                            <input type="text" id="monthly-anticipated-series-heading" name="monthly_anticipated_series_heading" placeholder="e.g., Most Anticipated Series (Next Month)">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monthly-watched-series-heading">Watched Series Heading</label>
+                            <input type="text" id="monthly-watched-series-heading" name="monthly_watched_series_heading" placeholder="e.g., Most Watched Series (Last Month)">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monthly-anticipated-movies-heading">Anticipated Movies Heading</label>
+                            <input type="text" id="monthly-anticipated-movies-heading" name="monthly_anticipated_movies_heading" placeholder="e.g., Most Anticipated Movies (Next Month)">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monthly-watched-movies-heading">Watched Movies Heading</label>
+                            <input type="text" id="monthly-watched-movies-heading" name="monthly_watched_movies_heading" placeholder="e.g., Most Watched Movies (Last Month)">
+                        </div>
+                    </div>
+
+                    <!-- Common fields that don't change between weekly and monthly -->
                     <hr style="margin: 25px 0; border: none; border-top: 1px solid #2a3444;">
-                    <h4 style="color: #667eea; margin-bottom: 15px;">Section Headings</h4>
-
-                    <div class="form-group">
-                        <label for="week-range-prefix">Week Range Prefix</label>
-                        <input type="text" id="week-range-prefix" name="week_range_prefix" placeholder="e.g., Week of">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="coming-this-week-heading">Coming This Week Heading</label>
-                        <input type="text" id="coming-this-week-heading" name="coming_this_week_heading" placeholder="e.g., Coming This Week">
-                    </div>
+                    <h4 style="color: #667eea; margin-bottom: 15px;">Common Section Headings (used in both schedules)</h4>
 
                     <div class="form-group">
                         <label for="tv-shows-heading">TV Shows Heading</label>
@@ -1190,63 +1327,9 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
                     </div>
 
                     <div class="form-group">
-                        <label for="downloaded-section-heading">Downloaded Section Heading</label>
-                        <input type="text" id="downloaded-section-heading" name="downloaded_section_heading" placeholder="e.g., Downloaded Last Week">
-                    </div>
-
-                    <div class="form-group">
                         <label for="trending-section-heading">Trending Section Heading</label>
                         <input type="text" id="trending-section-heading" name="trending_section_heading" placeholder="e.g., Trending">
                     </div>
-
-                    <hr style="margin: 25px 0; border: none; border-top: 1px solid #2a3444;">
-                    <h4 style="color: #667eea; margin-bottom: 15px;">Empty State Messages</h4>
-
-                    <div class="form-group">
-                        <label for="no-shows-message">No Shows Message</label>
-                        <input type="text" id="no-shows-message" name="no_shows_message" placeholder="e.g., No shows scheduled for this week">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="no-movies-message">No Movies Message</label>
-                        <input type="text" id="no-movies-message" name="no_movies_message" placeholder="e.g., No movies scheduled for this week">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="no-downloaded-shows-message">No Downloaded Shows Message</label>
-                        <input type="text" id="no-downloaded-shows-message" name="no_downloaded_shows_message" placeholder="e.g., No shows downloaded this week">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="no-downloaded-movies-message">No Downloaded Movies Message</label>
-                        <input type="text" id="no-downloaded-movies-message" name="no_downloaded_movies_message" placeholder="e.g., No movies downloaded this week">
-                    </div>
-
-                    <hr style="margin: 25px 0; border: none; border-top: 1px solid #2a3444;">
-                    <h4 style="color: #667eea; margin-bottom: 15px;">Trakt Trending Headings</h4>
-
-                    <div class="form-group">
-                        <label for="anticipated-series-heading">Anticipated Series Heading</label>
-                        <input type="text" id="anticipated-series-heading" name="anticipated_series_heading" placeholder="e.g., Most Anticipated Series (Next Week)">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="watched-series-heading">Watched Series Heading</label>
-                        <input type="text" id="watched-series-heading" name="watched_series_heading" placeholder="e.g., Most Watched Series (Last Week)">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="anticipated-movies-heading">Anticipated Movies Heading</label>
-                        <input type="text" id="anticipated-movies-heading" name="anticipated_movies_heading" placeholder="e.g., Most Anticipated Movies (Next Week)">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="watched-movies-heading">Watched Movies Heading</label>
-                        <input type="text" id="watched-movies-heading" name="watched_movies_heading" placeholder="e.g., Most Watched Movies (Last Week)">
-                    </div>
-
-                    <hr style="margin: 25px 0; border: none; border-top: 1px solid #2a3444;">
-                    <h4 style="color: #667eea; margin-bottom: 15px;">Footer</h4>
 
                     <div class="form-group">
                         <label for="footer-text">Footer Text</label>
@@ -1847,6 +1930,20 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
                 document.getElementById('watched-movies-heading').value = config.watched_movies_heading || '';
                 document.getElementById('footer-text').value = config.footer_text || '';
 
+                // Monthly strings
+                document.getElementById('monthly-email-title').value = config.monthly_email_title || '';
+                document.getElementById('monthly-week-range-prefix').value = config.monthly_week_range_prefix || '';
+                document.getElementById('monthly-coming-this-week-heading').value = config.monthly_coming_this_week_heading || '';
+                document.getElementById('monthly-downloaded-section-heading').value = config.monthly_downloaded_section_heading || '';
+                document.getElementById('monthly-no-shows-message').value = config.monthly_no_shows_message || '';
+                document.getElementById('monthly-no-movies-message').value = config.monthly_no_movies_message || '';
+                document.getElementById('monthly-no-downloaded-shows-message').value = config.monthly_no_downloaded_shows_message || '';
+                document.getElementById('monthly-no-downloaded-movies-message').value = config.monthly_no_downloaded_movies_message || '';
+                document.getElementById('monthly-anticipated-series-heading').value = config.monthly_anticipated_series_heading || '';
+                document.getElementById('monthly-watched-series-heading').value = config.monthly_watched_series_heading || '';
+                document.getElementById('monthly-anticipated-movies-heading').value = config.monthly_anticipated_movies_heading || '';
+                document.getElementById('monthly-watched-movies-heading').value = config.monthly_watched_movies_heading || '';
+
                 // Show modal
                 document.getElementById('edit-strings-modal').classList.add('show');
 
@@ -1862,6 +1959,29 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
 
         function closeEditStringsModal() {
             document.getElementById('edit-strings-modal').classList.remove('show');
+        }
+
+        function switchStringTab(tab) {
+            const weeklyTab = document.getElementById('weekly-strings-tab');
+            const monthlyTab = document.getElementById('monthly-strings-tab');
+            const weeklyContainer = document.getElementById('weekly-strings-container');
+            const monthlyContainer = document.getElementById('monthly-strings-container');
+
+            if (tab === 'weekly') {
+                weeklyTab.style.background = '#667eea';
+                weeklyTab.style.color = 'white';
+                monthlyTab.style.background = '#252f3f';
+                monthlyTab.style.color = '#a0b0c0';
+                weeklyContainer.style.display = 'block';
+                monthlyContainer.style.display = 'none';
+            } else {
+                monthlyTab.style.background = '#667eea';
+                monthlyTab.style.color = 'white';
+                weeklyTab.style.background = '#252f3f';
+                weeklyTab.style.color = '#a0b0c0';
+                weeklyContainer.style.display = 'none';
+                monthlyContainer.style.display = 'block';
+            }
         }
 
         async function saveEmailStrings() {
@@ -1893,7 +2013,20 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
                     watched_series_heading: document.getElementById('watched-series-heading').value,
                     anticipated_movies_heading: document.getElementById('anticipated-movies-heading').value,
                     watched_movies_heading: document.getElementById('watched-movies-heading').value,
-                    footer_text: document.getElementById('footer-text').value
+                    footer_text: document.getElementById('footer-text').value,
+                    // Monthly strings
+                    monthly_email_title: document.getElementById('monthly-email-title').value,
+                    monthly_week_range_prefix: document.getElementById('monthly-week-range-prefix').value,
+                    monthly_coming_this_week_heading: document.getElementById('monthly-coming-this-week-heading').value,
+                    monthly_downloaded_section_heading: document.getElementById('monthly-downloaded-section-heading').value,
+                    monthly_no_shows_message: document.getElementById('monthly-no-shows-message').value,
+                    monthly_no_movies_message: document.getElementById('monthly-no-movies-message').value,
+                    monthly_no_downloaded_shows_message: document.getElementById('monthly-no-downloaded-shows-message').value,
+                    monthly_no_downloaded_movies_message: document.getElementById('monthly-no-downloaded-movies-message').value,
+                    monthly_anticipated_series_heading: document.getElementById('monthly-anticipated-series-heading').value,
+                    monthly_watched_series_heading: document.getElementById('monthly-watched-series-heading').value,
+                    monthly_anticipated_movies_heading: document.getElementById('monthly-anticipated-movies-heading').value,
+                    monthly_watched_movies_heading: document.getElementById('monthly-watched-movies-heading').value
                 };
 
                 // Save to backend

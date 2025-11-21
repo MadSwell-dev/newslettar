@@ -121,6 +121,19 @@ func loadConfig() *Config {
 		AnticipatedMoviesHeading:  getEnvFromFile(envMap, "ANTICIPATED_MOVIES_HEADING", DefaultAnticipatedMoviesHeading),
 		WatchedMoviesHeading:      getEnvFromFile(envMap, "WATCHED_MOVIES_HEADING", DefaultWatchedMoviesHeading),
 		FooterText:                getEnvFromFile(envMap, "FOOTER_TEXT", DefaultFooterText),
+		// Monthly email strings
+		MonthlyEmailTitle:                getEnvFromFile(envMap, "MONTHLY_EMAIL_TITLE", DefaultMonthlyEmailTitle),
+		MonthlyWeekRangePrefix:           getEnvFromFile(envMap, "MONTHLY_WEEK_RANGE_PREFIX", DefaultMonthlyWeekRangePrefix),
+		MonthlyComingThisWeekHeading:     getEnvFromFile(envMap, "MONTHLY_COMING_THIS_WEEK_HEADING", DefaultMonthlyComingThisWeekHeading),
+		MonthlyNoShowsMessage:            getEnvFromFile(envMap, "MONTHLY_NO_SHOWS_MESSAGE", DefaultMonthlyNoShowsMessage),
+		MonthlyNoMoviesMessage:           getEnvFromFile(envMap, "MONTHLY_NO_MOVIES_MESSAGE", DefaultMonthlyNoMoviesMessage),
+		MonthlyDownloadedSectionHeading:  getEnvFromFile(envMap, "MONTHLY_DOWNLOADED_SECTION_HEADING", DefaultMonthlyDownloadedSectionHeading),
+		MonthlyNoDownloadedShowsMessage:  getEnvFromFile(envMap, "MONTHLY_NO_DOWNLOADED_SHOWS_MESSAGE", DefaultMonthlyNoDownloadedShowsMessage),
+		MonthlyNoDownloadedMoviesMessage: getEnvFromFile(envMap, "MONTHLY_NO_DOWNLOADED_MOVIES_MESSAGE", DefaultMonthlyNoDownloadedMoviesMessage),
+		MonthlyAnticipatedSeriesHeading:  getEnvFromFile(envMap, "MONTHLY_ANTICIPATED_SERIES_HEADING", DefaultMonthlyAnticipatedSeriesHeading),
+		MonthlyWatchedSeriesHeading:      getEnvFromFile(envMap, "MONTHLY_WATCHED_SERIES_HEADING", DefaultMonthlyWatchedSeriesHeading),
+		MonthlyAnticipatedMoviesHeading:  getEnvFromFile(envMap, "MONTHLY_ANTICIPATED_MOVIES_HEADING", DefaultMonthlyAnticipatedMoviesHeading),
+		MonthlyWatchedMoviesHeading:      getEnvFromFile(envMap, "MONTHLY_WATCHED_MOVIES_HEADING", DefaultMonthlyWatchedMoviesHeading),
 	}
 }
 
