@@ -118,7 +118,7 @@ type Config struct {
 	EmailBatchSize  int    // Number of recipients per batch
 	EmailBatchDelay int    // Delay between batches in seconds
 	LogLevel        string // debug, info, warn, error
-	// Customizable email strings
+	// Customizable email strings (weekly schedule)
 	EmailTitle                string
 	EmailIntro                string
 	WeekRangePrefix           string
@@ -136,6 +136,19 @@ type Config struct {
 	AnticipatedMoviesHeading  string
 	WatchedMoviesHeading      string
 	FooterText                string
+	// Customizable email strings (monthly schedule)
+	MonthlyEmailTitle                string
+	MonthlyWeekRangePrefix           string
+	MonthlyComingThisWeekHeading     string
+	MonthlyNoShowsMessage            string
+	MonthlyNoMoviesMessage           string
+	MonthlyDownloadedSectionHeading  string
+	MonthlyNoDownloadedShowsMessage  string
+	MonthlyNoDownloadedMoviesMessage string
+	MonthlyAnticipatedSeriesHeading  string
+	MonthlyWatchedSeriesHeading      string
+	MonthlyAnticipatedMoviesHeading  string
+	MonthlyWatchedMoviesHeading      string
 }
 
 // Minimal structs - only fields we actually need (reduces memory & JSON parsing time)
@@ -324,7 +337,7 @@ type WebConfig struct {
 	TraktWatchedSeriesLimit     string `json:"trakt_watched_series_limit"`
 	TraktAnticipatedMoviesLimit string `json:"trakt_anticipated_movies_limit"`
 	TraktWatchedMoviesLimit     string `json:"trakt_watched_movies_limit"`
-	// Customizable email strings
+	// Customizable email strings (weekly)
 	EmailTitle                string `json:"email_title"`
 	EmailIntro                string `json:"email_intro"`
 	WeekRangePrefix           string `json:"week_range_prefix"`
@@ -342,6 +355,19 @@ type WebConfig struct {
 	AnticipatedMoviesHeading  string `json:"anticipated_movies_heading"`
 	WatchedMoviesHeading      string `json:"watched_movies_heading"`
 	FooterText                string `json:"footer_text"`
+	// Customizable email strings (monthly)
+	MonthlyEmailTitle                string `json:"monthly_email_title"`
+	MonthlyWeekRangePrefix           string `json:"monthly_week_range_prefix"`
+	MonthlyComingThisWeekHeading     string `json:"monthly_coming_this_week_heading"`
+	MonthlyNoShowsMessage            string `json:"monthly_no_shows_message"`
+	MonthlyNoMoviesMessage           string `json:"monthly_no_movies_message"`
+	MonthlyDownloadedSectionHeading  string `json:"monthly_downloaded_section_heading"`
+	MonthlyNoDownloadedShowsMessage  string `json:"monthly_no_downloaded_shows_message"`
+	MonthlyNoDownloadedMoviesMessage string `json:"monthly_no_downloaded_movies_message"`
+	MonthlyAnticipatedSeriesHeading  string `json:"monthly_anticipated_series_heading"`
+	MonthlyWatchedSeriesHeading      string `json:"monthly_watched_series_heading"`
+	MonthlyAnticipatedMoviesHeading  string `json:"monthly_anticipated_movies_heading"`
+	MonthlyWatchedMoviesHeading      string `json:"monthly_watched_movies_heading"`
 }
 
 // Statistics for dashboard

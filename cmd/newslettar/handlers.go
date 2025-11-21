@@ -511,6 +511,19 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 			envMap["ANTICIPATED_MOVIES_HEADING"] = webCfg.AnticipatedMoviesHeading
 			envMap["WATCHED_MOVIES_HEADING"] = webCfg.WatchedMoviesHeading
 			envMap["FOOTER_TEXT"] = webCfg.FooterText
+			// Monthly versions
+			envMap["MONTHLY_EMAIL_TITLE"] = webCfg.MonthlyEmailTitle
+			envMap["MONTHLY_WEEK_RANGE_PREFIX"] = webCfg.MonthlyWeekRangePrefix
+			envMap["MONTHLY_COMING_THIS_WEEK_HEADING"] = webCfg.MonthlyComingThisWeekHeading
+			envMap["MONTHLY_NO_SHOWS_MESSAGE"] = webCfg.MonthlyNoShowsMessage
+			envMap["MONTHLY_NO_MOVIES_MESSAGE"] = webCfg.MonthlyNoMoviesMessage
+			envMap["MONTHLY_DOWNLOADED_SECTION_HEADING"] = webCfg.MonthlyDownloadedSectionHeading
+			envMap["MONTHLY_NO_DOWNLOADED_SHOWS_MESSAGE"] = webCfg.MonthlyNoDownloadedShowsMessage
+			envMap["MONTHLY_NO_DOWNLOADED_MOVIES_MESSAGE"] = webCfg.MonthlyNoDownloadedMoviesMessage
+			envMap["MONTHLY_ANTICIPATED_SERIES_HEADING"] = webCfg.MonthlyAnticipatedSeriesHeading
+			envMap["MONTHLY_WATCHED_SERIES_HEADING"] = webCfg.MonthlyWatchedSeriesHeading
+			envMap["MONTHLY_ANTICIPATED_MOVIES_HEADING"] = webCfg.MonthlyAnticipatedMoviesHeading
+			envMap["MONTHLY_WATCHED_MOVIES_HEADING"] = webCfg.MonthlyWatchedMoviesHeading
 		}
 
 		var envContent strings.Builder
@@ -609,6 +622,19 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		"anticipated_movies_heading":   getEnvFromFile(envMap, "ANTICIPATED_MOVIES_HEADING", DefaultAnticipatedMoviesHeading),
 		"watched_movies_heading":       getEnvFromFile(envMap, "WATCHED_MOVIES_HEADING", DefaultWatchedMoviesHeading),
 		"footer_text":                  getEnvFromFile(envMap, "FOOTER_TEXT", DefaultFooterText),
+		// Monthly email string customization
+		"monthly_email_title":                  getEnvFromFile(envMap, "MONTHLY_EMAIL_TITLE", DefaultMonthlyEmailTitle),
+		"monthly_week_range_prefix":            getEnvFromFile(envMap, "MONTHLY_WEEK_RANGE_PREFIX", DefaultMonthlyWeekRangePrefix),
+		"monthly_coming_this_week_heading":     getEnvFromFile(envMap, "MONTHLY_COMING_THIS_WEEK_HEADING", DefaultMonthlyComingThisWeekHeading),
+		"monthly_no_shows_message":             getEnvFromFile(envMap, "MONTHLY_NO_SHOWS_MESSAGE", DefaultMonthlyNoShowsMessage),
+		"monthly_no_movies_message":            getEnvFromFile(envMap, "MONTHLY_NO_MOVIES_MESSAGE", DefaultMonthlyNoMoviesMessage),
+		"monthly_downloaded_section_heading":   getEnvFromFile(envMap, "MONTHLY_DOWNLOADED_SECTION_HEADING", DefaultMonthlyDownloadedSectionHeading),
+		"monthly_no_downloaded_shows_message":  getEnvFromFile(envMap, "MONTHLY_NO_DOWNLOADED_SHOWS_MESSAGE", DefaultMonthlyNoDownloadedShowsMessage),
+		"monthly_no_downloaded_movies_message": getEnvFromFile(envMap, "MONTHLY_NO_DOWNLOADED_MOVIES_MESSAGE", DefaultMonthlyNoDownloadedMoviesMessage),
+		"monthly_anticipated_series_heading":   getEnvFromFile(envMap, "MONTHLY_ANTICIPATED_SERIES_HEADING", DefaultMonthlyAnticipatedSeriesHeading),
+		"monthly_watched_series_heading":       getEnvFromFile(envMap, "MONTHLY_WATCHED_SERIES_HEADING", DefaultMonthlyWatchedSeriesHeading),
+		"monthly_anticipated_movies_heading":   getEnvFromFile(envMap, "MONTHLY_ANTICIPATED_MOVIES_HEADING", DefaultMonthlyAnticipatedMoviesHeading),
+		"monthly_watched_movies_heading":       getEnvFromFile(envMap, "MONTHLY_WATCHED_MOVIES_HEADING", DefaultMonthlyWatchedMoviesHeading),
 	})
 }
 
