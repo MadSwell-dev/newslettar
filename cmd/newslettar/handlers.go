@@ -346,11 +346,10 @@ func previewHandler(w http.ResponseWriter, r *http.Request) {
 	if cfg.ScheduleType == "monthly" {
 		// For monthly, just show the current month name and year
 		currentMonth := weekEnd.Format("January 2006")
-		nextMonth := upcomingEnd.Format("January 2006")
 		weekStartStr = currentMonth
 		weekEndStr = currentMonth
 		upcomingStartStr = currentMonth
-		upcomingEndStr = nextMonth
+		upcomingEndStr = currentMonth
 	} else {
 		// For weekly, show full dates
 		weekStartStr = weekStart.Format("January 2, 2006")
