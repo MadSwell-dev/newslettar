@@ -765,6 +765,14 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
                 </div>
 
                 <div class="form-group">
+                    <label for="schedule_type">Schedule Type</label>
+                    <select name="schedule_type" id="schedule_type" aria-label="Select schedule type">
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="weekly-day-group">
                     <label for="schedule_day">Day of Week</label>
                     <select name="schedule_day" id="schedule_day" aria-label="Select day of week">
                         <option value="Sun">Sunday</option>
@@ -775,6 +783,12 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
                         <option value="Fri">Friday</option>
                         <option value="Sat">Saturday</option>
                     </select>
+                </div>
+
+                <div class="form-group" id="monthly-day-group" style="display: none;">
+                    <label for="schedule_day_of_month">Day of Month (1-31)</label>
+                    <input type="number" name="schedule_day_of_month" id="schedule_day_of_month" min="1" max="31" value="1" aria-label="Select day of month">
+                    <div class="error-message" id="day-of-month-error">Please enter a day between 1 and 31</div>
                 </div>
 
                 <div class="form-group">
@@ -1573,6 +1587,24 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
             setTimeout(updateTraktToggles, 100);
         });
 
+        // Toggle schedule type visibility (weekly vs monthly)
+        function toggleScheduleType() {
+            const scheduleType = document.getElementById('schedule_type').value;
+            const weeklyGroup = document.getElementById('weekly-day-group');
+            const monthlyGroup = document.getElementById('monthly-day-group');
+
+            if (scheduleType === 'monthly') {
+                weeklyGroup.style.display = 'none';
+                monthlyGroup.style.display = 'block';
+            } else {
+                weeklyGroup.style.display = 'block';
+                monthlyGroup.style.display = 'none';
+            }
+        }
+
+        // Add event listener for schedule type change
+        document.getElementById('schedule_type').addEventListener('change', toggleScheduleType);
+
         async function updateTimezoneInfo() {
             const tz = document.getElementById('timezone').value;
             try {
@@ -1610,9 +1642,14 @@ func getUIHTML(version string, nextRun string, timezone string, isDocker bool) s
                 document.querySelector('[name="to_emails"]').value = data.to_emails || '';
                 loadEmailTags(data.to_emails || '');
                 document.querySelector('[name="timezone"]').value = data.timezone || 'UTC';
+                document.querySelector('[name="schedule_type"]').value = data.schedule_type || 'weekly';
                 document.querySelector('[name="schedule_day"]').value = data.schedule_day || 'Sun';
+                document.querySelector('[name="schedule_day_of_month"]').value = data.schedule_day_of_month || '1';
                 document.querySelector('[name="schedule_time"]').value = data.schedule_time || '09:00';
-                
+
+                // Toggle schedule type visibility
+                toggleScheduleType();
+
                 document.getElementById('show-posters').checked = data.show_posters !== 'false';
                 document.getElementById('show-downloaded').checked = data.show_downloaded !== 'false';
                 document.getElementById('show-series-overview').checked = data.show_series_overview !== 'false';

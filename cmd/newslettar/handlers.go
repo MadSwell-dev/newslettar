@@ -68,7 +68,7 @@ func (w *gzipResponseWriter) Write(b []byte) (int, error) {
 func uiHandler(w http.ResponseWriter, r *http.Request) {
 	cfg := getConfig()
 	loc := getTimezone(cfg.Timezone)
-	nextRun := getNextScheduledRun(cfg.ScheduleDay, cfg.ScheduleTime, loc)
+	nextRun := getNextScheduledRun(cfg.ScheduleDay, cfg.ScheduleTime, cfg.ScheduleType, cfg.ScheduleDayOfMonth, loc)
 
 	// Detect if running in Docker
 	_, err := os.Stat("/.dockerenv")
@@ -425,6 +425,12 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 			if webCfg.ScheduleTime != "" {
 				envMap["SCHEDULE_TIME"] = webCfg.ScheduleTime
 			}
+			if webCfg.ScheduleType != "" {
+				envMap["SCHEDULE_TYPE"] = webCfg.ScheduleType
+			}
+			if webCfg.ScheduleDayOfMonth != "" {
+				envMap["SCHEDULE_DAY_OF_MONTH"] = webCfg.ScheduleDayOfMonth
+			}
 		}
 		if webCfg.ShowPosters != "" {
 			envMap["SHOW_POSTERS"] = webCfg.ShowPosters
@@ -568,6 +574,8 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		"timezone":                       getEnvFromFile(envMap, "TIMEZONE", DefaultTimezone),
 		"schedule_day":                   getEnvFromFile(envMap, "SCHEDULE_DAY", DefaultScheduleDay),
 		"schedule_time":                  getEnvFromFile(envMap, "SCHEDULE_TIME", DefaultScheduleTime),
+		"schedule_type":                  getEnvFromFile(envMap, "SCHEDULE_TYPE", DefaultScheduleType),
+		"schedule_day_of_month":          fmt.Sprintf("%d", cfg.ScheduleDayOfMonth),
 		"show_posters":                   getEnvFromFile(envMap, "SHOW_POSTERS", DefaultShowPosters),
 		"show_downloaded":                getEnvFromFile(envMap, "SHOW_DOWNLOADED", DefaultShowDownloaded),
 		"show_series_overview":           getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", DefaultShowSeriesOverview),
@@ -863,7 +871,7 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 
 	cfg := getConfig()
 	loc := getTimezone(cfg.Timezone)
-	nextRun := getNextScheduledRun(cfg.ScheduleDay, cfg.ScheduleTime, loc)
+	nextRun := getNextScheduledRun(cfg.ScheduleDay, cfg.ScheduleTime, cfg.ScheduleType, cfg.ScheduleDayOfMonth, loc)
 
 	// Calculate uptime
 	uptime := time.Since(startTime)

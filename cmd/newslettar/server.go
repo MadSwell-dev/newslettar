@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -20,8 +21,13 @@ func setupScheduler(cfg *Config) {
 	scheduler = cron.New(cron.WithLocation(getTimezone(cfg.Timezone)))
 
 	// Convert day/time to cron expression
-	cronExpr := convertToCronExpression(cfg.ScheduleDay, cfg.ScheduleTime)
-	log.Printf("📅 Setting up scheduler: %s (cron: %s)", cfg.ScheduleDay+" "+cfg.ScheduleTime, cronExpr)
+	cronExpr := convertToCronExpression(cfg.ScheduleDay, cfg.ScheduleTime, cfg.ScheduleType, cfg.ScheduleDayOfMonth)
+
+	scheduleDesc := cfg.ScheduleDay + " " + cfg.ScheduleTime
+	if cfg.ScheduleType == "monthly" {
+		scheduleDesc = "Day " + fmt.Sprintf("%d", cfg.ScheduleDayOfMonth) + " at " + cfg.ScheduleTime
+	}
+	log.Printf("📅 Setting up scheduler (%s): %s (cron: %s)", cfg.ScheduleType, scheduleDesc, cronExpr)
 
 	_, err := scheduler.AddFunc(cronExpr, func() {
 		log.Println("⏰ Scheduled newsletter triggered")

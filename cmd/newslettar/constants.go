@@ -11,6 +11,8 @@ const (
 	DefaultTimezone                   = "UTC"
 	DefaultScheduleDay                = "Sun"
 	DefaultScheduleTime               = "09:00"
+	DefaultScheduleType               = "weekly"
+	DefaultScheduleDayOfMonth         = 1
 	DefaultShowPosters                = "true"
 	DefaultShowDownloaded             = "true"
 	DefaultShowSeriesOverview         = "false"
