@@ -317,33 +317,53 @@ case "$1" in
     update)
         echo -e "${YELLOW}Updating Newslettar...${NC}"
         cd /opt/newslettar
-        cp .env .env.backup
-        
+
+        # Backup configuration
+        if [ ! -f .env ]; then
+            echo -e "${RED}No .env file found! Please configure Newslettar first.${NC}"
+            exit 1
+        fi
+
+        echo -e "${BLUE}  Backing up configuration...${NC}"
+        cp .env .env.backup || {
+            echo -e "${RED}Failed to backup .env file${NC}"
+            exit 1
+        }
+        echo -e "${GREEN}  ✓ Configuration backed up${NC}"
+
         # Update from GitHub (all files)
         git fetch origin main -q
         git reset --hard origin/main -q
         if [ $? -ne 0 ]; then
             echo -e "${RED}Failed to update from GitHub${NC}"
             mv .env.backup .env
+            rm -f .env.backup 2>/dev/null
             exit 1
         fi
-        
+
         /usr/local/go/bin/go mod tidy
         VERSION=$(grep '"version"' version.json | cut -d'"' -f4)
         # Validate version format
         if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$'; then
             echo -e "${RED}Invalid version format in version.json${NC}"
             mv .env.backup .env
+            rm -f .env.backup 2>/dev/null
             exit 1
         fi
         /usr/local/go/bin/go build -ldflags="-s -w -X main.version=${VERSION}" -trimpath -o newslettar ./cmd/newslettar
         if [ $? -ne 0 ]; then
             echo -e "${RED}Build failed!${NC}"
             mv .env.backup .env
+            rm -f .env.backup 2>/dev/null
             exit 1
         fi
-        
+
+        # Restore configuration
+        echo -e "${BLUE}  Restoring configuration...${NC}"
         mv .env.backup .env
+        rm -f .env.backup 2>/dev/null
+        echo -e "${GREEN}  ✓ Configuration restored${NC}"
+
         systemctl restart newslettar.service
         echo -e "${GREEN}✓ Updated successfully!${NC}"
         ;;

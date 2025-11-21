@@ -99,6 +99,15 @@ echo -e "${YELLOW}[3/5] Installing Newslettar...${NC}"
 # Change to safe directory before removing installation
 cd /tmp
 
+# Backup configuration if it exists
+ENV_BACKUP=""
+if [ -f "$INSTALL_DIR/.env" ]; then
+    echo -e "${BLUE}  Backing up configuration...${NC}"
+    ENV_BACKUP=$(mktemp)
+    cp "$INSTALL_DIR/.env" "$ENV_BACKUP"
+    echo -e "${GREEN}  ✓ Configuration backed up to $ENV_BACKUP${NC}"
+fi
+
 # Remove old installation if exists
 if [ -d "$INSTALL_DIR" ]; then
     echo -e "${BLUE}  Removing old installation...${NC}"
@@ -121,8 +130,14 @@ echo -e "${GREEN}✓ Installed to $INSTALL_DIR (${BINARY_SIZE})${NC}"
 
 echo -e "${YELLOW}[4/5] Creating configuration...${NC}"
 
+# Restore backed up configuration if it exists
+if [ -n "$ENV_BACKUP" ] && [ -f "$ENV_BACKUP" ]; then
+    echo -e "${BLUE}  Restoring backed up configuration...${NC}"
+    cp "$ENV_BACKUP" "$INSTALL_DIR/.env"
+    rm "$ENV_BACKUP"
+    echo -e "${GREEN}✓ Configuration restored from backup${NC}"
 # Only create .env if it doesn't exist (preserve existing config on updates)
-if [ ! -f "$INSTALL_DIR/.env" ]; then
+elif [ ! -f "$INSTALL_DIR/.env" ]; then
     cat > "$INSTALL_DIR/.env" << 'EOF'
 # Sonarr Configuration
 SONARR_URL=http://localhost:8989
