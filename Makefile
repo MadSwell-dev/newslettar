@@ -1,4 +1,4 @@
-.PHONY: build clean test run docker-build docker-run install deb help
+.PHONY: build clean test run docker-build docker-run install deb windows-installer help
 
 # Build variables
 BINARY_NAME=newslettar
@@ -80,6 +80,17 @@ deb: ## Build Debian package
 	@echo "Building Debian package..."
 	@./scripts/build-deb.sh
 	@echo "✓ Debian package built"
+
+windows-installer: ## Build Windows MSI installer (requires go-msi)
+	@echo "Building Windows installer..."
+	@which go-msi > /dev/null || (echo "go-msi not installed. Run: go install github.com/mh-cbon/go-msi@latest" && exit 1)
+	@mkdir -p $(DIST_DIR)
+	@echo "Building Windows binary..."
+	GOOS=windows GOARCH=amd64 go build $(BUILDFLAGS) $(LDFLAGS) -o $(BINARY_NAME).exe $(CMD_DIR)
+	@echo "Creating MSI package..."
+	go-msi make --msi $(DIST_DIR)/$(BINARY_NAME)-$(VERSION)-amd64.msi --version $(VERSION) --arch amd64
+	@rm -f $(BINARY_NAME).exe
+	@echo "✓ Windows installer built: $(DIST_DIR)/$(BINARY_NAME)-$(VERSION)-amd64.msi"
 
 fmt: ## Format Go code
 	@echo "Formatting code..."

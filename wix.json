@@ -1,0 +1,41 @@
+{
+  "product": "Newslettar",
+  "company": "MadSwell",
+  "license": "LICENSE",
+  "upgrade-code": "9A7F2B3C-8D4E-4F5A-9B6C-1E2D3F4A5B6C",
+  "version": "1.0.0",
+  "files": {
+    "guid": "8B6C1A2D-3E4F-5A6B-7C8D-9E0F1A2B3C4D",
+    "items": [
+      "newslettar.exe"
+    ]
+  },
+  "env": {
+    "guid": "7C5D2E3F-4A5B-6C7D-8E9F-0A1B2C3D4E5F",
+    "vars": [
+      {
+        "name": "PATH",
+        "value": "[INSTALLDIR]",
+        "permanent": "no",
+        "system": "yes",
+        "action": "set",
+        "part": "last"
+      }
+    ]
+  },
+  "shortcuts": {
+    "guid": "6D4E3F2A-5B6C-7D8E-9F0A-1B2C3D4E5F6A",
+    "items": [
+      {
+        "name": "Newslettar Web UI",
+        "description": "Open Newslettar Web Interface",
+        "target": "[INSTALLDIR]newslettar.exe",
+        "arguments": "-web",
+        "wdir": "INSTALLDIR"
+      }
+    ]
+  },
+  "choco": {
+    "skip": true
+  }
+}

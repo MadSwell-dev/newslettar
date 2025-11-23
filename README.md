@@ -20,11 +20,11 @@ Generate beautiful, scheduled email newsletters summarizing new TV shows and mov
 
 ## Architecture Support
 
-| Platform | Support |
-|----------|---------|
-| amd64    | ✅      |
-| arm64    | ✅      |
-| armv6    | ✅      |
+| Platform      | Linux | Windows | macOS |
+|---------------|-------|---------|-------|
+| amd64 (x86_64)| ✅    | ✅      | ✅    |
+| arm64         | ✅    | -       | ✅    |
+| armv6         | ✅    | -       | -     |
 
 ## Quick Installation (Docker Compose)
 
@@ -108,6 +108,38 @@ newslettar-ctl status     # Check status
 newslettar-ctl logs       # View logs
 newslettar-ctl web        # Show Web UI URL
 newslettar-ctl update     # Update to latest version
+```
+
+## Native Installation (Windows)
+
+Download and install the MSI installer from the [latest release](https://github.com/MadSwell-dev/newslettar/releases/latest).
+
+The installer will:
+- Install Newslettar to `C:\Program Files\Newslettar`
+- Add Newslettar to your system PATH
+- Create a Windows service for automatic startup
+- Configure Windows Firewall to allow port 8080
+
+**Management commands (PowerShell):**
+```powershell
+Start-Service Newslettar        # Start service
+Stop-Service Newslettar         # Stop service
+Restart-Service Newslettar      # Restart service
+Get-Service Newslettar          # Check status
+```
+
+**Configuration:**
+Edit `C:\Program Files\Newslettar\.env` and restart the service.
+
+**Alternative:** Use the included control script:
+```cmd
+newslettar-ctl.bat start        # Start service
+newslettar-ctl.bat stop         # Stop service
+newslettar-ctl.bat restart      # Restart service
+newslettar-ctl.bat status       # Check status
+newslettar-ctl.bat logs         # View logs
+newslettar-ctl.bat web          # Show Web UI URL
+newslettar-ctl.bat edit         # Edit configuration
 ```
 
 ## Security
