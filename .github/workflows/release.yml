@@ -223,7 +223,7 @@ jobs:
             Write-Host "Checking: $path"
             if (Test-Path $path) {
               $wixPath = $path
-              Write-Host "✓ WiX found at: $wixPath"
+              Write-Host "[OK] WiX found at: $wixPath"
               break
             }
           }
@@ -233,9 +233,9 @@ jobs:
             $found = Get-ChildItem -Path "C:\Program Files*" -Filter "candle.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
             if ($found) {
               $wixPath = $found.DirectoryName
-              Write-Host "✓ WiX found via search at: $wixPath"
+              Write-Host "[OK] WiX found via search at: $wixPath"
             } else {
-              Write-Host "✗ WiX installation failed - candle.exe not found"
+              Write-Host "[ERROR] WiX installation failed - candle.exe not found"
               exit 1
             }
           }
@@ -245,9 +245,9 @@ jobs:
 
           # Verify candle.exe exists
           if (Test-Path "$wixPath\candle.exe") {
-            Write-Host "✓ candle.exe verified"
+            Write-Host "[OK] candle.exe verified"
           } else {
-            Write-Host "✗ candle.exe not found in $wixPath"
+            Write-Host "[ERROR] candle.exe not found in $wixPath"
             exit 1
           }
 
@@ -290,9 +290,9 @@ jobs:
           Write-Host "Checking for required files..."
           @("newslettar.exe", "newslettar-service.xml", "scripts/install-windows.ps1", "scripts/newslettar-ctl.bat") | ForEach-Object {
             if (Test-Path $_) {
-              Write-Host "  ✓ $_"
+              Write-Host "  [OK] $_"
             } else {
-              Write-Host "  ✗ $_ (missing)"
+              Write-Host "  [MISSING] $_ - file not found"
               exit 1
             }
           }
