@@ -241,30 +241,53 @@ jobs:
       - name: Install go-msi
         shell: powershell
         run: |
-          # Download pre-built go-msi binary (avoids Go version compatibility issues)
-          Write-Host "Downloading go-msi pre-built binary..."
-          $goMsiUrl = "https://github.com/mh-cbon/go-msi/releases/download/1.0.2/go-msi-amd64.exe"
           $goMsiPath = "$env:USERPROFILE\go\bin\go-msi.exe"
-
-          # Create directory if it doesn't exist
           New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\go\bin" | Out-Null
 
-          # Download go-msi
-          Invoke-WebRequest -Uri $goMsiUrl -OutFile $goMsiPath -UseBasicParsing
+          # Try downloading pre-built binary with retry
+          Write-Host "Attempting to download go-msi pre-built binary..."
+          $goMsiUrl = "https://github.com/mh-cbon/go-msi/releases/download/1.0.2/go-msi-amd64.exe"
+          $downloadSuccess = $false
+
+          for ($i = 1; $i -le 3; $i++) {
+            try {
+              Write-Host "Download attempt $i/3..."
+              Invoke-WebRequest -Uri $goMsiUrl -OutFile $goMsiPath -UseBasicParsing -TimeoutSec 30
+              if (Test-Path $goMsiPath) {
+                $downloadSuccess = $true
+                Write-Host "[OK] go-msi downloaded successfully"
+                break
+              }
+            } catch {
+              Write-Host "Download attempt $i failed: $_"
+              Start-Sleep -Seconds 2
+            }
+          }
+
+          # Fallback: Build from source if download failed
+          if (-not $downloadSuccess) {
+            Write-Host "Download failed, building go-msi from source..."
+            $env:GO111MODULE = "on"
+
+            # Clone and build go-msi
+            git clone --depth 1 --branch 1.0.2 https://github.com/mh-cbon/go-msi.git C:\temp\go-msi
+            Set-Location C:\temp\go-msi
+            go build -o $goMsiPath
+
+            if (-not (Test-Path $goMsiPath)) {
+              Write-Host "[ERROR] Failed to build go-msi from source"
+              exit 1
+            }
+            Write-Host "[OK] go-msi built from source"
+          }
 
           # Add to PATH
           $goPath = "$env:USERPROFILE\go\bin"
           echo "$goPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-          # Verify installation
-          if (Test-Path $goMsiPath) {
-            Write-Host "[OK] go-msi downloaded successfully"
-            $fileSize = [math]::Round((Get-Item $goMsiPath).Length / 1MB, 2)
-            Write-Host "Size: $fileSize MB"
-          } else {
-            Write-Host "[ERROR] go-msi download failed"
-            exit 1
-          }
+          # Verify
+          $fileSize = [math]::Round((Get-Item $goMsiPath).Length / 1MB, 2)
+          Write-Host "[OK] go-msi ready (Size: $fileSize MB)"
 
       - name: Build Windows binary
         shell: powershell
