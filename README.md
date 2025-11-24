@@ -142,6 +142,16 @@ newslettar-ctl.bat web          # Show Web UI URL
 newslettar-ctl.bat edit         # Edit configuration
 ```
 
+**Updating:**
+1. Download the latest MSI installer from [Releases](https://github.com/MadSwell-dev/newslettar/releases/latest)
+2. Run the installer - it will automatically:
+   - Stop the existing service
+   - Replace the binary with the new version
+   - Preserve your configuration (.env file)
+   - Restart the service
+
+The installer is designed to handle upgrades seamlessly without losing your settings.
+
 ## Security
 
 This is a self-hosted application designed to run on your own infrastructure.

@@ -7,7 +7,10 @@
   "files": {
     "guid": "8B6C1A2D-3E4F-5A6B-7C8D-9E0F1A2B3C4D",
     "items": [
-      "newslettar.exe"
+      "newslettar.exe",
+      "newslettar-service.xml",
+      "scripts/install-windows.ps1",
+      "scripts/newslettar-ctl.bat"
     ]
   },
   "env": {

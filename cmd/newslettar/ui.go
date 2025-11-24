@@ -1,13 +1,18 @@
 package main
 
 // getUIHTML returns the full HTML for the web UI
-func getUIHTML(version string, nextRun string, timezone string, isDocker bool) string {
+func getUIHTML(version string, nextRun string, timezone string, installType string) string {
 	// Set tooltip text based on install type
 	var updateTooltip string
-	if isDocker {
+	switch installType {
+	case "docker":
 		updateTooltip = "Update available! Run: docker pull madswell/newslettar:latest"
-	} else {
+	case "native-windows":
+		updateTooltip = "Update available! Download the latest MSI from GitHub Releases"
+	case "native-linux":
 		updateTooltip = "Update available! Run: newslettar-ctl update"
+	default:
+		updateTooltip = "Update available! Visit GitHub for the latest release"
 	}
 
 	return `<!DOCTYPE html>
