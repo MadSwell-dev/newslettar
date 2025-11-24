@@ -35,8 +35,9 @@ if %errorlevel% neq 0 (
     echo [STEP 1/3] Requesting administrator privileges...
     echo.
 
-    REM Run the installer with admin privileges
-    powershell -Command "Start-Process powershell -Verb RunAs -ArgumentList '-ExecutionPolicy Bypass -NoProfile -Command \"& \"\"\"%INSTALL_DIR%\scripts\install-windows.ps1\"\"\"\"' -Wait"
+    REM Run the installer with admin privileges using -File (simpler than -Command)
+    cd /d "%INSTALL_DIR%"
+    powershell -Command "Start-Process powershell -Verb RunAs -ArgumentList '-ExecutionPolicy Bypass -NoProfile -File \"%INSTALL_DIR%\scripts\install-windows.ps1\"' -Wait"
 
     echo.
     echo [STEP 2/3] Verifying service installation...
@@ -55,9 +56,10 @@ if %errorlevel% neq 0 (
         echo Troubleshooting:
         echo   1. Make sure you clicked "Yes" when prompted for admin rights
         echo   2. Check if antivirus is blocking the installation
-        echo   3. Try running manually as administrator:
-        echo      Right-click: %INSTALL_DIR%\scripts\install-windows.ps1
-        echo      Select: "Run with PowerShell"
+        echo   3. Try running manually:
+        echo      - Open PowerShell as Administrator
+        echo      - Run: cd "%INSTALL_DIR%"
+        echo      - Run: .\scripts\install-windows.ps1
         echo.
         echo For logs, check:
         echo   %INSTALL_DIR%\newslettar-service.out.log
