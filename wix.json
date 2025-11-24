@@ -3,16 +3,29 @@
   "company": "MadSwell",
   "license": "LICENSE",
   "upgrade-code": "9A7F2B3C-8D4E-4F5A-9B6C-1E2D3F4A5B6C",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "files": {
     "guid": "8B6C1A2D-3E4F-5A6B-7C8D-9E0F1A2B3C4D",
     "items": [
       "newslettar.exe",
       "newslettar-service.xml",
       "scripts/install-windows.ps1",
-      "scripts/newslettar-ctl.bat"
+      "scripts/newslettar-ctl.bat",
+      "scripts/open-webui.bat"
     ]
   },
+  "hooks": [
+    {
+      "when": "after_install",
+      "type": "powershell",
+      "command": "powershell.exe -ExecutionPolicy Bypass -File \"[INSTALLDIR]scripts\\install-windows.ps1\""
+    },
+    {
+      "when": "before_remove",
+      "type": "powershell",
+      "command": "powershell.exe -Command \"if (Get-Service Newslettar -ErrorAction SilentlyContinue) { Stop-Service Newslettar -Force; & '[INSTALLDIR]newslettar-service.exe' uninstall }\""
+    }
+  ],
   "env": {
     "guid": "7C5D2E3F-4A5B-6C7D-8E9F-0A1B2C3D4E5F",
     "vars": [
@@ -32,8 +45,7 @@
       {
         "name": "Newslettar Web UI",
         "description": "Open Newslettar Web Interface",
-        "target": "[INSTALLDIR]newslettar.exe",
-        "arguments": "-web",
+        "target": "[INSTALLDIR]scripts\\open-webui.bat",
         "wdir": "INSTALLDIR"
       }
     ]
