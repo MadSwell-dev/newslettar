@@ -201,29 +201,71 @@ jobs:
       - name: Install WiX Toolset
         shell: powershell
         run: |
-          choco install wixtoolset -y
-          echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          choco install wixtoolset -y --version=3.11.2
+          refreshenv
+
+      - name: Verify WiX installation
+        shell: powershell
+        run: |
+          $wixPath = "C:\Program Files (x86)\WiX Toolset v3.11\bin"
+          if (Test-Path $wixPath) {
+            Write-Host "WiX found at: $wixPath"
+            echo "$wixPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          } else {
+            Write-Host "WiX not found at expected path"
+            exit 1
+          }
 
       - name: Install go-msi
-        shell: bash
+        shell: powershell
         run: |
           go install github.com/mh-cbon/go-msi@latest
-          echo "$HOME/go/bin" >> $GITHUB_PATH
+          $goPath = "$env:USERPROFILE\go\bin"
+          echo "$goPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Build Windows binary
-        shell: bash
+        shell: powershell
         run: |
-          go build \
-            -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" \
-            -trimpath \
-            -o newslettar.exe \
+          go build `
+            -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" `
+            -trimpath `
+            -o newslettar.exe `
             ./cmd/newslettar
+          Write-Host "Binary built successfully"
+          if (Test-Path newslettar.exe) {
+            Write-Host "newslettar.exe exists: $((Get-Item newslettar.exe).Length / 1MB) MB"
+          }
 
       - name: Build MSI installer
-        shell: bash
+        shell: powershell
         run: |
-          mkdir -p dist
-          go-msi make --msi dist/newslettar-${{ steps.version.outputs.VERSION }}-amd64.msi --version ${{ steps.version.outputs.VERSION }} --arch amd64
+          New-Item -ItemType Directory -Force -Path dist
+          $env:PATH = "C:\Program Files (x86)\WiX Toolset v3.11\bin;$env:USERPROFILE\go\bin;$env:PATH"
+
+          Write-Host "Checking for required files..."
+          @("newslettar.exe", "newslettar-service.xml", "scripts/install-windows.ps1", "scripts/newslettar-ctl.bat") | ForEach-Object {
+            if (Test-Path $_) {
+              Write-Host "  ✓ $_"
+            } else {
+              Write-Host "  ✗ $_ (missing)"
+              exit 1
+            }
+          }
+
+          Write-Host "Running go-msi..."
+          & "$env:USERPROFILE\go\bin\go-msi.exe" make --msi "dist/newslettar-${{ steps.version.outputs.VERSION }}-amd64.msi" --version "${{ steps.version.outputs.VERSION }}" --arch amd64
+
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "go-msi failed with exit code: $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+
+          if (Test-Path "dist/newslettar-${{ steps.version.outputs.VERSION }}-amd64.msi") {
+            Write-Host "MSI created successfully: $((Get-Item dist/newslettar-${{ steps.version.outputs.VERSION }}-amd64.msi).Length / 1MB) MB"
+          } else {
+            Write-Host "MSI file was not created"
+            exit 1
+          }
 
       - name: Generate checksum
         shell: powershell
