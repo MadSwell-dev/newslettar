@@ -57,10 +57,10 @@ $ServiceName = "Newslettar"
 $WinswVersion = "3.0.0-alpha.11"
 $WinswUrl = "https://github.com/winsw/winsw/releases/download/v$WinswVersion/WinSW-x64.exe"
 
-Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║    Newslettar Windows Installer        ║" -ForegroundColor Green
-Write-Host "║    Version 1.0.2                       ║" -ForegroundColor Green
-Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Green
+Write-Host "    Newslettar Windows Installer        " -ForegroundColor Green
+Write-Host "    Version 1.0.2                       " -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Installation Directory: $InstallDir" -ForegroundColor Cyan
 Write-Host ""
@@ -82,7 +82,7 @@ if (Test-ServiceExists -ServiceName $ServiceName) {
     Write-Host "[1/6] Removing existing service..." -ForegroundColor Yellow
     & "$InstallDir\newslettar-service.exe" uninstall
     Start-Sleep -Seconds 2
-    Write-Host "[OK] Existing service removed" -ForegroundColor Green
+    Write-Host "OK: Existing service removed" -ForegroundColor Green
 }
 
 # Create installation directory
@@ -98,9 +98,9 @@ try {
     $AccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $Permission
     $Acl.SetAccessRule($AccessRule)
     Set-Acl $InstallDir $Acl
-    Write-Host "[OK] Directory created with proper permissions: $InstallDir" -ForegroundColor Green
+    Write-Host "OK: Directory created with proper permissions: $InstallDir" -ForegroundColor Green
 } catch {
-    Write-Host "[OK] Directory created: $InstallDir" -ForegroundColor Green
+    Write-Host "OK: Directory created: $InstallDir" -ForegroundColor Green
     Write-Host "  Warning: Could not set permissions, using defaults" -ForegroundColor Yellow
 }
 
@@ -108,9 +108,9 @@ try {
 Write-Host "[3/6] Installing Newslettar..." -ForegroundColor Yellow
 if (Test-Path ".\newslettar.exe") {
     Copy-Item ".\newslettar.exe" -Destination $InstallDir -Force
-    Write-Host "[OK] Newslettar binary installed" -ForegroundColor Green
+    Write-Host "OK: Newslettar binary installed" -ForegroundColor Green
 } else {
-    Write-Host "[ERROR] newslettar.exe not found in current directory" -ForegroundColor Red
+    Write-Host "ERROR: newslettar.exe not found in current directory" -ForegroundColor Red
     Write-Host "  Please ensure newslettar.exe is in the same directory as this script" -ForegroundColor Yellow
     exit 1
 }
@@ -120,9 +120,9 @@ Write-Host "[4/6] Downloading Windows Service Wrapper..." -ForegroundColor Yello
 $WinswPath = "$InstallDir\newslettar-service.exe"
 try {
     Invoke-WebRequest -Uri $WinswUrl -OutFile $WinswPath -UseBasicParsing
-    Write-Host "[OK] Service wrapper downloaded" -ForegroundColor Green
+    Write-Host "OK: Service wrapper downloaded" -ForegroundColor Green
 } catch {
-    Write-Host "[ERROR] Failed to download WinSW: $_" -ForegroundColor Red
+    Write-Host "ERROR: Failed to download WinSW: $_" -ForegroundColor Red
     exit 1
 }
 
@@ -130,7 +130,7 @@ try {
 Write-Host "[5/6] Configuring Windows service..." -ForegroundColor Yellow
 if (Test-Path ".\newslettar-service.xml") {
     Copy-Item ".\newslettar-service.xml" -Destination $InstallDir -Force
-    Write-Host "[OK] Service configuration installed" -ForegroundColor Green
+    Write-Host "OK: Service configuration installed" -ForegroundColor Green
 } else {
     # Create minimal service configuration if not found
     $ServiceConfig = @"
@@ -149,7 +149,7 @@ if (Test-Path ".\newslettar-service.xml") {
 </service>
 "@
     $ServiceConfig | Out-File -FilePath (Join-Path $InstallDir "newslettar-service.xml") -Encoding UTF8
-    Write-Host "[OK] Service configuration created" -ForegroundColor Green
+    Write-Host "OK: Service configuration created" -ForegroundColor Green
 }
 
 # Create default .env file if it doesn't exist
@@ -185,9 +185,9 @@ SHOW_DOWNLOADED=true
 WEBUI_PORT=8080
 "@
     $EnvTemplate | Out-File -FilePath (Join-Path $InstallDir ".env") -Encoding UTF8
-    Write-Host "[OK] Configuration file created" -ForegroundColor Green
+    Write-Host "OK: Configuration file created" -ForegroundColor Green
 } else {
-    Write-Host "[OK] Existing configuration preserved" -ForegroundColor Green
+    Write-Host "OK: Existing configuration preserved" -ForegroundColor Green
 }
 
 # Ensure .env file is writable
@@ -210,30 +210,29 @@ Write-Host "[6/6] Starting service..." -ForegroundColor Yellow
 & ".\newslettar-service.exe" start
 Start-Sleep -Seconds 3
 
-Write-Host "[OK] Service installed and started" -ForegroundColor Green
+Write-Host "OK: Service installed and started" -ForegroundColor Green
 Write-Host ""
 
 # Add firewall rule for web UI
 Write-Host "Configuring Windows Firewall..." -ForegroundColor Yellow
 try {
     New-NetFirewallRule -DisplayName "Newslettar Web UI" -Direction Inbound -LocalPort 8080 -Protocol TCP -Action Allow -ErrorAction SilentlyContinue | Out-Null
-    Write-Host "[OK] Firewall rule added for port 8080" -ForegroundColor Green
+    Write-Host "OK: Firewall rule added for port 8080" -ForegroundColor Green
 } catch {
-    Write-Host "⚠ Could not add firewall rule (may already exist)" -ForegroundColor Yellow
+    Write-Host "WARNING: Could not add firewall rule (may already exist)" -ForegroundColor Yellow
 }
 
 Write-Host ""
-Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║     Installation Complete! 🚀          ║" -ForegroundColor Green
-Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Green
+Write-Host "     Installation Complete!             " -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║                                        ║" -ForegroundColor Cyan
-Write-Host "║      Web UI:                           ║" -ForegroundColor Cyan
-Write-Host "║      http://localhost:8080             ║" -ForegroundColor Cyan -NoNewline
-Write-Host "            ║" -ForegroundColor Cyan
-Write-Host "║                                        ║" -ForegroundColor Cyan
-Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "                                        " -ForegroundColor Cyan
+Write-Host "      Web UI:                           " -ForegroundColor Cyan
+Write-Host "      http://localhost:8080             " -ForegroundColor Cyan
+Write-Host "                                        " -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Quick Start:" -ForegroundColor Yellow
 Write-Host "  1. Open http://localhost:8080 in your browser"
