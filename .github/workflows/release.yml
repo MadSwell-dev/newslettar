@@ -186,7 +186,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22.10'
+          go-version: '1.24'
 
       - name: Get version
         id: version
@@ -241,53 +241,22 @@ jobs:
       - name: Install go-msi
         shell: powershell
         run: |
-          $goMsiPath = "$env:USERPROFILE\go\bin\go-msi.exe"
-          New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\go\bin" | Out-Null
-
-          # Download pre-built binary with retry and fallback URLs
-          Write-Host "Attempting to download go-msi pre-built binary..."
-          $downloadUrls = @(
-            "https://github.com/mh-cbon/go-msi/releases/download/1.0.2/go-msi-amd64.exe",
-            "https://github.com/mh-cbon/go-msi/releases/download/1.0.1/go-msi-amd64.exe"
-          )
-
-          $downloadSuccess = $false
-          foreach ($url in $downloadUrls) {
-            Write-Host "Trying URL: $url"
-            for ($i = 1; $i -le 3; $i++) {
-              try {
-                Write-Host "  Attempt $i/3..."
-                $webClient = New-Object System.Net.WebClient
-                $webClient.DownloadFile($url, $goMsiPath)
-
-                if ((Test-Path $goMsiPath) -and ((Get-Item $goMsiPath).Length -gt 0)) {
-                  $downloadSuccess = $true
-                  Write-Host "[OK] go-msi downloaded successfully from $url"
-                  break
-                }
-              } catch {
-                Write-Host "  Attempt $i failed: $_"
-                if (Test-Path $goMsiPath) { Remove-Item $goMsiPath -Force }
-                Start-Sleep -Seconds (2 * $i)
-              }
-            }
-            if ($downloadSuccess) { break }
-          }
-
-          if (-not $downloadSuccess) {
-            Write-Host "[ERROR] All download attempts failed"
-            Write-Host "Tried URLs:"
-            $downloadUrls | ForEach-Object { Write-Host "  - $_" }
-            exit 1
-          }
+          Write-Host "Installing go-msi..."
+          go install github.com/mh-cbon/go-msi@latest
 
           # Add to PATH
           $goPath = "$env:USERPROFILE\go\bin"
           echo "$goPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-          # Verify
-          $fileSize = [math]::Round((Get-Item $goMsiPath).Length / 1MB, 2)
-          Write-Host "[OK] go-msi ready (Size: $fileSize MB)"
+          # Verify installation
+          $goMsiPath = "$env:USERPROFILE\go\bin\go-msi.exe"
+          if (Test-Path $goMsiPath) {
+            $fileSize = [math]::Round((Get-Item $goMsiPath).Length / 1MB, 2)
+            Write-Host "[OK] go-msi installed successfully (Size: $fileSize MB)"
+          } else {
+            Write-Host "[ERROR] go-msi installation failed"
+            exit 1
+          }
 
       - name: Build Windows binary
         shell: powershell
