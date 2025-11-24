@@ -14,11 +14,19 @@
 $ErrorActionPreference = "Stop"
 
 # Auto-detect installation directory from script location
+# Note: go-msi flattens all files to the root installation directory
 # This works regardless of Windows language (Program Files, Programmes, etc.)
 $ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
-$InstallDir = Split-Path -Parent $ScriptPath  # Go up one level from scripts/ to installation root
 
-# Fallback: if called from wrong location, try to detect
+# Check if we're already in the installation directory (go-msi flattens structure)
+if (Test-Path "$ScriptPath\newslettar.exe") {
+    $InstallDir = $ScriptPath
+} else {
+    # Maybe script is in a scripts/ subdirectory (manual installation)
+    $InstallDir = Split-Path -Parent $ScriptPath
+}
+
+# Fallback: if still can't find it, try to detect
 if (-not (Test-Path "$InstallDir\newslettar.exe")) {
     Write-Host "Auto-detection failed. Searching for Newslettar installation..." -ForegroundColor Yellow
 

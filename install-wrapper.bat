@@ -13,23 +13,14 @@ echo.
 echo Installation directory: %WRAPPER_DIR%
 echo.
 
-REM Check if install script exists
-if not exist "%WRAPPER_DIR%\scripts\install-windows.ps1" (
+REM Check if install script exists (go-msi flattens all files to root)
+if not exist "%WRAPPER_DIR%\install-windows.ps1" (
     echo [ERROR] Install script not found!
     echo.
-    echo Expected at: %WRAPPER_DIR%\scripts\install-windows.ps1
+    echo Expected at: %WRAPPER_DIR%\install-windows.ps1
     echo.
-    echo Checking what files are present...
-    echo.
-    echo Files in installation directory:
+    echo Files present in installation directory:
     dir /B "%WRAPPER_DIR%"
-    echo.
-    if exist "%WRAPPER_DIR%\scripts" (
-        echo Files in scripts directory:
-        dir /B "%WRAPPER_DIR%\scripts"
-    ) else (
-        echo [ERROR] Scripts directory does not exist!
-    )
     echo.
     echo Please verify the MSI installation completed successfully.
     echo.
@@ -37,11 +28,11 @@ if not exist "%WRAPPER_DIR%\scripts\install-windows.ps1" (
     exit /b 1
 )
 
-echo Running installer from: %WRAPPER_DIR%\scripts\install-windows.ps1
+echo Running installer from: %WRAPPER_DIR%\install-windows.ps1
 echo.
 
 cd /d "%WRAPPER_DIR%"
-powershell -ExecutionPolicy Bypass -NoProfile -File "%WRAPPER_DIR%\scripts\install-windows.ps1"
+powershell -ExecutionPolicy Bypass -NoProfile -File "%WRAPPER_DIR%\install-windows.ps1"
 
 if %errorlevel% neq 0 (
     echo.
