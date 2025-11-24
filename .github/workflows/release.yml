@@ -297,6 +297,51 @@ jobs:
             Write-Host "newslettar.exe exists: $((Get-Item newslettar.exe).Length / 1MB) MB"
           }
 
+      - name: Create Windows icon from SVG
+        shell: powershell
+        run: |
+          Write-Host "Converting SVG to ICO..."
+
+          # Install Inkscape via Chocolatey (fastest way on Windows)
+          choco install inkscape -y --no-progress
+
+          # Refresh environment to get Inkscape in PATH
+          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+          # Create PNG at multiple sizes for ICO
+          $sizes = @(16, 32, 48, 64, 128, 256)
+          $pngFiles = @()
+
+          foreach ($size in $sizes) {
+            $pngFile = "icon_$size.png"
+            & "C:\Program Files\Inkscape\bin\inkscape.exe" `
+              --export-type=png `
+              --export-filename=$pngFile `
+              --export-width=$size `
+              --export-height=$size `
+              newslettar_logo.svg
+            $pngFiles += $pngFile
+          }
+
+          # Use ImageMagick to combine PNGs into ICO
+          $magickPath = "C:\Program Files\ImageMagick-7.1.1-Q16-HDRI\magick.exe"
+          if (-not (Test-Path $magickPath)) {
+            # Try default path
+            $magickPath = "magick"
+          }
+
+          & $magickPath convert $pngFiles newslettar.ico
+
+          # Cleanup PNG files
+          Remove-Item icon_*.png
+
+          if (Test-Path newslettar.ico) {
+            Write-Host "[OK] Icon created successfully: $((Get-Item newslettar.ico).Length / 1KB) KB"
+          } else {
+            Write-Host "[ERROR] Failed to create icon"
+            exit 1
+          }
+
       - name: Build MSI installer
         shell: powershell
         run: |
