@@ -106,13 +106,28 @@ try {
 
 # Copy newslettar.exe to installation directory
 Write-Host "[3/6] Installing Newslettar..." -ForegroundColor Yellow
-if (Test-Path ".\newslettar.exe") {
-    Copy-Item ".\newslettar.exe" -Destination $InstallDir -Force
-    Write-Host "OK: Newslettar binary installed" -ForegroundColor Green
+
+# Get current directory to check if we're already in the installation directory
+$CurrentDir = (Get-Location).Path
+
+if ($CurrentDir -ne $InstallDir) {
+    # We're in a different directory (manual install), need to copy
+    if (Test-Path ".\newslettar.exe") {
+        Copy-Item ".\newslettar.exe" -Destination $InstallDir -Force
+        Write-Host "OK: Newslettar binary installed" -ForegroundColor Green
+    } else {
+        Write-Host "ERROR: newslettar.exe not found in current directory" -ForegroundColor Red
+        Write-Host "  Please ensure newslettar.exe is in the same directory as this script" -ForegroundColor Yellow
+        exit 1
+    }
 } else {
-    Write-Host "ERROR: newslettar.exe not found in current directory" -ForegroundColor Red
-    Write-Host "  Please ensure newslettar.exe is in the same directory as this script" -ForegroundColor Yellow
-    exit 1
+    # Already in installation directory (MSI case), just verify file exists
+    if (Test-Path "$InstallDir\newslettar.exe") {
+        Write-Host "OK: Newslettar binary already in place" -ForegroundColor Green
+    } else {
+        Write-Host "ERROR: newslettar.exe not found in installation directory" -ForegroundColor Red
+        exit 1
+    }
 }
 
 # Download WinSW (Windows Service Wrapper)
