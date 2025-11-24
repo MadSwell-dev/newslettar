@@ -3,12 +3,10 @@ REM ============================================================================
 REM Newslettar Launcher - First-run setup and browser opener
 REM ============================================================================
 
-REM Get the directory where this script is located
-set SCRIPT_DIR=%~dp0
+REM Get the directory where this script is located (installation directory)
+set INSTALL_DIR=%~dp0
 REM Remove trailing backslash
-set SCRIPT_DIR=%SCRIPT_DIR:~0,-1%
-REM Get the parent directory (installation directory)
-for %%I in ("%SCRIPT_DIR%\..") do set INSTALL_DIR=%%~fI
+set INSTALL_DIR=%INSTALL_DIR:~0,-1%
 
 echo Newslettar Launcher
 echo Install Directory: %INSTALL_DIR%

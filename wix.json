@@ -9,9 +9,9 @@
     "items": [
       "newslettar.exe",
       "newslettar-service.xml",
+      "launcher.bat",
       "scripts/install-windows.ps1",
       "scripts/newslettar-ctl.bat",
-      "scripts/launcher.bat",
       "WINDOWS_INSTALL.txt"
     ]
   },
@@ -34,7 +34,7 @@
       {
         "name": "Newslettar",
         "description": "Launch Newslettar Web Interface",
-        "target": "[INSTALLDIR]scripts\\launcher.bat",
+        "target": "[INSTALLDIR]launcher.bat",
         "wdir": "INSTALLDIR"
       }
     ]
