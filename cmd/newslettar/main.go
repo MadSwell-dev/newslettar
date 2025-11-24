@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	_ "time/tzdata" // Embed timezone database for Windows support
 )
 
 // Embed static files to reduce memory and simplify deployment

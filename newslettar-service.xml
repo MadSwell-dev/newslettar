@@ -10,6 +10,7 @@
   <description>Automated newsletter generator for Sonarr and Radarr</description>
   <executable>%BASE%\newslettar.exe</executable>
   <arguments>-web</arguments>
+  <workingdirectory>%BASE%</workingdirectory>
   <startmode>Automatic</startmode>
   <delayedAutoStart>true</delayedAutoStart>
 
