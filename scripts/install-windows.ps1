@@ -143,12 +143,15 @@ try {
 
 # Copy service configuration
 Write-Host "[5/6] Configuring Windows service..." -ForegroundColor Yellow
-if (Test-Path ".\newslettar-service.xml") {
-    Copy-Item ".\newslettar-service.xml" -Destination $InstallDir -Force
-    Write-Host "OK: Service configuration installed" -ForegroundColor Green
-} else {
-    # Create minimal service configuration if not found
-    $ServiceConfig = @"
+
+if ($CurrentDir -ne $InstallDir) {
+    # We're in a different directory (manual install), need to copy
+    if (Test-Path ".\newslettar-service.xml") {
+        Copy-Item ".\newslettar-service.xml" -Destination $InstallDir -Force
+        Write-Host "OK: Service configuration installed" -ForegroundColor Green
+    } else {
+        # Create minimal service configuration if not found
+        $ServiceConfig = @"
 <?xml version="1.0" encoding="UTF-8"?>
 <service>
   <id>Newslettar</id>
@@ -163,8 +166,33 @@ if (Test-Path ".\newslettar-service.xml") {
   </log>
 </service>
 "@
-    $ServiceConfig | Out-File -FilePath (Join-Path $InstallDir "newslettar-service.xml") -Encoding UTF8
-    Write-Host "OK: Service configuration created" -ForegroundColor Green
+        $ServiceConfig | Out-File -FilePath (Join-Path $InstallDir "newslettar-service.xml") -Encoding UTF8
+        Write-Host "OK: Service configuration created" -ForegroundColor Green
+    }
+} else {
+    # Already in installation directory (MSI case), verify file exists or create it
+    if (Test-Path "$InstallDir\newslettar-service.xml") {
+        Write-Host "OK: Service configuration already in place" -ForegroundColor Green
+    } else {
+        # Create minimal service configuration if not found
+        $ServiceConfig = @"
+<?xml version="1.0" encoding="UTF-8"?>
+<service>
+  <id>Newslettar</id>
+  <name>Newslettar</name>
+  <description>Automated newsletter generator for Sonarr and Radarr</description>
+  <executable>${InstallDir}\newslettar.exe</executable>
+  <arguments>-web</arguments>
+  <startmode>Automatic</startmode>
+  <log mode="roll-by-size">
+    <sizeThreshold>10240</sizeThreshold>
+    <keepFiles>8</keepFiles>
+  </log>
+</service>
+"@
+        $ServiceConfig | Out-File -FilePath (Join-Path $InstallDir "newslettar-service.xml") -Encoding UTF8
+        Write-Host "OK: Service configuration created" -ForegroundColor Green
+    }
 }
 
 # Create default .env file if it doesn't exist
