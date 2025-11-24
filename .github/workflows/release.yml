@@ -276,8 +276,16 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force -Path dist
+
+          # Create local temp directory on same drive to avoid path resolution issues
+          $localTemp = "$PWD\temp"
+          New-Item -ItemType Directory -Force -Path $localTemp
+          $env:TEMP = $localTemp
+          $env:TMP = $localTemp
+
           $env:PATH = "$env:WIX_PATH;$env:USERPROFILE\go\bin;$env:PATH"
           Write-Host "Using WiX from: $env:WIX_PATH"
+          Write-Host "Using temp directory: $localTemp"
 
           Write-Host "Checking for required files..."
           @("newslettar.exe", "newslettar-service.xml", "scripts/install-windows.ps1", "scripts/newslettar-ctl.bat") | ForEach-Object {
@@ -294,7 +302,7 @@ jobs:
 
           if ($LASTEXITCODE -ne 0) {
             Write-Host "go-msi failed with exit code: $LASTEXITCODE"
-            exit $LASTEXITCODE
+            exit 1
           }
 
           if (Test-Path "dist/newslettar-${{ steps.version.outputs.VERSION }}-amd64.msi") {
