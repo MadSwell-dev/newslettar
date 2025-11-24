@@ -10,6 +10,7 @@
       "newslettar.exe",
       "newslettar-service.xml",
       "launcher.bat",
+      "install-wrapper.bat",
       "scripts/install-windows.ps1",
       "scripts/newslettar-ctl.bat",
       "WINDOWS_INSTALL.txt"

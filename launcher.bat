@@ -34,10 +34,12 @@ if %errorlevel% neq 0 (
     echo.
     echo [STEP 1/3] Requesting administrator privileges...
     echo.
+    echo A new window will open. Please review the output.
+    echo If there are errors, the window will stay open so you can read them.
+    echo.
 
-    REM Run the installer with admin privileges using -File (simpler than -Command)
-    cd /d "%INSTALL_DIR%"
-    powershell -Command "Start-Process powershell -Verb RunAs -ArgumentList '-ExecutionPolicy Bypass -NoProfile -File \"%INSTALL_DIR%\scripts\install-windows.ps1\"' -Wait"
+    REM Run the installer wrapper with admin privileges (simpler and shows errors)
+    powershell -Command "Start-Process cmd -Verb RunAs -ArgumentList '/c \"%INSTALL_DIR%\install-wrapper.bat\"' -Wait"
 
     echo.
     echo [STEP 2/3] Verifying service installation...

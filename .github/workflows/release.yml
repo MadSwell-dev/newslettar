@@ -313,7 +313,7 @@ jobs:
           Write-Host "Using temp directory: $localTemp"
 
           Write-Host "Checking for required files..."
-          @("newslettar.exe", "newslettar-service.xml", "launcher.bat", "scripts/install-windows.ps1", "scripts/newslettar-ctl.bat", "WINDOWS_INSTALL.txt") | ForEach-Object {
+          @("newslettar.exe", "newslettar-service.xml", "launcher.bat", "install-wrapper.bat", "scripts/install-windows.ps1", "scripts/newslettar-ctl.bat", "WINDOWS_INSTALL.txt") | ForEach-Object {
             if (Test-Path $_) {
               Write-Host "  [OK] $_"
             } else {
