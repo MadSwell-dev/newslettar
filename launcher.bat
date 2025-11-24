@@ -35,25 +35,8 @@ if %errorlevel% neq 0 (
     echo [STEP 1/3] Requesting administrator privileges...
     echo.
 
-    REM Create a temporary PowerShell script to run the installer
-    set TEMP_PS1=%TEMP%\newslettar-install-wrapper.ps1
-
-    echo $installScript = '%INSTALL_DIR%\scripts\install-windows.ps1' > "%TEMP_PS1%"
-    echo if (-not (Test-Path $installScript)) { >> "%TEMP_PS1%"
-    echo     Write-Host "[ERROR] Install script not found at: $installScript" -ForegroundColor Red >> "%TEMP_PS1%"
-    echo     Write-Host "Please verify the installation is complete." -ForegroundColor Yellow >> "%TEMP_PS1%"
-    echo     pause >> "%TEMP_PS1%"
-    echo     exit 1 >> "%TEMP_PS1%"
-    echo } >> "%TEMP_PS1%"
-    echo Write-Host "[INFO] Running installer: $installScript" -ForegroundColor Cyan >> "%TEMP_PS1%"
-    echo ^& $installScript >> "%TEMP_PS1%"
-    echo exit $LASTEXITCODE >> "%TEMP_PS1%"
-
     REM Run the installer with admin privileges
-    powershell -Command "Start-Process powershell -Verb RunAs -ArgumentList '-ExecutionPolicy Bypass -NoProfile -File \"%TEMP_PS1%\"' -Wait"
-
-    REM Clean up temp script
-    if exist "%TEMP_PS1%" del "%TEMP_PS1%"
+    powershell -Command "Start-Process powershell -Verb RunAs -ArgumentList '-ExecutionPolicy Bypass -NoProfile -Command \"& \"\"\"%INSTALL_DIR%\scripts\install-windows.ps1\"\"\"\"' -Wait"
 
     echo.
     echo [STEP 2/3] Verifying service installation...
@@ -73,7 +56,8 @@ if %errorlevel% neq 0 (
         echo   1. Make sure you clicked "Yes" when prompted for admin rights
         echo   2. Check if antivirus is blocking the installation
         echo   3. Try running manually as administrator:
-        echo      %INSTALL_DIR%\scripts\install-windows.ps1
+        echo      Right-click: %INSTALL_DIR%\scripts\install-windows.ps1
+        echo      Select: "Run with PowerShell"
         echo.
         echo For logs, check:
         echo   %INSTALL_DIR%\newslettar-service.out.log
@@ -124,8 +108,6 @@ echo.
 REM Open Web UI in browser
 start http://localhost:8080
 
-REM If this was a first-time setup, keep window open briefly
-sc query Newslettar | find "RUNNING" >nul 2>&1
-if %errorlevel% equ 0 (
-    timeout /t 3 /nobreak >nul
-)
+echo.
+echo You can close this window now.
+timeout /t 5 /nobreak >nul
