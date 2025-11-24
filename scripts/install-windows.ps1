@@ -187,9 +187,13 @@ Write-Host "╔═════════════════════�
 Write-Host "║     Installation Complete! 🚀          ║" -ForegroundColor Green
 Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Green
 Write-Host ""
-Write-Host "┌─ Web UI Access ──────────────────────┐" -ForegroundColor Blue
-Write-Host "│ http://localhost:8080                 │" -ForegroundColor Blue
-Write-Host "└──────────────────────────────────────┘" -ForegroundColor Blue
+Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "║                                        ║" -ForegroundColor Cyan
+Write-Host "║      Web UI:                           ║" -ForegroundColor Cyan
+Write-Host "║      http://localhost:8080             ║" -ForegroundColor Cyan -NoNewline
+Write-Host "            ║" -ForegroundColor Cyan
+Write-Host "║                                        ║" -ForegroundColor Cyan
+Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Quick Start:" -ForegroundColor Yellow
 Write-Host "  1. Open http://localhost:8080 in your browser"
@@ -208,4 +212,8 @@ Write-Host "  Edit: $InstallDir\.env"
 Write-Host "  After editing, restart the service: Restart-Service Newslettar"
 Write-Host ""
 Write-Host "Installation Directory: $InstallDir" -ForegroundColor Green
+Write-Host ""
+Write-Host "Opening Web UI in your browser..." -ForegroundColor Cyan
+Start-Sleep -Seconds 2
+Start-Process "http://localhost:8080"
 Write-Host ""
