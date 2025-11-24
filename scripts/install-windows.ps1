@@ -13,16 +13,48 @@
 
 $ErrorActionPreference = "Stop"
 
-# Configuration
-$InstallDir = "$env:ProgramFiles\Newslettar"
+# Auto-detect installation directory from script location
+# This works regardless of Windows language (Program Files, Programmes, etc.)
+$ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+$InstallDir = Split-Path -Parent $ScriptPath  # Go up one level from scripts/ to installation root
+
+# Fallback: if called from wrong location, try to detect
+if (-not (Test-Path "$InstallDir\newslettar.exe")) {
+    Write-Host "Auto-detection failed. Searching for Newslettar installation..." -ForegroundColor Yellow
+
+    # Search in common locations
+    $possiblePaths = @(
+        "$env:ProgramFiles\Newslettar",
+        "${env:ProgramFiles(x86)}\Newslettar",
+        "C:\Newslettar"
+    )
+
+    foreach ($path in $possiblePaths) {
+        if (Test-Path "$path\newslettar.exe") {
+            $InstallDir = $path
+            Write-Host "Found installation at: $InstallDir" -ForegroundColor Green
+            break
+        }
+    }
+
+    if (-not (Test-Path "$InstallDir\newslettar.exe")) {
+        Write-Host "ERROR: Cannot find Newslettar installation!" -ForegroundColor Red
+        Write-Host "Please run this script from the Newslettar installation directory." -ForegroundColor Yellow
+        pause
+        exit 1
+    }
+}
+
 $ServiceName = "Newslettar"
 $WinswVersion = "3.0.0-alpha.11"
 $WinswUrl = "https://github.com/winsw/winsw/releases/download/v$WinswVersion/WinSW-x64.exe"
 
 Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Green
 Write-Host "║    Newslettar Windows Installer        ║" -ForegroundColor Green
-Write-Host "║    Version 1.0.0                       ║" -ForegroundColor Green
+Write-Host "║    Version 1.0.2                       ║" -ForegroundColor Green
 Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host ""
+Write-Host "Installation Directory: $InstallDir" -ForegroundColor Cyan
 Write-Host ""
 
 # Function to check if service exists
