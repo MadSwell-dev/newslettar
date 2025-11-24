@@ -35,7 +35,7 @@
         "name": "Newslettar",
         "description": "Launch Newslettar Web Interface",
         "target": "[INSTALLDIR]scripts\\launcher.bat",
-        "wdir": "[INSTALLDIR]"
+        "wdir": "INSTALLDIR"
       }
     ]
   },
