@@ -59,7 +59,7 @@ $WinswUrl = "https://github.com/winsw/winsw/releases/download/v$WinswVersion/Win
 
 Write-Host "========================================" -ForegroundColor Green
 Write-Host "    Newslettar Windows Installer        " -ForegroundColor Green
-Write-Host "    Version 1.0.2                       " -ForegroundColor Green
+Write-Host "    Version 1.0.3                       " -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Installation Directory: $InstallDir" -ForegroundColor Cyan
