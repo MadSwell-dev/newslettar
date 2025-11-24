@@ -643,9 +643,12 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		// Write .env file with restricted permissions (owner read/write only)
 		// 0600 prevents other users from reading API keys and passwords
 		if err := os.WriteFile(".env", []byte(envContent.String()), 0600); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("❌ Failed to write .env file: %v", err)
+			http.Error(w, fmt.Sprintf("Failed to save configuration: %v", err), http.StatusInternalServerError)
 			return
 		}
+
+		log.Println("✅ Configuration saved successfully")
 
 		// Reload config and restart scheduler
 		reloadConfig()

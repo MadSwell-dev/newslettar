@@ -50,7 +50,19 @@ Write-Host "[2/6] Creating installation directory..." -ForegroundColor Yellow
 if (-not (Test-Path $InstallDir)) {
     New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
 }
-Write-Host "✓ Directory created: $InstallDir" -ForegroundColor Green
+
+# Grant write permissions to LocalSystem account
+try {
+    $Acl = Get-Acl $InstallDir
+    $Permission = "NT AUTHORITY\SYSTEM", "FullControl", "ContainerInherit,ObjectInherit", "None", "Allow"
+    $AccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $Permission
+    $Acl.SetAccessRule($AccessRule)
+    Set-Acl $InstallDir $Acl
+    Write-Host "✓ Directory created with proper permissions: $InstallDir" -ForegroundColor Green
+} catch {
+    Write-Host "✓ Directory created: $InstallDir" -ForegroundColor Green
+    Write-Host "  Warning: Could not set permissions, using defaults" -ForegroundColor Yellow
+}
 
 # Copy newslettar.exe to installation directory
 Write-Host "[3/6] Installing Newslettar..." -ForegroundColor Yellow
@@ -134,6 +146,18 @@ WEBUI_PORT=8080
 "@
     $EnvTemplate | Out-File -FilePath "$InstallDir\.env" -Encoding UTF8
     Write-Host "✓ Configuration file created" -ForegroundColor Green
+} else {
+    Write-Host "✓ Existing configuration preserved" -ForegroundColor Green
+}
+
+# Ensure .env file is writable
+if (Test-Path "$InstallDir\.env") {
+    try {
+        $EnvFile = Get-Item "$InstallDir\.env" -Force
+        $EnvFile.IsReadOnly = $false
+    } catch {
+        Write-Host "  Warning: Could not verify .env file permissions" -ForegroundColor Yellow
+    }
 }
 
 # Install and start service
