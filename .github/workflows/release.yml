@@ -259,6 +259,31 @@ jobs:
             exit 1
           }
 
+          # Clone go-msi repository to get templates
+          Write-Host "Cloning go-msi repository for templates..."
+          git clone --depth 1 https://github.com/mh-cbon/go-msi.git temp-go-msi
+
+          # Copy templates to where go-msi expects them
+          $templatesSource = "temp-go-msi\templates"
+          $templatesDest = "$env:USERPROFILE\go\bin\templates"
+
+          if (Test-Path $templatesSource) {
+            Copy-Item -Path $templatesSource -Destination $templatesDest -Recurse -Force
+            Write-Host "[OK] Templates copied successfully"
+
+            # Verify templates exist
+            if (Test-Path $templatesDest) {
+              $templateCount = (Get-ChildItem $templatesDest -Recurse -File).Count
+              Write-Host "[OK] Found $templateCount template files"
+            }
+          } else {
+            Write-Host "[ERROR] Templates directory not found in cloned repository"
+            exit 1
+          }
+
+          # Cleanup
+          Remove-Item -Path temp-go-msi -Recurse -Force
+
       - name: Build Windows binary
         shell: powershell
         run: |
