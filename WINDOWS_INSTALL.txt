@@ -1,0 +1,81 @@
+================================================================================
+  Newslettar - Windows Installation Guide
+================================================================================
+
+QUICK START
+-----------
+1. Run the Newslettar MSI installer
+2. After installation, find "Newslettar" in the Start Menu
+3. Click it - you'll be prompted for administrator privileges (first run only)
+4. The web interface will open automatically in your browser
+5. Configure your Sonarr/Radarr and email settings
+
+WHAT HAPPENS ON FIRST RUN
+--------------------------
+The first time you launch Newslettar from the Start Menu:
+- You'll be asked to grant administrator privileges
+- The Newslettar Windows service will be installed automatically
+- The service will start
+- Your web browser will open to http://localhost:8080
+
+After the first run, launching Newslettar will simply open your browser.
+
+WEB INTERFACE
+-------------
+URL: http://localhost:8080
+
+You can bookmark this URL or access it anytime from the Start Menu.
+
+SERVICE MANAGEMENT
+------------------
+Newslettar runs as a Windows service in the background.
+
+Using Command Prompt or PowerShell:
+- Start:   net start Newslettar
+- Stop:    net stop Newslettar
+- Restart: net stop Newslettar && net start Newslettar
+- Status:  sc query Newslettar
+
+Using the provided script:
+Run: newslettar-ctl.bat [start|stop|restart|status|logs|web]
+
+CONFIGURATION
+-------------
+Configuration is managed through the web interface at http://localhost:8080
+
+Advanced users can edit: C:\Program Files\Newslettar\.env
+After editing, restart the service: net stop Newslettar && net start Newslettar
+
+LOGS
+----
+Service logs: C:\Program Files\Newslettar\newslettar-service.out.log
+View live: newslettar-ctl.bat logs
+
+UNINSTALL
+---------
+1. Uninstall via Windows "Add or Remove Programs"
+2. Or run: msiexec /x {PRODUCT_CODE}
+
+The service will be automatically stopped (but not removed).
+To manually remove the service:
+1. Stop it: net stop Newslettar
+2. Uninstall: C:\Program Files\Newslettar\newslettar-service.exe uninstall
+
+TROUBLESHOOTING
+---------------
+Service won't start?
+- Check logs at C:\Program Files\Newslettar\newslettar-service.out.log
+- Ensure port 8080 is not in use by another application
+
+Can't access web interface?
+- Verify service is running: sc query Newslettar
+- Check firewall settings for port 8080
+
+Configuration not saving?
+- Ensure you launched Newslettar at least once (to install the service)
+- The service needs write permissions to save the .env file
+
+SUPPORT
+-------
+GitHub: https://github.com/MadSwell-dev/newslettar
+Issues: https://github.com/MadSwell-dev/newslettar/issues
