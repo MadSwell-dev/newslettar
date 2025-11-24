@@ -244,41 +244,41 @@ jobs:
           $goMsiPath = "$env:USERPROFILE\go\bin\go-msi.exe"
           New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\go\bin" | Out-Null
 
-          # Try downloading pre-built binary with retry
+          # Download pre-built binary with retry and fallback URLs
           Write-Host "Attempting to download go-msi pre-built binary..."
-          $goMsiUrl = "https://github.com/mh-cbon/go-msi/releases/download/1.0.2/go-msi-amd64.exe"
-          $downloadSuccess = $false
+          $downloadUrls = @(
+            "https://github.com/mh-cbon/go-msi/releases/download/1.0.2/go-msi-amd64.exe",
+            "https://github.com/mh-cbon/go-msi/releases/download/1.0.1/go-msi-amd64.exe"
+          )
 
-          for ($i = 1; $i -le 3; $i++) {
-            try {
-              Write-Host "Download attempt $i/3..."
-              Invoke-WebRequest -Uri $goMsiUrl -OutFile $goMsiPath -UseBasicParsing -TimeoutSec 30
-              if (Test-Path $goMsiPath) {
-                $downloadSuccess = $true
-                Write-Host "[OK] go-msi downloaded successfully"
-                break
+          $downloadSuccess = $false
+          foreach ($url in $downloadUrls) {
+            Write-Host "Trying URL: $url"
+            for ($i = 1; $i -le 3; $i++) {
+              try {
+                Write-Host "  Attempt $i/3..."
+                $webClient = New-Object System.Net.WebClient
+                $webClient.DownloadFile($url, $goMsiPath)
+
+                if ((Test-Path $goMsiPath) -and ((Get-Item $goMsiPath).Length -gt 0)) {
+                  $downloadSuccess = $true
+                  Write-Host "[OK] go-msi downloaded successfully from $url"
+                  break
+                }
+              } catch {
+                Write-Host "  Attempt $i failed: $_"
+                if (Test-Path $goMsiPath) { Remove-Item $goMsiPath -Force }
+                Start-Sleep -Seconds (2 * $i)
               }
-            } catch {
-              Write-Host "Download attempt $i failed: $_"
-              Start-Sleep -Seconds 2
             }
+            if ($downloadSuccess) { break }
           }
 
-          # Fallback: Build from source if download failed
           if (-not $downloadSuccess) {
-            Write-Host "Download failed, building go-msi from source..."
-            $env:GO111MODULE = "on"
-
-            # Clone and build go-msi
-            git clone --depth 1 --branch 1.0.2 https://github.com/mh-cbon/go-msi.git C:\temp\go-msi
-            Set-Location C:\temp\go-msi
-            go build -o $goMsiPath
-
-            if (-not (Test-Path $goMsiPath)) {
-              Write-Host "[ERROR] Failed to build go-msi from source"
-              exit 1
-            }
-            Write-Host "[OK] go-msi built from source"
+            Write-Host "[ERROR] All download attempts failed"
+            Write-Host "Tried URLs:"
+            $downloadUrls | ForEach-Object { Write-Host "  - $_" }
+            exit 1
           }
 
           # Add to PATH
