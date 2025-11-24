@@ -139,7 +139,7 @@ if (Test-Path ".\newslettar-service.xml") {
   <id>Newslettar</id>
   <name>Newslettar</name>
   <description>Automated newsletter generator for Sonarr and Radarr</description>
-  <executable>$InstallDir\newslettar.exe</executable>
+  <executable>${InstallDir}\newslettar.exe</executable>
   <arguments>-web</arguments>
   <startmode>Automatic</startmode>
   <log mode="roll-by-size">
@@ -148,7 +148,7 @@ if (Test-Path ".\newslettar-service.xml") {
   </log>
 </service>
 "@
-    $ServiceConfig | Out-File -FilePath "$InstallDir\newslettar-service.xml" -Encoding UTF8
+    $ServiceConfig | Out-File -FilePath (Join-Path $InstallDir "newslettar-service.xml") -Encoding UTF8
     Write-Host "[OK] Service configuration created" -ForegroundColor Green
 }
 
@@ -184,7 +184,7 @@ SHOW_DOWNLOADED=true
 # Web UI Port
 WEBUI_PORT=8080
 "@
-    $EnvTemplate | Out-File -FilePath "$InstallDir\.env" -Encoding UTF8
+    $EnvTemplate | Out-File -FilePath (Join-Path $InstallDir ".env") -Encoding UTF8
     Write-Host "[OK] Configuration file created" -ForegroundColor Green
 } else {
     Write-Host "[OK] Existing configuration preserved" -ForegroundColor Green
@@ -245,10 +245,10 @@ Write-Host "Service Management:" -ForegroundColor Yellow
 Write-Host "  Start:   Start-Service Newslettar"
 Write-Host "  Stop:    Stop-Service Newslettar"
 Write-Host "  Status:  Get-Service Newslettar"
-Write-Host "  Logs:    Get-Content '$InstallDir\newslettar-service.out.log' -Tail 50 -Wait"
+Write-Host "  Logs:    Get-Content (Join-Path `"$InstallDir`" `"newslettar-service.out.log`") -Tail 50 -Wait"
 Write-Host ""
 Write-Host "Configuration:" -ForegroundColor Yellow
-Write-Host "  Edit: $InstallDir\.env"
+Write-Host "  Edit: ${InstallDir}\.env"
 Write-Host "  After editing, restart the service: Restart-Service Newslettar"
 Write-Host ""
 Write-Host "Installation Directory: $InstallDir" -ForegroundColor Green
