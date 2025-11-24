@@ -1,0 +1,187 @@
+# =============================================================================
+# Newslettar Windows Installer Script
+# =============================================================================
+# This script installs Newslettar as a Windows service
+# Requires Administrator privileges
+#
+# USAGE:
+#   powershell -ExecutionPolicy Bypass -File install-windows.ps1
+#
+
+# Requires Administrator
+#Requires -RunAsAdministrator
+
+$ErrorActionPreference = "Stop"
+
+# Configuration
+$InstallDir = "$env:ProgramFiles\Newslettar"
+$ServiceName = "Newslettar"
+$WinswVersion = "3.0.0-alpha.11"
+$WinswUrl = "https://github.com/winsw/winsw/releases/download/v$WinswVersion/WinSW-x64.exe"
+
+Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Green
+Write-Host "║    Newslettar Windows Installer        ║" -ForegroundColor Green
+Write-Host "║    Version 1.0.0                       ║" -ForegroundColor Green
+Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host ""
+
+# Function to check if service exists
+function Test-ServiceExists {
+    param($ServiceName)
+    if (Get-Service -Name $ServiceName -ErrorAction SilentlyContinue) {
+        return $true
+    }
+    return $false
+}
+
+# Stop and remove existing service if it exists
+if (Test-ServiceExists -ServiceName $ServiceName) {
+    Write-Host "[1/6] Stopping existing service..." -ForegroundColor Yellow
+    Stop-Service -Name $ServiceName -Force -ErrorAction SilentlyContinue
+
+    Write-Host "[1/6] Removing existing service..." -ForegroundColor Yellow
+    & "$InstallDir\newslettar-service.exe" uninstall
+    Start-Sleep -Seconds 2
+    Write-Host "✓ Existing service removed" -ForegroundColor Green
+}
+
+# Create installation directory
+Write-Host "[2/6] Creating installation directory..." -ForegroundColor Yellow
+if (-not (Test-Path $InstallDir)) {
+    New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
+}
+Write-Host "✓ Directory created: $InstallDir" -ForegroundColor Green
+
+# Copy newslettar.exe to installation directory
+Write-Host "[3/6] Installing Newslettar..." -ForegroundColor Yellow
+if (Test-Path ".\newslettar.exe") {
+    Copy-Item ".\newslettar.exe" -Destination $InstallDir -Force
+    Write-Host "✓ Newslettar binary installed" -ForegroundColor Green
+} else {
+    Write-Host "✗ newslettar.exe not found in current directory" -ForegroundColor Red
+    Write-Host "  Please ensure newslettar.exe is in the same directory as this script" -ForegroundColor Yellow
+    exit 1
+}
+
+# Download WinSW (Windows Service Wrapper)
+Write-Host "[4/6] Downloading Windows Service Wrapper..." -ForegroundColor Yellow
+$WinswPath = "$InstallDir\newslettar-service.exe"
+try {
+    Invoke-WebRequest -Uri $WinswUrl -OutFile $WinswPath -UseBasicParsing
+    Write-Host "✓ Service wrapper downloaded" -ForegroundColor Green
+} catch {
+    Write-Host "✗ Failed to download WinSW: $_" -ForegroundColor Red
+    exit 1
+}
+
+# Copy service configuration
+Write-Host "[5/6] Configuring Windows service..." -ForegroundColor Yellow
+if (Test-Path ".\newslettar-service.xml") {
+    Copy-Item ".\newslettar-service.xml" -Destination $InstallDir -Force
+    Write-Host "✓ Service configuration installed" -ForegroundColor Green
+} else {
+    # Create minimal service configuration if not found
+    $ServiceConfig = @"
+<?xml version="1.0" encoding="UTF-8"?>
+<service>
+  <id>Newslettar</id>
+  <name>Newslettar</name>
+  <description>Automated newsletter generator for Sonarr and Radarr</description>
+  <executable>$InstallDir\newslettar.exe</executable>
+  <arguments>-web</arguments>
+  <startmode>Automatic</startmode>
+  <log mode="roll-by-size">
+    <sizeThreshold>10240</sizeThreshold>
+    <keepFiles>8</keepFiles>
+  </log>
+</service>
+"@
+    $ServiceConfig | Out-File -FilePath "$InstallDir\newslettar-service.xml" -Encoding UTF8
+    Write-Host "✓ Service configuration created" -ForegroundColor Green
+}
+
+# Create default .env file if it doesn't exist
+if (-not (Test-Path "$InstallDir\.env")) {
+    $EnvTemplate = @"
+# Sonarr Configuration
+SONARR_URL=http://localhost:8989
+SONARR_API_KEY=
+
+# Radarr Configuration
+RADARR_URL=http://localhost:7878
+RADARR_API_KEY=
+
+# Email Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+FROM_NAME=Newslettar
+FROM_EMAIL=newsletter@yourdomain.com
+TO_EMAILS=user@example.com
+
+# Schedule Settings
+TIMEZONE=UTC
+SCHEDULE_DAY=Sun
+SCHEDULE_TIME=09:00
+
+# Template Settings
+SHOW_POSTERS=true
+SHOW_DOWNLOADED=true
+
+# Web UI Port
+WEBUI_PORT=8080
+"@
+    $EnvTemplate | Out-File -FilePath "$InstallDir\.env" -Encoding UTF8
+    Write-Host "✓ Configuration file created" -ForegroundColor Green
+}
+
+# Install and start service
+Write-Host "[6/6] Installing Windows service..." -ForegroundColor Yellow
+Set-Location $InstallDir
+& ".\newslettar-service.exe" install
+Start-Sleep -Seconds 2
+
+Write-Host "[6/6] Starting service..." -ForegroundColor Yellow
+& ".\newslettar-service.exe" start
+Start-Sleep -Seconds 3
+
+Write-Host "✓ Service installed and started" -ForegroundColor Green
+Write-Host ""
+
+# Add firewall rule for web UI
+Write-Host "Configuring Windows Firewall..." -ForegroundColor Yellow
+try {
+    New-NetFirewallRule -DisplayName "Newslettar Web UI" -Direction Inbound -LocalPort 8080 -Protocol TCP -Action Allow -ErrorAction SilentlyContinue | Out-Null
+    Write-Host "✓ Firewall rule added for port 8080" -ForegroundColor Green
+} catch {
+    Write-Host "⚠ Could not add firewall rule (may already exist)" -ForegroundColor Yellow
+}
+
+Write-Host ""
+Write-Host "╔════════════════════════════════════════╗" -ForegroundColor Green
+Write-Host "║     Installation Complete! 🚀          ║" -ForegroundColor Green
+Write-Host "╚════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host ""
+Write-Host "┌─ Web UI Access ──────────────────────┐" -ForegroundColor Blue
+Write-Host "│ http://localhost:8080                 │" -ForegroundColor Blue
+Write-Host "└──────────────────────────────────────┘" -ForegroundColor Blue
+Write-Host ""
+Write-Host "Quick Start:" -ForegroundColor Yellow
+Write-Host "  1. Open http://localhost:8080 in your browser"
+Write-Host "  2. Configure Sonarr/Radarr in Configuration tab"
+Write-Host "  3. Configure email settings"
+Write-Host "  4. Test connections and send test newsletter"
+Write-Host ""
+Write-Host "Service Management:" -ForegroundColor Yellow
+Write-Host "  Start:   Start-Service Newslettar"
+Write-Host "  Stop:    Stop-Service Newslettar"
+Write-Host "  Status:  Get-Service Newslettar"
+Write-Host "  Logs:    Get-Content '$InstallDir\newslettar-service.out.log' -Tail 50 -Wait"
+Write-Host ""
+Write-Host "Configuration:" -ForegroundColor Yellow
+Write-Host "  Edit: $InstallDir\.env"
+Write-Host "  After editing, restart the service: Restart-Service Newslettar"
+Write-Host ""
+Write-Host "Installation Directory: $InstallDir" -ForegroundColor Green
+Write-Host ""

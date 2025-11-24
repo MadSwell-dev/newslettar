@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Windows Service Configuration for Newslettar
+  Used with WinSW (Windows Service Wrapper)
+  https://github.com/winsw/winsw
+-->
+<service>
+  <id>Newslettar</id>
+  <name>Newslettar</name>
+  <description>Automated newsletter generator for Sonarr and Radarr</description>
+  <executable>%BASE%\newslettar.exe</executable>
+  <arguments>-web</arguments>
+  <startmode>Automatic</startmode>
+  <delayedAutoStart>true</delayedAutoStart>
+
+  <!-- Logging configuration -->
+  <log mode="roll-by-size">
+    <sizeThreshold>10240</sizeThreshold>
+    <keepFiles>8</keepFiles>
+  </log>
+
+  <!-- Environment variables -->
+  <env name="NEWSLETTAR_HOME" value="%BASE%"/>
+
+  <!-- Service recovery options -->
+  <onfailure action="restart" delay="10 sec"/>
+  <onfailure action="restart" delay="20 sec"/>
+  <onfailure action="restart" delay="30 sec"/>
+  <resetfailure>1 day</resetfailure>
+
+  <!-- Security -->
+  <serviceaccount>
+    <username>.\LocalSystem</username>
+    <allowservicelogon>true</allowservicelogon>
+  </serviceaccount>
+
+  <!-- Priority -->
+  <priority>Normal</priority>
+
+  <!-- Startup timeout -->
+  <stopparentprocessfirst>true</stopparentprocessfirst>
+  <stoptimeout>15 sec</stoptimeout>
+</service>

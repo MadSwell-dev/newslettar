@@ -70,14 +70,46 @@ func uiHandler(w http.ResponseWriter, r *http.Request) {
 	loc := getTimezone(cfg.Timezone)
 	nextRun := getNextScheduledRun(cfg.ScheduleDay, cfg.ScheduleTime, cfg.ScheduleType, cfg.ScheduleDayOfMonth, loc)
 
-	// Detect if running in Docker
-	_, err := os.Stat("/.dockerenv")
-	isDocker := err == nil
+	// Detect installation type: docker, native-windows, native-linux, or unknown
+	installType := detectInstallationType()
 
-	html := getUIHTML(version, nextRun, cfg.Timezone, isDocker)
+	html := getUIHTML(version, nextRun, cfg.Timezone, installType)
 
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprint(w, html)
+}
+
+// detectInstallationType determines how Newslettar was installed
+func detectInstallationType() string {
+	// Check for Docker first (most specific)
+	if _, err := os.Stat("/.dockerenv"); err == nil {
+		return "docker"
+	}
+
+	// Check for Windows
+	if runtime.GOOS == "windows" {
+		// Check if running as Windows service or from Program Files
+		if _, err := os.Stat("C:\\Program Files\\Newslettar"); err == nil {
+			return "native-windows"
+		}
+		// Still Windows, even if not in Program Files
+		return "native-windows"
+	}
+
+	// Check for Linux native installation
+	if runtime.GOOS == "linux" {
+		// Check for systemd service file (native Linux installation)
+		if _, err := os.Stat("/etc/systemd/system/newslettar.service"); err == nil {
+			return "native-linux"
+		}
+		// Check if installed in /opt (from install script)
+		if _, err := os.Stat("/opt/newslettar/newslettar"); err == nil {
+			return "native-linux"
+		}
+	}
+
+	// Default to unknown for other scenarios
+	return "unknown"
 }
 
 // Health check endpoint for monitoring and load balancers
