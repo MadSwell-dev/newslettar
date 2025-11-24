@@ -112,45 +112,22 @@ newslettar-ctl update     # Update to latest version
 
 ## Native Installation (Windows)
 
-Download and install the MSI installer from the [latest release](https://github.com/MadSwell-dev/newslettar/releases/latest).
+1. Download the MSI installer from [latest release](https://github.com/MadSwell-dev/newslettar/releases/latest)
+2. Run the installer
+3. Click the "Newslettar" shortcut from Start Menu
+4. Browser opens to http://localhost:8080 - configure and test
 
-The installer will:
-- Install Newslettar to `C:\Program Files\Newslettar`
-- Add Newslettar to your system PATH
-- Create a Windows service for automatic startup
-- Configure Windows Firewall to allow port 8080
+The installer creates a Windows service for automatic startup and configures the firewall for port 8080.
 
-**Management commands (PowerShell):**
+**Service management (PowerShell):**
 ```powershell
-Start-Service Newslettar        # Start service
-Stop-Service Newslettar         # Stop service
-Restart-Service Newslettar      # Restart service
+Restart-Service Newslettar      # After editing configuration
 Get-Service Newslettar          # Check status
 ```
 
-**Configuration:**
-Edit `C:\Program Files\Newslettar\.env` and restart the service.
+**Configuration:** Edit `C:\Program Files\Newslettar\.env` and restart the service.
 
-**Alternative:** Use the included control script:
-```cmd
-newslettar-ctl.bat start        # Start service
-newslettar-ctl.bat stop         # Stop service
-newslettar-ctl.bat restart      # Restart service
-newslettar-ctl.bat status       # Check status
-newslettar-ctl.bat logs         # View logs
-newslettar-ctl.bat web          # Show Web UI URL
-newslettar-ctl.bat edit         # Edit configuration
-```
-
-**Updating:**
-1. Download the latest MSI installer from [Releases](https://github.com/MadSwell-dev/newslettar/releases/latest)
-2. Run the installer - it will automatically:
-   - Stop the existing service
-   - Replace the binary with the new version
-   - Preserve your configuration (.env file)
-   - Restart the service
-
-The installer is designed to handle upgrades seamlessly without losing your settings.
+**Updating:** Download and run the latest MSI - it preserves your configuration automatically.
 
 ## Security
 
