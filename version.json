@@ -1,13 +1,12 @@
 {
-  "version": "1.0.0",
-  "released": "2025-11-21",
+  "version": "1.0.1",
+  "released": "2025-11-24",
   "changelog": [
+    "FEATURE: Add native Windows MSI installer with automatic service installation",
+    "FEATURE: Add platform-specific update instructions in Web UI (Docker, Windows, Linux)",
+    "ENHANCEMENT: Automatic installation type detection (Docker, native-Windows, native-Linux)",
     "FIX: Display correct date range in weekly newsletter header (shows upcoming period instead of historical)",
     "FIX: Display only current month in monthly newsletter header (no date range)",
-    "FIX: Preserve .env configuration during newslettar-ctl update (critical bug fix)",
-    "FEATURE: Add monthly schedule option alongside weekly schedules",
-    "FEATURE: Schedule-aware email strings (separate customization for weekly vs monthly)",
-    "FIX: Remove duplicate episodes and movies from newsletter",
-    "ENHANCEMENT: UI improvements with tabbed interface for email string customization"
+    "FIX: Preserve .env configuration during newslettar-ctl update (critical bug fix)"
   ]
 }
