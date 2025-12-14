@@ -174,8 +174,16 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 				}
 			}
 
+			// Debug logging for upgrade detection
+			log.Printf("🔍 Episode: %s S%02dE%02d - EventType: %s",
+				record.Series.Title, record.Episode.SeasonNumber, record.Episode.EpisodeNumber, record.EventType)
+			log.Printf("   Data.Reason: '%s'", record.Data.Reason)
+			log.Printf("   Data.DroppedPath: '%s'", record.Data.DroppedPath)
+			log.Printf("   Data.ImportedPath: '%s'", record.Data.ImportedPath)
+
 			// Detect upgrades by checking if the reason contains "upgrade"
 			isUpgrade := strings.Contains(strings.ToLower(record.Data.Reason), "upgrade")
+			log.Printf("   IsUpgrade: %v", isUpgrade)
 
 			episodes = append(episodes, Episode{
 				SeriesTitle:    record.Series.Title,
@@ -400,8 +408,16 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 				rating = record.Movie.Ratings.Tmdb.Value
 			}
 
+			// Debug logging for upgrade detection
+			log.Printf("🔍 Movie: %s (%d) - EventType: %s",
+				record.Movie.Title, record.Movie.Year, record.EventType)
+			log.Printf("   Data.Reason: '%s'", record.Data.Reason)
+			log.Printf("   Data.DroppedPath: '%s'", record.Data.DroppedPath)
+			log.Printf("   Data.ImportedPath: '%s'", record.Data.ImportedPath)
+
 			// Detect upgrades by checking if the reason contains "upgrade"
 			isUpgrade := strings.Contains(strings.ToLower(record.Data.Reason), "upgrade")
+			log.Printf("   IsUpgrade: %v", isUpgrade)
 
 			movies = append(movies, Movie{
 				Title:       record.Movie.Title,
