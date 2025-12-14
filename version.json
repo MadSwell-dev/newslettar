@@ -1,18 +1,10 @@
 {
-  "version": "1.0.3",
-  "released": "2025-11-24",
+  "version": "1.0.4",
+  "released": "2025-12-14",
   "changelog": [
-    "FEATURE: Add native Windows MSI installer with automatic service installation",
-    "FEATURE: Add platform-specific update instructions in Web UI (Docker, Windows, Linux)",
-    "FEATURE: Automatically open Web UI in browser after Windows installation",
-    "FEATURE: Add Start Menu shortcut that opens Web UI directly in browser",
-    "ENHANCEMENT: Automatic installation type detection (Docker, native-Windows, native-Linux)",
-    "FIX: Windows installer PowerShell parsing errors on non-English Windows (French)",
-    "FIX: Windows installer file copy errors when running from installation directory",
-    "FIX: Windows service working directory and timezone database support",
-    "FIX: Windows service file write permissions for configuration saving",
-    "FIX: Display correct date range in weekly newsletter header (shows upcoming period instead of historical)",
-    "FIX: Display only current month in monthly newsletter header (no date range)",
-    "FIX: Preserve .env configuration during newslettar-ctl update (critical bug fix)"
+    "FEATURE: Add toggle to exclude/include upgraded shows in newsletter downloaded section",
+    "FEATURE: Visual indicator (blue ↑ icon) for quality upgrades when shown in newsletter",
+    "FEATURE: Smart filtering ensures new releases always appear even if upgraded",
+    "ENHANCEMENT: Added SHOW_UPGRADED config option for controlling upgrade visibility"
   ]
 }
