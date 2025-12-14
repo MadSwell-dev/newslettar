@@ -84,6 +84,7 @@ func loadConfig() *Config {
 		ShowSeriesOverview:          getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", DefaultShowSeriesOverview) != "false",
 		ShowEpisodeOverview:         getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", DefaultShowEpisodeOverview) != "false",
 		ShowUnmonitored:             getEnvFromFile(envMap, "SHOW_UNMONITORED", DefaultShowUnmonitored) != "false",
+		ShowUpgraded:                getEnvFromFile(envMap, "SHOW_UPGRADED", DefaultShowUpgraded) != "false",
 		ShowSeriesRatings:           getEnvFromFile(envMap, "SHOW_SERIES_RATINGS", DefaultShowSeriesRatings) != "false",
 		DarkMode:                    getEnvFromFile(envMap, "DARK_MODE", DefaultDarkMode) != "false",
 		ShowTraktAnticipatedSeries:  getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_SERIES", DefaultShowTraktAnticipatedSeries) != "false",

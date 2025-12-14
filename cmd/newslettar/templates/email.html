@@ -221,7 +221,7 @@
                         {{range .Episodes}}
                         <div class="episode-item">
                             <span class="episode-number">S{{printf "%02d" .SeasonNum}}E{{printf "%02d" .EpisodeNum}}</span>
-                            <span class="episode-title">{{if .Title}}{{.Title}}{{else}}Episode {{.EpisodeNum}}{{end}}</span>
+                            <span class="episode-title">{{if .Title}}{{.Title}}{{else}}Episode {{.EpisodeNum}}{{end}}{{if .IsUpgrade}} <span style="color: #2196f3; font-size: 0.85em;" title="Quality upgrade">↑</span>{{end}}</span>
                             {{if $.ShowEpisodeOverview}}
                                 {{if .Overview}}
                                     <span class="episode-overview">{{.Overview}}</span>
@@ -254,6 +254,7 @@
                             {{else}}
                                 {{.Title}}
                             {{end}}
+                            {{if .IsUpgrade}} <span style="color: #2196f3; font-size: 0.85em;" title="Quality upgrade">↑</span>{{end}}
                         </div>
                         <div class="movie-year">({{.Year}}){{if and $.ShowSeriesRatings (gt .Rating 0.0)}} • ⭐ {{printf "%.1f" .Rating}}/10{{end}}</div>
                         {{if $.ShowSeriesOverview}}

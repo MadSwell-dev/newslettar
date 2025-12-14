@@ -114,7 +114,10 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 			Records      []struct {
 				Date      time.Time `json:"date"`
 				EventType string    `json:"eventType"`
-				Series    struct {
+				Data      struct {
+					IsUpgrade bool `json:"isUpgrade"`
+				} `json:"data"`
+				Series struct {
 					Title     string `json:"title"`
 					TvdbID    int    `json:"tvdbId"`
 					ImdbID    string `json:"imdbId"`
@@ -175,6 +178,7 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 				Title:          record.Episode.Title,
 				AirDate:        record.Episode.AirDate,
 				Downloaded:     true,
+				IsUpgrade:      record.Data.IsUpgrade,
 				PosterURL:      posterURL,
 				IMDBID:         record.Series.ImdbID,
 				TvdbID:         record.Series.TvdbID,
@@ -327,7 +331,10 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 			Records      []struct {
 				Date      time.Time `json:"date"`
 				EventType string    `json:"eventType"`
-				Movie     struct {
+				Data      struct {
+					IsUpgrade bool `json:"isUpgrade"`
+				} `json:"data"`
+				Movie struct {
 					Title     string `json:"title"`
 					Year      int    `json:"year"`
 					TmdbID    int    `json:"tmdbId"`
@@ -390,6 +397,7 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 				Year:        record.Movie.Year,
 				ReleaseDate: record.Movie.InCinemas,
 				Downloaded:  true,
+				IsUpgrade:   record.Data.IsUpgrade,
 				PosterURL:   posterURL,
 				IMDBID:      record.Movie.ImdbID,
 				TmdbID:      record.Movie.TmdbID,
