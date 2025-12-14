@@ -99,7 +99,6 @@ type Config struct {
 	ShowSeriesOverview          bool
 	ShowEpisodeOverview         bool
 	ShowUnmonitored             bool
-	ShowUpgraded                bool
 	ShowSeriesRatings           bool
 	DarkMode                    bool
 	ShowTraktAnticipatedSeries  bool
@@ -160,7 +159,6 @@ type Episode struct {
 	Title          string
 	AirDate        string
 	Downloaded     bool
-	IsUpgrade      bool
 	PosterURL      string
 	IMDBID         string
 	TvdbID         int
@@ -175,7 +173,6 @@ type Movie struct {
 	Year        int
 	ReleaseDate string
 	Downloaded  bool
-	IsUpgrade   bool
 	PosterURL   string
 	IMDBID      string
 	TmdbID      int
@@ -332,7 +329,6 @@ type WebConfig struct {
 	ShowSeriesOverview          string `json:"show_series_overview"`
 	ShowEpisodeOverview         string `json:"show_episode_overview"`
 	ShowUnmonitored             string `json:"show_unmonitored"`
-	ShowUpgraded                string `json:"show_upgraded"`
 	ShowSeriesRatings           string `json:"show_series_ratings"`
 	DarkMode                    string `json:"dark_mode"`
 	ShowTraktAnticipatedSeries  string `json:"show_trakt_anticipated_series"`

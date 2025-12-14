@@ -707,7 +707,6 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 		"show_series_overview":           getEnvFromFile(envMap, "SHOW_SERIES_OVERVIEW", DefaultShowSeriesOverview),
 		"show_episode_overview":          getEnvFromFile(envMap, "SHOW_EPISODE_OVERVIEW", DefaultShowEpisodeOverview),
 		"show_unmonitored":               getEnvFromFile(envMap, "SHOW_UNMONITORED", DefaultShowUnmonitored),
-		"show_upgraded":                  getEnvFromFile(envMap, "SHOW_UPGRADED", DefaultShowUpgraded),
 		"show_series_ratings":            getEnvFromFile(envMap, "SHOW_SERIES_RATINGS", DefaultShowSeriesRatings),
 		"dark_mode":                      getEnvFromFile(envMap, "DARK_MODE", DefaultDarkMode),
 		"show_trakt_anticipated_series":  getEnvFromFile(envMap, "SHOW_TRAKT_ANTICIPATED_SERIES", DefaultShowTraktAnticipatedSeries),

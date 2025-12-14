@@ -992,19 +992,6 @@ func getUIHTML(version string, nextRun string, timezone string, installType stri
 
             <div class="template-option">
                 <div>
-                    <strong>Include Upgraded Shows/Movies</strong>
-                    <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
-                        Show quality upgrades in downloaded section. New releases always appear. Upgrades marked with blue ↑ icon.
-                    </p>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="show-upgraded" onchange="saveTemplateSettings()" aria-label="Toggle upgraded items">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <div class="template-option">
-                <div>
                     <strong>Show Series Ratings</strong>
                     <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
                         Display series ratings in series headers from Sonarr/Radarr
@@ -1756,7 +1743,6 @@ func getUIHTML(version string, nextRun string, timezone string, installType stri
                 document.getElementById('show-series-overview').checked = data.show_series_overview !== 'false';
                 document.getElementById('show-episode-overview').checked = data.show_episode_overview !== 'false';
                 document.getElementById('show-unmonitored').checked = data.show_unmonitored !== 'false';
-                document.getElementById('show-upgraded').checked = data.show_upgraded !== 'false';
                 document.getElementById('show-series-ratings').checked = data.show_series_ratings !== 'false';
                 document.getElementById('dark-mode').checked = data.dark_mode !== 'false';
                 document.getElementById('show-trakt-anticipated-series').checked = data.show_trakt_anticipated_series !== 'false';
@@ -2169,7 +2155,6 @@ func getUIHTML(version string, nextRun string, timezone string, installType stri
             const showSeriesOverview = document.getElementById('show-series-overview').checked;
             const showEpisodeOverview = document.getElementById('show-episode-overview').checked;
             const showUnmonitored = document.getElementById('show-unmonitored').checked;
-            const showUpgraded = document.getElementById('show-upgraded').checked;
             const showSeriesRatings = document.getElementById('show-series-ratings').checked;
             const darkMode = document.getElementById('dark-mode').checked;
             const showTraktAnticipatedSeries = document.getElementById('show-trakt-anticipated-series').checked;
@@ -2191,7 +2176,6 @@ func getUIHTML(version string, nextRun string, timezone string, installType stri
                         show_series_overview: showSeriesOverview ? 'true' : 'false',
                         show_episode_overview: showEpisodeOverview ? 'true' : 'false',
                         show_unmonitored: showUnmonitored ? 'true' : 'false',
-                        show_upgraded: showUpgraded ? 'true' : 'false',
                         show_series_ratings: showSeriesRatings ? 'true' : 'false',
                         dark_mode: darkMode ? 'true' : 'false',
                         show_trakt_anticipated_series: showTraktAnticipatedSeries ? 'true' : 'false',

@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -170,23 +169,6 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 				}
 			}
 
-			// Debug logging for upgrade detection
-			log.Printf("🔍 Episode: %s S%02dE%02d - EventType: %s",
-				record.Series.Title, record.Episode.SeasonNumber, record.Episode.EpisodeNumber, record.EventType)
-			log.Printf("   Data fields: %v", record.Data)
-
-			// Detect upgrades by checking various data fields
-			// Check for droppedFor (file that was replaced) or reason containing upgrade
-			isUpgrade := false
-			if reason, ok := record.Data["reason"]; ok && strings.Contains(strings.ToLower(reason), "upgrade") {
-				isUpgrade = true
-				log.Printf("   ⚠️  UPGRADE: reason field contains 'upgrade'")
-			} else if droppedFor, ok := record.Data["droppedFor"]; ok && droppedFor != "" {
-				isUpgrade = true
-				log.Printf("   ⚠️  UPGRADE: droppedFor field is set")
-			}
-			log.Printf("   IsUpgrade: %v", isUpgrade)
-
 			episodes = append(episodes, Episode{
 				SeriesTitle:    record.Series.Title,
 				SeasonNum:      record.Episode.SeasonNumber,
@@ -194,7 +176,6 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 				Title:          record.Episode.Title,
 				AirDate:        record.Episode.AirDate,
 				Downloaded:     true,
-				IsUpgrade:      isUpgrade,
 				PosterURL:      posterURL,
 				IMDBID:         record.Series.ImdbID,
 				TvdbID:         record.Series.TvdbID,
@@ -406,29 +387,11 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 				rating = record.Movie.Ratings.Tmdb.Value
 			}
 
-			// Debug logging for upgrade detection
-			log.Printf("🔍 Movie: %s (%d) - EventType: %s",
-				record.Movie.Title, record.Movie.Year, record.EventType)
-			log.Printf("   Data fields: %v", record.Data)
-
-			// Detect upgrades by checking various data fields
-			// Check for droppedFor (file that was replaced) or reason containing upgrade
-			isUpgrade := false
-			if reason, ok := record.Data["reason"]; ok && strings.Contains(strings.ToLower(reason), "upgrade") {
-				isUpgrade = true
-				log.Printf("   ⚠️  UPGRADE: reason field contains 'upgrade'")
-			} else if droppedFor, ok := record.Data["droppedFor"]; ok && droppedFor != "" {
-				isUpgrade = true
-				log.Printf("   ⚠️  UPGRADE: droppedFor field is set")
-			}
-			log.Printf("   IsUpgrade: %v", isUpgrade)
-
 			movies = append(movies, Movie{
 				Title:       record.Movie.Title,
 				Year:        record.Movie.Year,
 				ReleaseDate: record.Movie.InCinemas,
 				Downloaded:  true,
-				IsUpgrade:   isUpgrade,
 				PosterURL:   posterURL,
 				IMDBID:      record.Movie.ImdbID,
 				TmdbID:      record.Movie.TmdbID,
