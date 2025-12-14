@@ -994,7 +994,7 @@ func getUIHTML(version string, nextRun string, timezone string, installType stri
                 <div>
                     <strong>Include Upgraded Shows/Movies</strong>
                     <p style="font-size: 0.9em; color: #8899aa; margin-top: 5px;">
-                        Include quality upgrades in the downloaded section. When disabled, only new releases are shown (upgrades of recent releases will still appear). Upgraded items are marked with a blue ↑ icon.
+                        Show quality upgrades in downloaded section. New releases always appear. Upgrades marked with blue ↑ icon.
                     </p>
                 </div>
                 <label class="toggle-switch">
