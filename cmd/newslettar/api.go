@@ -115,11 +115,7 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 			Records      []struct {
 				Date      time.Time `json:"date"`
 				EventType string    `json:"eventType"`
-				Data      struct {
-					DroppedPath   string `json:"droppedPath"`
-					ImportedPath  string `json:"importedPath"`
-					Reason        string `json:"reason"`
-				} `json:"data"`
+				Data map[string]string `json:"data"`
 				Series struct {
 					Title     string `json:"title"`
 					TvdbID    int    `json:"tvdbId"`
@@ -177,12 +173,18 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 			// Debug logging for upgrade detection
 			log.Printf("🔍 Episode: %s S%02dE%02d - EventType: %s",
 				record.Series.Title, record.Episode.SeasonNumber, record.Episode.EpisodeNumber, record.EventType)
-			log.Printf("   Data.Reason: '%s'", record.Data.Reason)
-			log.Printf("   Data.DroppedPath: '%s'", record.Data.DroppedPath)
-			log.Printf("   Data.ImportedPath: '%s'", record.Data.ImportedPath)
+			log.Printf("   Data fields: %v", record.Data)
 
-			// Detect upgrades by checking if the reason contains "upgrade"
-			isUpgrade := strings.Contains(strings.ToLower(record.Data.Reason), "upgrade")
+			// Detect upgrades by checking various data fields
+			// Check for droppedFor (file that was replaced) or reason containing upgrade
+			isUpgrade := false
+			if reason, ok := record.Data["reason"]; ok && strings.Contains(strings.ToLower(reason), "upgrade") {
+				isUpgrade = true
+				log.Printf("   ⚠️  UPGRADE: reason field contains 'upgrade'")
+			} else if droppedFor, ok := record.Data["droppedFor"]; ok && droppedFor != "" {
+				isUpgrade = true
+				log.Printf("   ⚠️  UPGRADE: droppedFor field is set")
+			}
 			log.Printf("   IsUpgrade: %v", isUpgrade)
 
 			episodes = append(episodes, Episode{
@@ -345,11 +347,7 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 			Records      []struct {
 				Date      time.Time `json:"date"`
 				EventType string    `json:"eventType"`
-				Data      struct {
-					DroppedPath   string `json:"droppedPath"`
-					ImportedPath  string `json:"importedPath"`
-					Reason        string `json:"reason"`
-				} `json:"data"`
+				Data map[string]string `json:"data"`
 				Movie struct {
 					Title     string `json:"title"`
 					Year      int    `json:"year"`
@@ -411,12 +409,18 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 			// Debug logging for upgrade detection
 			log.Printf("🔍 Movie: %s (%d) - EventType: %s",
 				record.Movie.Title, record.Movie.Year, record.EventType)
-			log.Printf("   Data.Reason: '%s'", record.Data.Reason)
-			log.Printf("   Data.DroppedPath: '%s'", record.Data.DroppedPath)
-			log.Printf("   Data.ImportedPath: '%s'", record.Data.ImportedPath)
+			log.Printf("   Data fields: %v", record.Data)
 
-			// Detect upgrades by checking if the reason contains "upgrade"
-			isUpgrade := strings.Contains(strings.ToLower(record.Data.Reason), "upgrade")
+			// Detect upgrades by checking various data fields
+			// Check for droppedFor (file that was replaced) or reason containing upgrade
+			isUpgrade := false
+			if reason, ok := record.Data["reason"]; ok && strings.Contains(strings.ToLower(reason), "upgrade") {
+				isUpgrade = true
+				log.Printf("   ⚠️  UPGRADE: reason field contains 'upgrade'")
+			} else if droppedFor, ok := record.Data["droppedFor"]; ok && droppedFor != "" {
+				isUpgrade = true
+				log.Printf("   ⚠️  UPGRADE: droppedFor field is set")
+			}
 			log.Printf("   IsUpgrade: %v", isUpgrade)
 
 			movies = append(movies, Movie{
