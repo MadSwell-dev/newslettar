@@ -1,13 +1,8 @@
 {
-  "version": "1.0.6",
+  "version": "1.0.7",
   "released": "2025-12-14",
   "changelog": [
-    "FEATURE: Add toggle to exclude/include upgraded shows in newsletter downloaded section",
-    "FEATURE: Visual indicator (blue ↑ icon) for quality upgrades when shown in newsletter",
-    "FEATURE: Smart filtering ensures new releases always appear even if upgraded",
-    "ENHANCEMENT: Added SHOW_UPGRADED config option for controlling upgrade visibility",
-    "FIX: Correct upgrade detection using data.reason field from Sonarr/Radarr API",
-    "FIX: Correct upgrade filtering to check date range (weekStart to weekEnd) not just after weekStart",
-    "ENHANCEMENT: Shortened toggle description for better readability"
+    "REVERT: Removed upgrade detection feature (Sonarr/Radarr APIs don't provide reliable upgrade indicators)",
+    "FIX: Prevent false positives that filtered out intentionally downloaded old shows"
   ]
 }

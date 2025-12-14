@@ -245,15 +245,6 @@ func runNewsletter() {
 			len(upcomingEpisodes), len(upcomingMovies))
 	}
 
-	// Filter upgraded items from downloaded section (but always keep new releases)
-	if !cfg.ShowUpgraded {
-		log.Println("📋 Filtering out upgraded items (keeping new releases)...")
-		downloadedEpisodes = filterUpgradedEpisodes(downloadedEpisodes, weekStart, weekEnd)
-		downloadedMovies = filterUpgradedMovies(downloadedMovies, weekStart, weekEnd)
-		log.Printf("✓ After filtering: %d downloaded episodes, %d downloaded movies",
-			len(downloadedEpisodes), len(downloadedMovies))
-	}
-
 	// Check if we have any content to send
 	hasContent := len(upcomingEpisodes) > 0 || len(upcomingMovies) > 0 ||
 		(cfg.ShowDownloaded && (len(downloadedEpisodes) > 0 || len(downloadedMovies) > 0))
@@ -657,48 +648,4 @@ func filterMonitoredEpisodes(episodes []Episode) []Episode {
 
 func filterMonitoredMovies(movies []Movie) []Movie {
 	return filterMonitored[Movie](movies)
-}
-
-// Filter upgraded episodes - keep new releases even if upgraded
-func filterUpgradedEpisodes(episodes []Episode, weekStart, weekEnd time.Time) []Episode {
-	filtered := make([]Episode, 0, len(episodes))
-	for _, ep := range episodes {
-		// Always include non-upgrades
-		if !ep.IsUpgrade {
-			filtered = append(filtered, ep)
-			continue
-		}
-
-		// For upgrades, check if it's a new release (aired during the week range)
-		if ep.AirDate != "" {
-			airDate, err := time.Parse("2006-01-02", ep.AirDate)
-			if err == nil && !airDate.Before(weekStart) && airDate.Before(weekEnd) {
-				// New release that aired this week - include even though it's an upgrade
-				filtered = append(filtered, ep)
-			}
-		}
-	}
-	return filtered
-}
-
-// Filter upgraded movies - keep new releases even if upgraded
-func filterUpgradedMovies(movies []Movie, weekStart, weekEnd time.Time) []Movie {
-	filtered := make([]Movie, 0, len(movies))
-	for _, movie := range movies {
-		// Always include non-upgrades
-		if !movie.IsUpgrade {
-			filtered = append(filtered, movie)
-			continue
-		}
-
-		// For upgrades, check if it's a new release (released during the week range)
-		if movie.ReleaseDate != "" {
-			releaseDate, err := time.Parse("2006-01-02", movie.ReleaseDate)
-			if err == nil && !releaseDate.Before(weekStart) && releaseDate.Before(weekEnd) {
-				// New release that came out this week - include even though it's an upgrade
-				filtered = append(filtered, movie)
-			}
-		}
-	}
-	return filtered
 }
