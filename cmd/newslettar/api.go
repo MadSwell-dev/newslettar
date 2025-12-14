@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -115,7 +116,9 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 				Date      time.Time `json:"date"`
 				EventType string    `json:"eventType"`
 				Data      struct {
-					IsUpgrade bool `json:"isUpgrade"`
+					DroppedPath   string `json:"droppedPath"`
+					ImportedPath  string `json:"importedPath"`
+					Reason        string `json:"reason"`
 				} `json:"data"`
 				Series struct {
 					Title     string `json:"title"`
@@ -171,6 +174,9 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 				}
 			}
 
+			// Detect upgrades by checking if the reason contains "upgrade"
+			isUpgrade := strings.Contains(strings.ToLower(record.Data.Reason), "upgrade")
+
 			episodes = append(episodes, Episode{
 				SeriesTitle:    record.Series.Title,
 				SeasonNum:      record.Episode.SeasonNumber,
@@ -178,7 +184,7 @@ func fetchSonarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Ep
 				Title:          record.Episode.Title,
 				AirDate:        record.Episode.AirDate,
 				Downloaded:     true,
-				IsUpgrade:      record.Data.IsUpgrade,
+				IsUpgrade:      isUpgrade,
 				PosterURL:      posterURL,
 				IMDBID:         record.Series.ImdbID,
 				TvdbID:         record.Series.TvdbID,
@@ -332,7 +338,9 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 				Date      time.Time `json:"date"`
 				EventType string    `json:"eventType"`
 				Data      struct {
-					IsUpgrade bool `json:"isUpgrade"`
+					DroppedPath   string `json:"droppedPath"`
+					ImportedPath  string `json:"importedPath"`
+					Reason        string `json:"reason"`
 				} `json:"data"`
 				Movie struct {
 					Title     string `json:"title"`
@@ -392,12 +400,15 @@ func fetchRadarrHistory(ctx context.Context, cfg *Config, since time.Time) ([]Mo
 				rating = record.Movie.Ratings.Tmdb.Value
 			}
 
+			// Detect upgrades by checking if the reason contains "upgrade"
+			isUpgrade := strings.Contains(strings.ToLower(record.Data.Reason), "upgrade")
+
 			movies = append(movies, Movie{
 				Title:       record.Movie.Title,
 				Year:        record.Movie.Year,
 				ReleaseDate: record.Movie.InCinemas,
 				Downloaded:  true,
-				IsUpgrade:   record.Data.IsUpgrade,
+				IsUpgrade:   isUpgrade,
 				PosterURL:   posterURL,
 				IMDBID:      record.Movie.ImdbID,
 				TmdbID:      record.Movie.TmdbID,
